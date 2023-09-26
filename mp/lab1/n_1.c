@@ -6,22 +6,24 @@
 #include <math.h>
 
 bool is_integer(const char *str) { 
+    int length = strlen(str);
     if (*str == '\0') {
         return false;
     }
+
     if (*str == '-' || *str == '+') {
         str++;
     }
-    if (*str == '\0') {
-        return false;
-    }
+
     if (*str == '0' && *(str + 1) != '\0') {
         return false;
     }
+
     while (*str != '\0') {
         if (*str < '0' || *str > '9') {
             return false;
         }
+        
         str++;
     }
     return true;
@@ -55,10 +57,15 @@ int s_function(int num, int* array) {
     int count = 0;
     int last_digit;
 
-    if (num < 10) {
+    if (num < 0) {
+        num = -num;
+    }
+
+    if (num < 10 && num >= 0) {
         array[0] = num;
         return 1;
     }
+
 
     while (num != 0) {
         last_digit = num % 10;
@@ -74,66 +81,91 @@ int s_function(int num, int* array) {
     return count;
 }
 
-int e_function(long int num, long long* array) {
-
-    long long res;
-    for (int i = 1; i <= 10; i++) {
-        res = pow(num, i);
-        array[i] += res;
-
-    }
-}
-
-enum summ_numbers_status_code {
-    snsc_ok,
-    snsc_overflow,
-    snsc_invalid_parametrs,
-};
-
-enum summ_numbers_status_code summ_of_numbers(unsigned int num, unsigned long *result) {
-    if (num == 0 || result == NULL) {
-        return snsc_invalid_parametrs;
-    }
-    unsigned long sum = 0;
-    for (unsigned int i = 1; i <= num; i++) {
-        if (sum + i < sum) {
-            return snsc_overflow;
+void free_table(long long ***table, int n) {
+    if (*table) {
+        for (int i = 0; i < n; i++) {
+            if ((*table)[i]) {
+                free((*table)[i]);
+                (*table)[i] = NULL;
+            }
         }
-        sum += i;
+        free(*table);
+        *table = NULL;
     }
-    *result = sum;
-    return snsc_ok;
 }
 
-enum factorial_status_codes {
-    fsc_ok,
-    fsc_overflow,
-    fsc_invalid_parameter
-};
-
-enum factorial_status_codes factorial(unsigned int num, unsigned long *result) {
-    if (num > 20) {
-        return fsc_invalid_parameter;
+int fill_table(int num, long long*** table) {
+    (*table) = (long long**)malloc(10 * sizeof(long long*));
+    if (!(*table)) {
+        return 1;
     }
 
-    if (num == 0 || num == 1) {
-        *result = 1;
-        return fsc_ok;
-    }
-
-    unsigned long temp_result;
-    enum factorial_status_codes recursive_status_code = factorial(num - 1, &temp_result);
-
-    if (recursive_status_code == fsc_ok) {
-        if (ULONG_MAX / num < temp_result) {
-            return fsc_overflow;
+    for (int i = 0; i < 10; i++) {
+        (*table)[i] = (long long*)malloc(num * sizeof(long long));
+        if (!(*table)[i]) {
+            free_table(table, i);
         }
-        *result = num * temp_result;
     }
 
-    return recursive_status_code;
+    for (int i = 0; i < 10; i++) {
+        long long res = 1;
+        for (int j = 0; j < num; j++) {
+            res *= (i + 1);
+            (*table)[i][j] = res;
+        }
+    }
+
+    return 0;
 }
 
+void a_function(long long num, long long *sum) {
+    long long sum_num = 0;
+    if (num > 0) {
+        for (long int i = 1; i <= num; i++) {
+            sum_num += i;
+        }
+        *sum += sum_num;
+    }
+}
+
+// enum factorial_status_codes {
+//     fsc_ok,
+//     fsc_overflow,
+//     fsc_invalid_parameter
+// };
+
+// enum factorial_status_codes factorial(unsigned int num, unsigned long *result) {
+//     if (num > 25) {
+//         return fsc_invalid_parameter;
+//     }
+
+//     if (num == 0 || num == 1) {
+//         *result = 1;
+//         return fsc_ok;
+//     }
+
+//     unsigned long temp_result;
+//     enum factorial_status_codes recursive_status_code = factorial(num - 1, &temp_result);
+
+//     if (recursive_status_code == fsc_ok) {
+//         if (ULONG_MAX / num < temp_result) {
+//             return fsc_overflow;
+//         }
+//         *result = num * temp_result;
+//     }
+
+//     return recursive_status_code;
+// }
+
+unsigned long long factorial(unsigned int num, unsigned long long result) {
+    for (unsigned int i = 2; i <= num; i++) {
+        if (result > ULLONG_MAX / i) {
+            return 0;
+        }
+        result *= i;
+    }
+    return result;
+}
 
 int main(int argc, char *argv[]) {
     if (argc != 3) {
@@ -156,6 +188,7 @@ int main(int argc, char *argv[]) {
                     
                     if (num == 0) {
                         printf("0\n");
+
                     }
 
                     for (int i = 0; i < 100; i++) {
@@ -168,9 +201,11 @@ int main(int argc, char *argv[]) {
                 else if (argv[2][1] == 'p') {
                     
                     if (p_function(num)) {
+
                         printf("This digit is prime\n");
                     }
                     else {
+
                         printf("This digit is composite\n");
                     }
                 }
@@ -186,47 +221,63 @@ int main(int argc, char *argv[]) {
                 }
 
                 else if (argv[2][1] == 'e') {
-                    long long array[10] = {0};
-    
-                    if (num < 0 || num > 10) {
-                        printf("Number out of range\n");
+                    long long** table = NULL;
+
+                    fill_table(num, &table);
+
+                    if (num > 0 && num <= 10) {
+                        for (int i = 0; i < 10; i++) {
+                            for (int j = 0; j < num; j++) {
+                                printf("%lli ", table[i][j]);
+                            }
+                            printf("\n");
+                        }
+                        free_table(&table, num);
+                        return 0;
+                    }
+
+                    else if (num <= 0) {
+                        printf("a number less than 1");
                     }
 
                     else {
-                        e_function(num, array);
-                        for (int i = 0; i <= 10; i++) {
-                            printf("%d ", array[i]);
-                        }
+                        printf("a number more than 10");
                     }
+
+                    
                 }
 
                 else if (argv[2][1] == 'a') {
-                    unsigned int num;
-                    unsigned long result;
-                    enum summ_numbers_status_code status = summ_of_numbers(num, &result);
-                    if (status == snsc_ok) {
-                        printf("Sum of numbers from 1 to %u is %lu\n", num, result);
-                    } else if (status == snsc_overflow) {
-                        printf("Overflow\n");
-                    } else {
-                        printf("Invalid parameters\n");
+                    if (num != 0) {
+                        long long summ = 0;
+                        a_function(num, &summ);
+                        if (summ > LLONG_MAX - num) {
+
+                            printf("Error\n");
+                            return 0;
+                        }
+                        else {
+                            printf("%ld\n", summ);
+                        }
                     }
+
+                    else {
+                        printf("Error\n");
+                    }
+                    
                 }
 
                 else if (argv[2][1] == 'f') {
-                    long long value;
-                    unsigned long factorial_result;
-                    switch (factorial(value, &factorial_result)) {
-                        case fsc_ok:
-                            printf("%u! = %lu\n", value, factorial_result);
-                            break;
-                        case fsc_overflow:
-                            printf("Overflow");
-                            break;
-                        case fsc_invalid_parameter:
-                            printf("Invalid parameter");
-                            break;
+                    if (num > 0) {
+                        unsigned long long result = 1;
+                        long long f = factorial(num, result);
+                        printf("%lli", f);
                     }
+                    
+                    else {
+                        printf("Error\n");
+                    }
+
                 }
 
                 else {
@@ -235,7 +286,7 @@ int main(int argc, char *argv[]) {
             }
         }
         else {
-            printf("it's not an integer\n");
+            printf("it's not an int\n");
         }
         return 0;
     }
