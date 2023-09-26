@@ -128,34 +128,6 @@ void a_function(long long num, long long *sum) {
     }
 }
 
-// enum factorial_status_codes {
-//     fsc_ok,
-//     fsc_overflow,
-//     fsc_invalid_parameter
-// };
-
-// enum factorial_status_codes factorial(unsigned int num, unsigned long *result) {
-//     if (num > 25) {
-//         return fsc_invalid_parameter;
-//     }
-
-//     if (num == 0 || num == 1) {
-//         *result = 1;
-//         return fsc_ok;
-//     }
-
-//     unsigned long temp_result;
-//     enum factorial_status_codes recursive_status_code = factorial(num - 1, &temp_result);
-
-//     if (recursive_status_code == fsc_ok) {
-//         if (ULONG_MAX / num < temp_result) {
-//             return fsc_overflow;
-//         }
-//         *result = num * temp_result;
-//     }
-
-//     return recursive_status_code;
-// }
 
 unsigned long long factorial(unsigned int num, unsigned long long result) {
     for (unsigned int i = 2; i <= num; i++) {
