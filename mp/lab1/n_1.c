@@ -104,6 +104,7 @@ int fill_table(int num, long long*** table) {
         (*table)[i] = (long long*)malloc(num * sizeof(long long));
         if (!(*table)[i]) {
             free_table(table, i);
+            return 1;
         }
     }
 
@@ -156,43 +157,62 @@ int main(int argc, char *argv[]) {
 
                 if (argv[2][1] == 'h') {
                     int result[100] = {0};
-                    h_function(num, result);
+                    if (num > INT_MAX) {
+                        h_function(num, result);
                     
-                    if (num == 0) {
-                        printf("0\n");
+                        if (num == 0) {
+                            printf("0\n");
 
-                    }
+                        }
 
-                    for (int i = 0; i < 100; i++) {
-                        if (result[i] != 0) {
-                            printf("%d ", result[i]);
+                        for (int i = 0; i < 100; i++) {
+                            if (result[i] != 0) {
+                                printf("%d ", result[i]);
+                            }
                         }
                     }
+
+                    else {
+                        printf("overflow\n");
+                    }
+
                 }
 
                 else if (argv[2][1] == 'p') {
                     
-                    if (p_function(num)) {
+                    if (num < INT_MAX) {
+                        if (p_function(num)) {
 
-                        printf("This digit is prime\n");
+                            printf("This digit is prime\n");
+                        }
+                        else {
+
+                            printf("This digit is composite\n");
+                        }
                     }
                     else {
-
-                        printf("This digit is composite\n");
+                        printf("overflow\n");
                     }
+
                 }
 
                 else if (argv[2][1] == 's') {
-                    int array[100] = {0};
-                    int count = s_function(num, array);
+                    if (num < INT_MAX) {
+                        int array[100] = {0};
+                        int count = s_function(num, array);
 
-                    for (int j = count - 1; j >= 0; j--) {
-                        printf("%d ", array[j]);
+                        for (int j = count - 1; j >= 0; j--) {
+                            printf("%d ", array[j]);
+                        }
+                    }
+                    else {
+                        printf("overflow\n");
                     }
 
                 }
 
                 else if (argv[2][1] == 'e') {
+
                     long long** table = NULL;
 
                     fill_table(num, &table);
@@ -208,29 +228,30 @@ int main(int argc, char *argv[]) {
                         return 0;
                     }
 
-                    else if (num <= 0) {
-                        printf("a number less than 1");
-                    }
-
                     else {
-                        printf("a number more than 10");
+                        printf("overflow\n");
                     }
-
                     
                 }
 
                 else if (argv[2][1] == 'a') {
                     if (num != 0) {
-                        long long summ = 0;
-                        a_function(num, &summ);
-                        if (summ > LLONG_MAX - num) {
+                        if (num < INT_MAX) {
+                            long long summ = 0;
+                            a_function(num, &summ);
+                            if (summ > LLONG_MAX - num) {
 
-                            printf("Error\n");
-                            return 0;
+                                printf("Error\n");
+                                return 0;
+                            }
+                            else {
+                                printf("%ld\n", summ);
+                            }
                         }
                         else {
-                            printf("%ld\n", summ);
+                            printf("overflow\n");
                         }
+                        
                     }
 
                     else {
@@ -241,15 +262,19 @@ int main(int argc, char *argv[]) {
 
                 else if (argv[2][1] == 'f') {
                     if (num > 0) {
-                        unsigned long long result = 1;
-                        long long f = factorial(num, result);
-                        printf("%lli", f);
-                    }
+                        if (num < INT_MAX) {
+                            unsigned long long result = 1;
+                            long long f = factorial(num, result);
+                            printf("%lli", f);
+                        }
                     
-                    else {
-                        printf("Error\n");
+                        else {
+                            printf("overflow\n");
+                        }
                     }
-
+                    else {
+                        printf("error\n");
+                    }
                 }
 
                 else {
