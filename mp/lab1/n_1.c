@@ -5,45 +5,59 @@
 #include <stdbool.h>
 #include <math.h>
 
-bool is_integer(const char *str) { 
+bool is_integer(const char *str) 
+{ 
     int length = strlen(str);
-    if (*str == '\0') {
+    if (*str == '\0') 
+    {
         return false;
     }
 
-    if (*str == '-' || *str == '+') {
+    if (*str == '-' || *str == '+') 
+    {
         str++;
     }
 
-    if (*str == '0' && *(str + 1) != '\0') {
+    if (*str == '0' && *(str + 1) != '\0') 
+    {
         return false;
     }
 
-    while (*str != '\0') {
-        if (*str < '0' || *str > '9') {
+    while (*str) 
+    {
+        if (*str < '0' || *str > '9') 
+        {
             return false;
         }
         
         str++;
     }
+
+    
     return true;
 }
 
-int h_function(int num, int* result) {
+int h_function(int num, int* result) 
+{
 
-    if (num < 0) {
+    if (num < 0) 
+    {
         num = -num;
     }
 
-    for (int i = 0; i < 100; i += num) {
-        if (i % num == 0) {
+    for (int i = 0; i < 100; i += num) 
+    {
+        if (i % num == 0) 
+        {
             result[i] += i;
         }
     }
 }
 
-bool p_function(int num) {
-    if (num > 1) {
+bool p_function(int num) 
+{
+    if (num > 1) 
+    {
         for (int i = 2; i < sqrt(num); i++)
             if (num % i == 0)
                 return false;
@@ -53,35 +67,41 @@ bool p_function(int num) {
         return false;
 }
 
-int s_function(int num, int* array) {
+int s_function(int num, int* array)
+{
     int count = 0;
     int last_digit;
 
-    if (num < 0) {
+    if (num < 0) 
+    {
         num = -num;
     }
 
-    if (num < 10 && num >= 0) {
+    if (num < 10 && num >= 0) 
+    {
         array[0] = num;
         return 1;
     }
 
 
-    while (num != 0) {
+    while (num != 0) 
+    {
         last_digit = num % 10;
         array[count] = last_digit;
         count++;
         num /= 10;
     }
 
-    for (int i = count - 1; i <= 0; i--) {
+    for (int i = count - 1; i <= 0; i--) 
+    {
         array[i] += i;
     }
     
     return count;
 }
 
-void free_table(long long ***table, int n) {
+void free_table(long long ***table, int n) 
+{
     if (*table) {
         for (int i = 0; i < n; i++) {
             if ((*table)[i]) {
@@ -157,7 +177,7 @@ int main(int argc, char *argv[]) {
 
                 if (argv[2][1] == 'h') {
                     int result[100] = {0};
-                    if (num > INT_MAX) {
+                    if (num < INT_MAX) {
                         h_function(num, result);
                     
                         if (num == 0) {
