@@ -113,7 +113,7 @@ unsigned long long doubleFactorial(unsigned long long n) {
 double d_function(double x, double eps)
 {
     double sum = 0.0, term;
-    int n = 0;
+    int n = 1;
     
     do 
     {
