@@ -68,7 +68,7 @@ double b_function(double x) // 0.8556243918921488
 
 double c_function(double x) // 1
 {
-    if (x >= 1 || x <= 0)
+    if (x == 1 || x <= 0)
         return -1;
     return log(1 / (1 - x));
 }
