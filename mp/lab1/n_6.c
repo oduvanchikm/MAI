@@ -68,6 +68,8 @@ double b_function(double x) // 0.8556243918921488
 
 double c_function(double x) // 1
 {
+    if (x >= 1 || x <= 0)
+        return -1;
     return log(1 / (1 - x));
 }
 
@@ -79,7 +81,7 @@ double d_function(double x) // 0.7834305107121345
 double right_rectangle(double a, double b, double n, double (*f)(double), double eps)
 {
     double h = (b - a) / n;
-    double new_sum = 1.0 + eps;
+    double new_sum = 0.1 + eps;
     double old_sum = 0.0;
 
     while (fabs(new_sum - old_sum) > eps)
@@ -119,10 +121,10 @@ int main(int argc, char *argv[])
         return 1;
     }   
 
-    double integral_result_1 = right_rectangle(0, 1, 5, a_function, eps);
-    double integral_result_2 = right_rectangle(0, 1, 5, b_function, eps);
-    double integral_result_3 = right_rectangle(0, 1, 5, c_function, eps);
-    double integral_result_4 = right_rectangle(0, 1, 5, d_function, eps);
+    double integral_result_1 = right_rectangle(0, 1, 6, a_function, eps);
+    double integral_result_2 = right_rectangle(0, 1, 6, b_function, eps);
+    double integral_result_3 = right_rectangle(0, 1, 10, c_function, eps);
+    double integral_result_4 = right_rectangle(0, 1, 6, d_function, eps);
 
     printf("First integral result: %lf\n", integral_result_1);
     printf("Second integral result: %lf\n", integral_result_2);
