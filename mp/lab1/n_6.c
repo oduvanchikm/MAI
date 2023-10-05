@@ -3,17 +3,21 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <ctype.h>
 
 bool check_string(char *str) 
 {
     if (strlen(str) > 10) {
         return false;
     }
+    
     int count = 0;
+    
     if (*str == '\0') 
     {
         return false;
     }
+    
     if (*str == '-' || *str == '+')
     {
         str++;
@@ -22,9 +26,10 @@ bool check_string(char *str)
             return false;
         }
     }
+    
     while (*str) 
     {
-        if (*str >= '0' && *str <= '9') 
+        if (isdigit(*str)) 
         {
             str++;
             if (*str == '.') 
@@ -36,99 +41,67 @@ bool check_string(char *str)
                     return false;
                 }
             }
-            
         }
         else 
         {
             return false;
         }
     }
+    
     if (count == 0 || count > 1)
     {
         return false;
     }
+    
     return true;
 }
 
-
-double factorial(int n) 
+double a_function(double x) // 0.822467
 {
-    double result = 1.0;
-    for (int i = 1; i <= n; i++) 
+    return log(1 + x) / x;
+}
+
+double b_function(double x) // 0.8556243918921488
+{
+    return exp(-(pow(x, 2) / 2));
+}
+
+double c_function(double x) // 1
+{
+    return log(1 / (1 - x));
+}
+
+double d_function(double x) // 0.7834305107121345
+{
+    return pow(x, x);
+}
+
+double right_rectangle(double a, double b, double n, double (*f)(double), double eps)
+{
+    double h = (b - a) / n;
+    double new_sum = 1.0 + eps;
+    double old_sum = 0.0;
+
+    while (fabs(new_sum - old_sum) > eps)
     {
-        result *= i;
+        old_sum = new_sum;
+        new_sum = 0.0;
+        for (int i = 1; i <= n; i++)
+        {
+            double x = a + i * h;
+            new_sum += f(x);
+        }
     }
+
+    double result = h * new_sum;
     return result;
 }
 
-double a_function(double x, double eps) 
-{
-    double sum = 0.0;
-    int n = 1;
-    double res = 1.0;
-
-    while (fabs(res) > eps) 
-    {
-        res = (pow(-1, n + 1) * pow(x, n + 1)) / factorial(n);
-        sum += res;
-        n++;
-    }
-    return sum;
-}
-
-double b_function(double x, double eps) 
-{
-    double sum = 0.0;
-    int n = 0;
-    double res = 1.0;
-
-    while (fabs(res) > eps) 
-    {
-        res = (pow(-1, n) * pow(x, 2 * n)) / (pow(2, n) * factorial(n));
-        sum += res;
-        n++;
-    }
-    return sum;
-}
-
-
-
-double c_function(double x, double eps) 
-{
-    double sum = 0.0;
-    int n = 1;
-    double res = 1.0;
-
-    while (fabs(res) > eps) 
-    {
-        res = pow(x, n) / n;
-        sum += res;
-        n++;
-    }
-    return sum;
-}
-
-double d_function(double x, double eps)
-{
-    double sum = 0.0;
-    int n = 1;
-    double res = 1.0;
-
-    while (fabs(res) > eps) 
-    {
-        res = pow(-1, n + 1) * pow(n, -n);
-        sum += res;
-        n++;
-    }
-    return sum;
-}
-
-
 int main(int argc, char *argv[]) 
 {
-    if (argc != 3) 
+    if (argc != 2) 
     {
-        printf("Error!\n");
+        printf("Error\n");
         return 1;
     }
     
@@ -138,41 +111,23 @@ int main(int argc, char *argv[])
         return 1;
     }
     
-    if (!check_string(argv[2])) 
-    {
-        printf("Invalid x\n");
-        return 1;
-    }
-    
     double eps = atof(argv[1]);
-    double x = atof(argv[2]);
 
     if (eps <= 0) 
     {
         printf("Invalid epsilon\n");
         return 1;
     }   
-    
-    double result_a = a_function(x, eps);
-    printf("Result a function: %lf\n", result_a);
 
-    double result_b = b_function(x, eps);
-    printf("Result b function: %lf\n", result_b);
+    double integral_result_1 = right_rectangle(0, 1, 5, a_function, eps);
+    double integral_result_2 = right_rectangle(0, 1, 5, b_function, eps);
+    double integral_result_3 = right_rectangle(0, 1, 5, c_function, eps);
+    double integral_result_4 = right_rectangle(0, 1, 5, d_function, eps);
 
-    if (fabs(x) <= 1) 
-    {
-        double result_c = c_function(x, eps);
-        printf("Result c function: %lf\n", result_c);
-            
-        double result_d = d_function(x, eps);
-        printf("Result d function: %lf\n", result_d);
-    }
-
-    else 
-    {
-        printf("invalid x\n");
-    }
-    
+    printf("First integral result: %lf\n", integral_result_1);
+    printf("Second integral result: %lf\n", integral_result_2);
+    printf("Third integral result: %lf\n", integral_result_3);
+    printf("Fourth integral result: %lf\n", integral_result_4);
 
     return 0;
 }
