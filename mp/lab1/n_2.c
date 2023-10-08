@@ -119,7 +119,7 @@ double e_limits(double eps)
     return new_sum;
 }
 
-double pi_limits(double eps)
+double pi_limits(double eps) 
 {
     long long n = 1;
     double new_sum = 1.0 + eps;
@@ -318,7 +318,7 @@ double gamma_equation(double eps)
     double x = 1;
     double t = 0;
     double an = log(t) * gamma(t);
-    double an_1 = log(t + 1) * gamma(t + 1);
+    double an_1 = an + 1;
 
     while (fabs(an_1 - an) > eps)
     {
