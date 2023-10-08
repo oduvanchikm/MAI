@@ -122,12 +122,13 @@ double e_limits(double eps)
 double pi_limits(double eps) 
 {
     long long n = 1;
-    double new_sum = 1.0 + eps;
-    double old_sum = 0.0;
+    double old_sum = 0;
+    double new_sum = 4;
+
     while (fabs(new_sum - old_sum) > eps)
     {
         old_sum = new_sum;
-        new_sum = (pow(pow(2, n) * factorial(n), 4)) / (n * pow(factorial(2 * n), 2));
+        new_sum = new_sum * 4 * (n + 1) * n / ((2 * n + 1) * (2 * n + 1));
         n++;
     }
     return new_sum;
@@ -135,8 +136,8 @@ double pi_limits(double eps)
 
 double ln_limits(double eps)
 {
-    double new_sum = 1.0 + eps;
-    double old_sum = 0.0;
+    double old_sum = 1.0;
+    double new_sum = 0.0;    
     long long n = 1;
 
     while (fabs(new_sum - old_sum) > eps)
@@ -247,15 +248,15 @@ double ln_row(double eps)
 
 double sqrt2_row(double eps)
 {
-    double res_1 = 1;
-    double res_2 = pow(2.0, 0.25);  // подставляем 2
+    double res_1 = 0;
+    double r = pow(2.0, 0.25);  // подставляем 2
     double res_3 = 1;
 
     while (fabs(res_3 - res_1) >= eps)
     {
         res_1 = res_3;
-        res_3 *= res_2;
-        res_2 = pow(res_2, 0.5);
+        res_3 *= r;
+        r = pow(r, 0.5);
     }
     return res_3;
 }
