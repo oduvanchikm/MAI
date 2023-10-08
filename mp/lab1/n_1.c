@@ -39,12 +39,10 @@ bool is_integer(const char *str)
 
 int h_function(int num, int* result) 
 {
-
     if (num < 0) 
     {
         num = -num;
     }
-
     for (int i = 0; i < 100; i += num) 
     {
         if (i % num == 0) 

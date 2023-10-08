@@ -77,7 +77,7 @@ long long factorial(long long n)
     }
     for (int i = 2; i <= n; i++) 
     {
-        if (i > LLONG_MAX / n) 
+        if (result > INT_MAX / i) 
         {
             return -3;
         }
@@ -196,7 +196,6 @@ double gamma_limits(double eps)
     return new_sum;
 }
 
-
 // rows
 
 double e_row(double eps)
@@ -296,7 +295,6 @@ double sqrt2_equation(double eps)
     return sqrt(2.0);
 }
 
-
 double gamma(double t)
 {
     int p = 2;
@@ -330,9 +328,6 @@ double gamma_equation(double eps)
     return exp(x * (-1)) - an;
 
 }
-
-
-
 
 int main(int argc, char *argv[]) 
 {
@@ -381,4 +376,5 @@ int main(int argc, char *argv[])
     printf("The result equation gamma = %lf\n", gamma_equation(eps));
     
     return 0;
+
 }

@@ -121,10 +121,10 @@ int main(int argc, char *argv[])
         return 1;
     }   
 
-    double integral_result_1 = right_rectangle(0, 1, 6, a_function, eps);
-    double integral_result_2 = right_rectangle(0, 1, 6, b_function, eps);
-    double integral_result_3 = right_rectangle(0, 1, 10, c_function, eps);
-    double integral_result_4 = right_rectangle(0, 1, 6, d_function, eps);
+    double integral_result_1 = right_rectangle(0, 1, 100, a_function, eps);
+    double integral_result_2 = right_rectangle(0, 1, 100, b_function, eps);
+    double integral_result_3 = right_rectangle(0, 1, 100, c_function, eps);
+    double integral_result_4 = right_rectangle(0, 1, 100, d_function, eps);
 
     printf("First integral result: %lf\n", integral_result_1);
     printf("Second integral result: %lf\n", integral_result_2);

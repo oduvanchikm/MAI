@@ -177,6 +177,11 @@ bool right_triangle(double a, double b, double c, double eps)
 
 int main(int argc, char *argv[]) 
 {
+    if (argc < 2)
+    {
+        printf("Error!\n");
+        return 0;
+    }
 
     if (strlen(argv[1]) != 2 || argv[1][0] != '-' && argv[1][0] != '/') 
     {
