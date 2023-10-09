@@ -192,6 +192,7 @@ double gamma_limits(double eps)
             double c = combination(m, i);
             tmp_sum += c * (pow(-1, i) / i) * log(factorial(i));
         }
+
         new_sum = tmp_sum;
         m++;
     } while (fabs(new_sum - old_sum) > eps);
@@ -265,17 +266,17 @@ double sqrt2_row(double eps)
 double gamma_row(double eps)
 {
     double old_sum = 0.0;
-    double new_sum = 0.0;
+    double new_sum = 1.0;
     int k = 2;
     do
     {
         old_sum = new_sum;
         double term = 1.0 / (pow(floor(sqrt(k)), 2)) - 1.0 / k;
         new_sum += term;
-        if (fabs(term) < eps) 
-            // old_sum = 0.0;
+        if (fabs(term) < eps)
             break;
         k++;
+
     } while (fabs(new_sum - old_sum) > eps);
 
     return -pow(M_PI, 2) / 6 + new_sum;
@@ -311,7 +312,7 @@ double gamma(double t)
     {
         if (is_prime(i))
         {
-            mult *= (1.0 - (1.0 / i));
+            mult *= (i - 1.0) / i;
         }
     }
     return mult;
@@ -320,40 +321,34 @@ double gamma(double t)
 double limits_gamma_equation(double eps)
 {
     int t = 2;
-    double old_res = 0;
-    double new_res = 0;
-    while (fabs(new_res - old_res) > eps)
+    double old_res = 0.0;
+    double new_res = 0.0;
+    do
     {
         old_res = new_res;
         new_res = log(t) * gamma(t);
         t++;
-    }
+    } while(fabs(new_res - old_res) > eps);
+
     return new_res;
 }
 
-double gamma_equation(double x, double eps)
+double gamma_equation(double eps)
 {
-    return (exp(-x) - limits_gamma_equation(eps));
+    double prev_res = 0.0;
+    double new_res = 1.0;
+    
+    for (;; new_res += prev_res) 
+    {
+        prev_res = (exp(-new_res) - limits_gamma_equation(eps));
+
+        if (fabs(prev_res) <= eps) 
+        {
+            break;
+        }
+    }
+    return new_res;
 }
-
-
-// double gamma_equation(double eps)
-// {
-//     double x = 1;
-//     double t = 0;
-//     double an = log(t) * gamma(t);
-//     double an_1 = an + 1;
-
-//     while (fabs(an_1 - an) > eps)
-//     {
-//         t++;
-//         an = an_1;
-//         an_1 = log(t + 1) * gamma(t + 1);
-//     }
-
-//     return exp(x * (-1)) - an;
-
-// }
 
 int main(int argc, char *argv[]) 
 {
@@ -399,7 +394,7 @@ int main(int argc, char *argv[])
 
     printf("The result limit gamma = %lf\n", gamma_limits(eps));
     printf("The result row gamma = %lf\n", gamma_row(eps));
-    printf("The result equation gamma = %lf\n", gamma_equation(eps, 2));
+    printf("The result equation gamma = %lf\n", gamma_equation(eps));
     
     return 0;
 
