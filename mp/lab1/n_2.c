@@ -317,23 +317,43 @@ double gamma(double t)
     return mult;
 }
 
-double gamma_equation(double eps)
+double limits_gamma_equation(double eps)
 {
-    double x = 1;
-    double t = 0;
-    double an = log(t) * gamma(t);
-    double an_1 = an + 1;
-
-    while (fabs(an_1 - an) > eps)
+    int t = 2;
+    double old_res = 0;
+    double new_res = 0;
+    while (fabs(new_res - old_res) > eps)
     {
+        old_res = new_res;
+        new_res = log(t) * gamma(t);
         t++;
-        an = an_1;
-        an_1 = log(t + 1) * gamma(t + 1);
     }
-
-    return exp(x * (-1)) - an;
-
+    return new_res;
 }
+
+double gamma_equation(double x, double eps)
+{
+    return (exp(-x) - limits_gamma_equation(eps));
+}
+
+
+// double gamma_equation(double eps)
+// {
+//     double x = 1;
+//     double t = 0;
+//     double an = log(t) * gamma(t);
+//     double an_1 = an + 1;
+
+//     while (fabs(an_1 - an) > eps)
+//     {
+//         t++;
+//         an = an_1;
+//         an_1 = log(t + 1) * gamma(t + 1);
+//     }
+
+//     return exp(x * (-1)) - an;
+
+// }
 
 int main(int argc, char *argv[]) 
 {
@@ -379,7 +399,7 @@ int main(int argc, char *argv[])
 
     printf("The result limit gamma = %lf\n", gamma_limits(eps));
     printf("The result row gamma = %lf\n", gamma_row(eps));
-    printf("The result equation gamma = %lf\n", gamma_equation(eps));
+    printf("The result equation gamma = %lf\n", gamma_equation(eps, 2));
     
     return 0;
 
