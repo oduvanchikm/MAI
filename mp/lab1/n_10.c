@@ -1,13 +1,11 @@
 #include <stdio.h>
-#include <stdbool.h>
-#include <string.h>
 #include <stdlib.h>
-#include <ctype.h>
-#include <math.h>
+#include <string.h>
 #include <limits.h>
+#include <ctype.h>
+#include <stdbool.h>
 
 #define SIZE 33
-
 
 bool checking_base(int base)
 {
@@ -19,64 +17,55 @@ bool checking_base(int base)
     return true;
 }
 
-void ten_to_other_base(int base, int num, char* res, int* len)
+void* ten_to_other_base(int base, int number)
 {
-    int length = 0;
-    int r = 0;
-    int i = 0;
+    int sign = 1;
 
-    while (num > 0)
+    if (number < 0)
     {
-        r = num % base;
-        res[i] = (r > 9) ? r - 10 + 'A' : r + '0';
-        i++;
-        length++;
-        num/=base;
+        number *= -1;
     }
 
-    *len = length;
-    res[i] = '\0';
+    int r;
+    static char buf[SIZE];
+    char* ptr = buf + SIZE - 1;
+    *ptr = '\0';
+
+    while(number > 0)
+    {
+        r = number % base;
+        *--ptr = (r > 9)? r - 10 + 'A' : r + '0';
+        number /= base;
+    }
+
+    return ptr;
 }
 
-int other_base_to_ten(int digit, int base) 
+int other_base_to_ten(char* number, int base) 
 {
-    char str[100];
-    snprintf(str, sizeof str, "%d", digit);
-    int res = 0;
-    int symbol = 1;
-    char *ptr = str;
-
-    if (str == NULL || *str == '\0') 
+    if (!number)
     {
         return 0;
     }
+    int symbol = 1;
+    char *ptr = NULL;
+    int result = 0;
 
-    if (*str == '-')
+    if (*number == '-')
     {
         symbol = -1;
-        ptr = str + 1;
+        ptr = number + 1;
     }
-
-    while (*ptr && base > 0)
+    else
     {
-        int num;
-        if (isdigit(*ptr))
-        {
-            num = *ptr - '0';
-        }
-        else if (isalpha(*ptr))
-        {
-            num = (*ptr - 'A') + 10;
-        }
-        else
-        {
-            break;
-        }
-        res = res * base + num;
+        ptr = number;
+    }
+    while (*ptr)
+    {
+        result = result * base + (isdigit(*ptr) ? *ptr  - '0' : *ptr - 'A' + 10);
         ptr++;
     }
-
-    return res * symbol;
+    return result * symbol;
 }
 
 int check_base_integers(char *digits, int base)
@@ -95,7 +84,7 @@ int check_base_integers(char *digits, int base)
         {
             if (digits[i] - 'A' + 10 >= base) 
             {
-                return -1;
+                return 0;
             }
             i++;
         }
@@ -105,7 +94,7 @@ int check_base_integers(char *digits, int base)
         {
             if (digits[i] - '0' >= base) 
             {
-                return -1;
+                return 0;
             }
             i++;
         }
@@ -144,38 +133,26 @@ int main()
             return 1;
         }
         
-        int num = other_base_to_ten(atoi(digits), base); 
+        int num = other_base_to_ten(digits, base); 
+        int abs_num = abs(num);
 
-        if (num > max_digit)
+        if (abs_num > max_digit)
         {
-            max_digit = num;
+            max_digit = abs_num;
         }
 
     }
 
     char res[256];
     int len = 0;
-
-    printf("The maximum element in base = %d: %d\n", base, max_digit);
     int max_elem = max_digit;
 
     printf("The maximum element in base 10: %d\n", max_elem);
 
-    printf("Max value in base = 9: ");
-    ten_to_other_base(9, max_elem, res, &len); 
-
-
-    printf("Max value in base = 18: ");
-    ten_to_other_base(18, max_elem, res, &len); 
-
-
-    printf("Max value in base = 27: ");
-    ten_to_other_base(27, max_elem, res, &len); 
-
-
-    printf("Max value in base = 36: ");
-    ten_to_other_base(36, max_elem, res, &len);
-
-
+    printf("Max value in base 9: %s\n", ten_to_other_base(9, max_elem));
+    printf("Max value in base 18: %s\n", ten_to_other_base(18, max_elem));
+    printf("Max value in base 27: %s\n", ten_to_other_base(27, max_elem));
+    printf("Max value in base 36: %s\n", ten_to_other_base(36, max_elem));
+    
     return 0;
 }
