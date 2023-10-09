@@ -105,6 +105,7 @@ int check_base_integers(char *digits, int base)
 int main()
 {
     int base;
+    int flag = 0;
 
     printf("Enter the base of the number system: ");
     scanf("%d", &base);
@@ -132,6 +133,7 @@ int main()
             printf("Invalid integer for base %d\n", base);
             return 1;
         }
+        flag = 1;
         
         int num = other_base_to_ten(digits, base); 
         int abs_num = abs(num);
@@ -147,12 +149,17 @@ int main()
     int len = 0;
     int max_elem = max_digit;
 
-    printf("The maximum element in base 10: %d\n", max_elem);
+    if (flag == 1)
+    {
+        printf("The maximum element in base 10: %d\n", max_elem);
 
-    printf("Max value in base 9: %s\n", ten_to_other_base(9, max_elem));
-    printf("Max value in base 18: %s\n", ten_to_other_base(18, max_elem));
-    printf("Max value in base 27: %s\n", ten_to_other_base(27, max_elem));
-    printf("Max value in base 36: %s\n", ten_to_other_base(36, max_elem));
+        printf("Max value in base 9: %s\n", ten_to_other_base(9, max_elem));
+        printf("Max value in base 18: %s\n", ten_to_other_base(18, max_elem));
+        printf("Max value in base 27: %s\n", ten_to_other_base(27, max_elem));
+        printf("Max value in base 36: %s\n", ten_to_other_base(36, max_elem));
+    }
+
+    
     
     return 0;
 }
