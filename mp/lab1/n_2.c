@@ -178,22 +178,23 @@ double combination(int m, int k)
 double gamma_limits(double eps)
 {
     long long m = 2;
-    long long k = 1;
-    double new_sum = 1.0 + eps;
+    double tmp_sum = 0;
+    double new_sum = 0;
     double old_sum = 0;
 
-    while (fabs(new_sum - old_sum) > eps)
+    do
     {
         old_sum = new_sum;
+        tmp_sum = 0;
 
-        for (int i = 2; i <= m; ++i) 
+        for (int i = 1; i <= m; ++i)
         {
             double c = combination(m, i);
-            new_sum += c * (pow(-1, k) / k) * log(factorial(k));
-            k++;
+            tmp_sum += c * (pow(-1, i) / i) * log(factorial(i));
         }
+        new_sum = tmp_sum;
         m++;
-    }
+    } while (fabs(new_sum - old_sum) > eps);
     return new_sum;
 }
 
@@ -263,15 +264,21 @@ double sqrt2_row(double eps)
 
 double gamma_row(double eps)
 {
-    double sum = 0.0;
-    for (int k = 2; k <= INT_MAX; k++)
+    double old_sum = 0.0;
+    double new_sum = 0.0;
+    int k = 2;
+    do
     {
-        double term = 1.0 / floor(pow(k, 2)) - 1.0 / k;
-        sum += term;
-        if (fabs(term) < eps)
+        old_sum = new_sum;
+        double term = 1.0 / (pow(floor(sqrt(k)), 2)) - 1.0 / k;
+        new_sum += term;
+        if (fabs(term) < eps) 
+            // old_sum = 0.0;
             break;
-    }
-    return -pow(M_PI, 2) / 6 + sum;
+        k++;
+    } while (fabs(new_sum - old_sum) > eps);
+
+    return -pow(M_PI, 2) / 6 + new_sum;
 }
 
 // equation
@@ -298,16 +305,14 @@ double sqrt2_equation(double eps)
 
 double gamma(double t)
 {
-    int p = 2;
     double mult = 1;
 
-    while (p <= t)
+    for (int i = 2; i <= t; i++)
     {
-        if (is_prime(p))
+        if (is_prime(i))
         {
-            mult *= (1.0 - 1.0 / p);
+            mult *= (1.0 - (1.0 / i));
         }
-        p++;
     }
     return mult;
 }
