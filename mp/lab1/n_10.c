@@ -23,6 +23,7 @@ void* ten_to_other_base(int base, int number)
 
     if (number < 0)
     {
+        sign = -1;
         number *= -1;
     }
 
@@ -36,6 +37,11 @@ void* ten_to_other_base(int base, int number)
         r = number % base;
         *--ptr = (r > 9)? r - 10 + 'A' : r + '0';
         number /= base;
+    }
+
+    if (sign == -1)
+    {
+        *--ptr = '-';
     }
 
     return ptr;
@@ -136,11 +142,10 @@ int main()
         flag = 1;
         
         int num = other_base_to_ten(digits, base); 
-        int abs_num = abs(num);
 
-        if (abs_num > max_digit)
+        if (abs(num) > abs(max_digit))
         {
-            max_digit = abs_num;
+            max_digit = num;
         }
 
     }
@@ -158,8 +163,5 @@ int main()
         printf("Max value in base 27: %s\n", ten_to_other_base(27, max_elem));
         printf("Max value in base 36: %s\n", ten_to_other_base(36, max_elem));
     }
-
-    
-    
     return 0;
 }
