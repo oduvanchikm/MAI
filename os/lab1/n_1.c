@@ -13,8 +13,6 @@ enum status_file
 void print_file_state(FILE* file)
 {
     printf("__pad5: %ld ", file->__pad5);
-    // printf("_chain: %d ", file->_chain);
-    // printf("_codecvt: %d ", file->_codecvt);
     printf("_cur_column: %d ", file->_cur_column);
     printf("_fileno: %d ", file->_fileno);
     printf("_flags: %d ", file->_flags);
