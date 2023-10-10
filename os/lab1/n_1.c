@@ -34,6 +34,7 @@ int main(int argc, char* argv[])
         return error_with_writing_file;
     }
     fclose(filew);
+    
 
     FILE* filer = fopen(argv[1], "rb");
     if (filer == NULL)
