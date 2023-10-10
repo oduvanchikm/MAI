@@ -44,13 +44,6 @@ int main(int argc, char* argv[])
         return error_with_open_file;
     }
 
-    struct stat file_info;
-    fstat(fileno(filer), &file_info);
-    printf("File size: %ld bytes\n", file_info.st_size);
-    printf("File mode: %o\n", file_info.st_mode);
-    printf("File inode: %ld\n", file_info.st_ino);
-    printf("File device: %ld\n", file_info.st_dev);
-    printf("File stream position: %ld\n", ftell(filer));
 
     fseek(filer, 3, SEEK_SET);
 
