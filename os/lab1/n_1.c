@@ -46,21 +46,18 @@ int main(int argc, char* argv[])
 
     fseek(filer, 3, SEEK_SET);
 
-    char arr_bytes_res[11] = {0};
+    char arr_bytes_res[4] = {0};
 
-    for (int i = 0; i < 11; i++)
+    if (fread(arr_bytes_res, sizeof(char), 4, filer) != 4)
     {
-        if (fread(&arr_bytes_res[i], sizeof(char), 1, filer) != sizeof(char))
-        {
-            printf("Can't read a file\n");
-            fclose(filer);
-            return error_with_reading_file;
-        }
+        printf("Can't read a file\n");
+        fclose(filer);
+        return error_with_reading_file;
     }
 
-    for (int i = 0; i < 11; ++i)
+    for (int i = 0; i < 4; ++i)
     {
-        printf("%x ", arr_bytes_res[i]);
+        printf("%d ", arr_bytes_res[i]);
     }
 
     printf("\n");
