@@ -13,6 +13,8 @@ enum status_file
 void print_file_state(FILE* file)
 {
     printf("__pad5: %ld ", file->__pad5);
+    // printf("_chain: %d ", file->_chain);
+    // printf("_codecvt: %d ", file->_codecvt);
     printf("_cur_column: %d ", file->_cur_column);
     printf("_fileno: %d ", file->_fileno);
     printf("_flags: %d ", file->_flags);
@@ -22,18 +24,18 @@ void print_file_state(FILE* file)
     printf("_IO_buf_base: %p ", file->_IO_buf_base);
     printf("_IO_buf_end: %p ", file->_IO_buf_end);
 
-    printf("_shortbuf: %p ", file->_IO_read_base);
-    printf("_shortbuf: %p ", file->_IO_read_end);
-    printf("_shortbuf: %p ", file->_IO_read_ptr);
-    printf("_shortbuf: %p ", file->_IO_save_base);
-    printf("_shortbuf: %p ", file->_IO_save_end);
-    printf("_shortbuf: %p ", file->_IO_write_base);
-    printf("_shortbuf: %p ", file->_IO_write_end);
-    printf("_shortbuf: %p ", file->_IO_write_ptr);
-    printf("_shortbuf: %p ", file->_lock);
-    printf("_shortbuf: %p ", file->_markers);
-    printf("_shortbuf: %d ", file->_mode);
-    printf("_shortbuf: %ld ", file->_offset);
+    printf("_IO_read_base: %p ", file->_IO_read_base);
+    printf("_IO_read_end: %p ", file->_IO_read_end);
+    printf("_IO_read_ptr: %p ", file->_IO_read_ptr);
+    printf("_IO_save_base: %p ", file->_IO_save_base);
+    printf("_IO_save_end: %p ", file->_IO_save_end);
+    printf("_IO_write_base: %p ", file->_IO_write_base);
+    printf("_IO_write_end: %p ", file->_IO_write_end);
+    printf("_IO_write_ptr: %p ", file->_IO_write_ptr);
+    printf("_lock: %p ", file->_lock);
+    printf("_markers: %p ", file->_markers);
+    printf("_mode: %d ", file->_mode);
+    printf("_offset: %ld ", file->_offset);
 
     printf("_shortbuf: %p ", file->_shortbuf);
     printf("_unused2: %p ", file->_unused2);
