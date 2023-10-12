@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
         return error_with_open_file;
     }
 
-    FILE* second_file = fopen(argv[2], "wb+");
+    FILE* second_file = fopen(argv[2], "wb");
 
     if (second_file == NULL)
     {
