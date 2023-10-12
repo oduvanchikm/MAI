@@ -1,3 +1,3 @@
 # MAI
 
-Лабораторный работы 3 семестр по матпраку и осям
+# Labs for the 3rd semester on MathPrac and OS
