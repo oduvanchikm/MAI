@@ -6,6 +6,7 @@
 
 enum status_code
 {
+    ok,
     error_filename,
     error_with_open_file,
     error_with_writing_file,
@@ -19,20 +20,36 @@ int flag_xor8(FILE* file, int* array)
     long long sum = 0;
     char byte;
 
-    while ((byte = fgetc(file)) != EOF)
+    while ((byte = fread(&byte, sizeof(char), 1, file)) > 0)
     {
-
         sum ^= byte;
-        printf("%lld\n", sum);
+        // printf("%lld\n", sum);
         array[0] += sum;
     }
 
-    return 0;
+    return ok;
 }
+
+int flag_xor32(FILE* file, int* array)
+{
+    long long sum = 0;
+    int byte;
+
+    while ((byte = fread(&byte, sizeof(int), 1, file)) > 0)
+    {
+        sum ^= byte;
+        // printf("%lld\n", sum);
+        array[0] += sum;
+    }
+
+    return ok;
+}
+
+// int mask()
 
 int main(int argc, char* argv[])
 {
-    if (argc != 3)
+    if (argc != 3 && argc != 4)
     {
         printf("Error\n");
         return error_filename;
@@ -50,12 +67,19 @@ int main(int argc, char* argv[])
     {
         int array[ARRAY_SIZE] = {};
         flag_xor8(file, array);
-        printf("Result: %d\n", array[0]);
+        printf("Result xor8: %d\n", array[0]);
     }
 
     else if (strcmp(argv[2], "xor32") == 0)
     {
-        printf("be");
+        int array[ARRAY_SIZE] = {};
+        flag_xor32(file, array);
+        printf("Result xor 32: %d\n", array[0]);
+    }
+
+    else if (strcmp(argv[2], "mask") == 0)
+    {
+        printf("bebe");
     }
 
     else 
@@ -63,5 +87,7 @@ int main(int argc, char* argv[])
         printf("Invalid flag\n");
         return invalid_flag;
     }
+
+    return ok;
 
 }
