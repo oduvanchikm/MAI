@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 enum status_code
 {
@@ -9,6 +10,7 @@ enum status_code
     error_filename,
     error_with_open_file,
     invalid_flag,
+    error_with_base,
 };
 
 unsigned char flag_xor8(FILE* file)
@@ -65,6 +67,19 @@ unsigned int flag_mask(FILE* file, char* argv)
     return result;
 }
 
+bool is_16(char* str)
+{
+    while (*str)
+    {
+        if(!isxdigit(*str))
+        {
+            return false;
+        }
+        str++;
+    }
+    return true;
+}
+
 int main(int argc, char* argv[])
 {
     FILE* file = fopen(argv[1], "rb");
@@ -79,6 +94,7 @@ int main(int argc, char* argv[])
 
     if (argc == 3)
     {
+
         if (strcmp(argv[2], "xor8") == 0)
         {
             printf("Result xor8: %d\n", flag_xor8(file));
@@ -94,7 +110,15 @@ int main(int argc, char* argv[])
     {
         if (strcmp(argv[2], "mask") == 0)
         {
-            printf("%d\n", flag_mask(file, argv[3]));
+            if (is_16(argv[3]))
+            {
+                printf("%d\n", flag_mask(file, argv[3]));
+            }
+            else
+            {
+                printf("It's not a digit in 16 base\n");
+                return error_with_base;
+            }
         }
 
         else
@@ -111,7 +135,7 @@ int main(int argc, char* argv[])
         fclose(file);
 
         return invalid_flag;
-        
+
     }
 
     fclose(file);
