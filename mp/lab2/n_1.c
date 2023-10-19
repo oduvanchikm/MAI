@@ -2,17 +2,20 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <stdbool.h>
+#include <stdarg.h>
 
 enum status_code
 {
-    error_with_number_of_arguments,
-    error_with_memory_allocation,
-    out_of_range
+    ok,
+    error_with_number_of_arguments = -1,
+    error_with_memory_allocation = -2,
+    out_of_range = -3
 };
 
 enum flag
 {
     error_number_arguments,
+    wrong_arguments,
     flag_l,
     flag_r,
     flag_u,
@@ -20,7 +23,7 @@ enum flag
     flag_c
 };
 
-int my_strlen(const char *str)
+enum status_code my_strlen(const char *str)
 {
     int length = 0;
     while (*str != '\0') 
@@ -29,96 +32,12 @@ int my_strlen(const char *str)
         str++;
     }
      
-    return length;
+    return ok;
 }
 
-int choose_flag(char* str, int argc)
+bool checking_unsigned_int(char *str)
 {
-    if (argc < 3)
-    {
-        return error_number_arguments;
-    }
-
-    else if (argc == 3)
-    {
-        if (my_strlen(str) != 2 || str[0] != '-' && str[0] != '/') 
-        {
-           return error_number_arguments; 
-        }
-
-        if (str[1] == 'l')
-        {
-            return flag_l;
-        }
-
-        if (str[1] == 'r')
-        {
-            return flag_r;
-        }
-
-        if (str[1] == 'u')
-        {
-            return flag_u;
-        }
-
-        if (str[1] == 'n')
-        {
-            return flag_n;
-        }
-    }
-
-    else 
-    {
-        if (str[1] == 'c')
-        {
-            return flag_c;
-        }
-    }
-
-    return 0;
-}
-
-char* reversed_function(char* string, char* new_string)
-{
-    int len = my_strlen(string);
-
-    new_string = (char*)malloc((len) * sizeof(char));
-
-
-    for (int i = len - 1; i >= 0; i--)
-    {
-        new_string[len - 1 - i] = string[i];
-    }
-
-    return new_string;
-}
-
-char* string_conversion(char* string, char* new_string)
-{
-    int len = my_strlen(string);
-
-    new_string = (char*)malloc((len) * sizeof(char));
-
-
-    for (int i = 0; i < len; i++)
-    {
-        if (i & 1 == 1)
-        {
-            new_string[i] = toupper(string[i]);
-        }
-        else
-        {
-            new_string[i] = string[i];
-        }
-    }
-
-    return new_string;
-}
-
-bool digits(const char *str)
-{
-    if (*str == '\0')
-    {
+    if (*str == '\0' || *str == '-') {
         return false;
     }
 
@@ -129,131 +48,179 @@ bool digits(const char *str)
     return false;
 }
 
-bool letters(const char *str)
+int choose_flag(char* str_1, char* str_2, int argc)
 {
-    if (*str == '\0')
+    if (argc < 3)
     {
-        return false;
+        return error_number_arguments;
     }
 
-    if ((*str >= 'a' && *str <= 'z') || (*str >= 'A' && *str <= 'Z'))
+    else if (argc == 3)
     {
-        return true;
+        if (my_strlen(str_1) != 2 || str_1[0] != '-' && str_1[0] != '/') 
+        {
+           return wrong_arguments; 
+        }
+
+        if (str_1[1] == 'l')
+        {
+            return flag_l;
+        }
+
+        if (str_1[1] == 'r')
+        {
+            return flag_r;
+        }
+
+        if (str_1[1] == 'u')
+        {
+            return flag_u;
+        }
+
+        if (str_1[1] == 'n')
+        {
+            return flag_n;
+        }
     }
-    return false;
+
+    else 
+    {
+        if (str_1[1] == 'c')
+        {
+            if (my_strlen(str_2) == 10 && checking_unsigned_int(str_2) )
+            {
+                return flag_c;
+            }
+
+            else 
+            {
+                return wrong_arguments;
+            }
+
+        }
+    }
+    return 0;
 }
 
-bool symbols(const char *str)
+enum status_code reversed_function(char* string, char** new_string)
 {
-    if (*str == '\0')
+    int len = my_strlen(string);
+
+    *new_string = (char*)malloc((len + 1) * sizeof(char));
+    
+    if (*new_string == NULL)
     {
-        return false;
+        return error_with_memory_allocation;
     }
 
-    if (!(letters(str)) && !(digits(str)))
+    for (int i = len - 1; i >= 0; i--)
     {
-        return true;
+        (*new_string)[len - 1 - i] = string[i];
     }
-    return false;
+
+    return ok;
 }
 
-char* my_strcpy(char* first, const char* second)
+enum status_code string_conversion(char* string, char** new_string)
 {
-    char *ptr = first;
+    int len = my_strlen(string);
 
-    while (*second)
+    *new_string = (char*)malloc((len + 1) * sizeof(char));
+
+    if (*new_string == NULL)
+    {
+        return error_with_memory_allocation;
+    }
+
+
+    for (int i = 0; i < len; i++)
+    {
+        if (!(i & 1))
+        {
+            (*new_string)[i] = toupper(string[i]);
+        }
+        else
+        {
+            (*new_string)[i] = string[i];
+        }
+    }
+
+    return ok;
+}
+
+enum status_code my_strcat(char* first, char*second)
+{
+    char* ptr = first + my_strlen(first);
+
+    while (*second != '\0')
     {
         *first = *second;
         first++;
         second++;
     }
+    *ptr = '\0';
 
-    return ptr;
+    return ok;
 }
 
-char* string_digits_letters_symbols(char* string, char* new_string)
+enum status_code string_digits_letters_symbols(char **new_string, char* string)
 {
-    char* digits_string;
-    char* letter_string;
-    char* symbol_string;
+    int len = my_strlen(string);
 
-    int count_for_digits = 0;
-    int count_for_letters = 0;
-    int count_for_symbols = 0;
+    *new_string = (char*)malloc((len + 1) * sizeof(char));
 
-
-    while (*string)
+    if (*new_string == NULL)
     {
-        if (digits(string))
+        return error_with_memory_allocation;
+    }
+
+    int index = 0;
+
+    for (int i = 0; i < len; i++)
+    {
+        if (isdigit(string[i]))
         {
-            count_for_digits += 1;
+            (*new_string)[index] = string[i];
+            index++;
         }
-        string++;
-        
     }
 
-    digits_string = (char*)malloc((count_for_digits) * sizeof(char));  
-
-
-    for (int i = 0; i < count_for_digits; i++)
+    for (int i = 0; i < len; i++)
     {
-        digits_string[i] = string[i];
-    }
-
-    while (*string)
-    {
-        if (letters(string))
+        if (isalpha(string[i]))
         {
-            count_for_letters += 1;
+            (*new_string)[index] = string[i];
+            index++;
         }
-        string++;
     }
 
-    letter_string = (char*)malloc((count_for_letters) * sizeof(char));  
-
-
-    for (int i = 0; i < count_for_letters; i++)
+    for (int i = 0; i < len; i++)
     {
-        letter_string[i] = string[i];
-    }
-
-    while (*string)
-    {
-        if (symbols(string))
+        if (!(isdigit(string[i])) && !(isalpha(string[i])))
         {
-            count_for_symbols += 1;
+            (*new_string)[index] = string[i];
+            index++;
         }
-        string++;
     }
 
-    symbol_string = (char*)malloc((count_for_symbols) * sizeof(char));  
+    (*new_string)[index] = '\0';
 
-    for (int i = 0; i < count_for_symbols; i++)
-    {
-        symbol_string[i] = string[i];
-    }
+    return ok;
 
-    new_string = (char*)malloc(my_strlen(digits_string) + my_strlen(letter_string) + my_strlen(symbol_string) + 1);
-
-    my_strcpy(new_string, digits_string);
-    my_strcpy(new_string, letter_string);
-    my_strcpy(new_string, symbol_string);
-
-    free(digits_string);
-    free(letter_string);
-    free(symbol_string);
-
-    return new_string;
 }
+
 
 
 int main(int argc, char* argv[])
 {
-
-    int flag = choose_flag(argv[1], argc);
+    int flag = choose_flag(argv[1], argv[3], argc);
     int len = my_strlen(argv[2]);
+    int seed = atoi(argv[3]);
     char* string = argv[2];
     char* new_string = NULL;
+    enum status_code result_r;
+    enum status_code result_u;
+    enum status_code result_n;
 
     switch (flag)
     {
@@ -261,36 +228,62 @@ int main(int argc, char* argv[])
             printf("Error with number of arguments\n");
             break;
 
+        case wrong_arguments:
+            printf("Wrong arguments\n");
+            break;
+
         case flag_l:
             printf("%d\n", len);
             break;
 
         case flag_r:
-            new_string = reversed_function(string, new_string);
+            result_r = reversed_function(string, &new_string);
 
-            printf("%s\n", new_string);
+            if (result_r == ok)
+            {
+                printf("%s\n", new_string);
+            }
+            else
+            {
+                printf("Error with memory allocation\n");
+            }
 
             free(new_string);
             break;
         
         case flag_u:
-            new_string = string_conversion(string, new_string);
+            result_u = string_conversion(string, &new_string);
 
-            printf("%s\n", new_string);
+            if (result_u == ok)
+            {
+                printf("%s\n", new_string);
+            }
+            else
+            {
+                printf("Error with memory allocation\n");
+            }
 
             free(new_string);
             break;
         
         case flag_n:
-            new_string = string_digits_letters_symbols(string, new_string);
+            result_n = string_digits_letters_symbols(&new_string, string);
 
-            printf("%s\n", new_string);
+            if (result_n == ok)
+            {
+                printf("%s\n", new_string);
+            }
+            else
+            {
+                printf("Error with memory allocation\n");
+            }
+
             free(new_string);
 
             break;
         
         case flag_c:
-            printf("c flag\n");
+            ////////////////////////////////////////////////////////////////////////////////////////
             break;
     
     default:
