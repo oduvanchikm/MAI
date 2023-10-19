@@ -194,40 +194,6 @@ enum status_code string_digits_letters_symbols(char **new_string, char* string)
 
 }
 
-enum status_code concat_strings(int count, ...) 
-{
-    va_list args;
-    va_start(args, count);
-    int len = 0;
-
-    for (int i = 0; i < count; i++) 
-    {
-        len += my_strlen(va_arg(args, char*));
-    }
-    va_end(args);
-
-    char* concatination = (char*)malloc((len + 1) * sizeof(char));
-
-    va_start(args, count);
-
-    int index = 0;
-
-    for (int i = 0; i < count; i++) 
-    {
-        char* str = va_arg(args, char*);
-
-        while (*str != '\0') 
-        {
-            concatination[index++] = *str++;
-        }
-    }
-    va_end(args);
-
-    concatination[len] = '\0';
-
-    return ok;
-}
-
 
 int main(int argc, char* argv[])
 {
