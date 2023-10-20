@@ -2,4 +2,4 @@
 ## third sem
 - [mp](https://github.com/oduvanchikm/MAI/tree/main/mp)
 - [os](https://github.com/oduvanchikm/MAI/tree/main/os)
-- LP
+- [LP](https://github.com/oduvanchikm/MAI/tree/main/LP)
