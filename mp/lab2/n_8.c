@@ -31,6 +31,8 @@ void print_errors(int flag)
     }
 }
 
+
+// проверяем, что число в данной системе счисления
 bool checking_valid_number(char *digits, int base) 
 {
     int i = 0;
@@ -70,33 +72,45 @@ bool checking_valid_number(char *digits, int base)
     return true;
 }
 
+// удаление символов, отличных от цифр и букв, и удаление ведущих нулей и пробелов
 enum status_code remove_zero(char* str) 
 {
-    int i = 0;
-    int j = 0;
-    while (str[i] == '0' || str[i] == '-') 
+    int len = strlen(str);
+    int i, j = 0;
+  
+    for (i = 0; i < len; i++) 
     {
-        if(str[i] == '-') 
-        {
-            str[j++] = '-';
-        }
-
-        i++;
-    }
-    while (str[i]) 
-    {
-        if(str[i] >= '0' && str[i] <= '9') 
+        if (isalnum(str[i])) 
         {
             str[j++] = str[i];
         }
-        i++;
+    }
+  
+    str[j] = '\0';
+  
+    // Удаляем ведущие пробелы
+    while (str[0] == ' ') 
+    {
+        for (i = 0; i < len; i++) 
+        {
+            str[i] = str[i + 1];
+        }
     }
 
-    str[j] = '\0';
+    // Удаляем ведущие нули
+    while (str[0] == '0') 
+    {
+        for (i = 0; i < len; i++) 
+        {
+            str[i] = str[i + 1];
+        }
+    }
 
     return OK;
+
 }
 
+// функция сложения двух чисел
 enum status_code add_two_digits(char *num1, char *num2, int base, char** result) 
 {
     if (num1 == NULL || num2 == NULL)
@@ -141,6 +155,7 @@ enum status_code add_two_digits(char *num1, char *num2, int base, char** result)
     return OK;
 }
 
+// сложение нескольких
 enum status_code sum_in_base(int base, int count, char** result, ...) 
 {
     va_list args;
@@ -184,8 +199,8 @@ enum status_code sum_in_base(int base, int count, char** result, ...)
 int main() 
 {
     char *result = 0;
-    char* num1 = "-0005A";
-    char* num2 = "0005";
+    char* num1 = "0005A";
+    char* num2 = ".0005";
 
     enum status_code sum;
     sum = sum_in_base(16, 2, &result, num1, num2);
