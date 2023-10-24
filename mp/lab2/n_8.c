@@ -72,14 +72,24 @@ bool checking_valid_number(char *digits, int base)
 
 enum status_code remove_zero(char* str) 
 {
-    int i = 0, j = 0;
-    while (str[i] == '0') 
+    int i = 0;
+    int j = 0;
+    while (str[i] == '0' || str[i] == '-') 
     {
+        if(str[i] == '-') 
+        {
+            str[j++] = '-';
+        }
+
         i++;
     }
     while (str[i]) 
     {
-        str[j++] = str[i++];
+        if(str[i] >= '0' && str[i] <= '9') 
+        {
+            str[j++] = str[i];
+        }
+        i++;
     }
 
     str[j] = '\0';
@@ -113,7 +123,6 @@ enum status_code add_two_digits(char *num1, char *num2, int base, char** result)
         return ERROR_WITH_MEMORY_ALLOCATION;
     }
 
-    // (*result)[0] = '0';
     (*result)[max_len] = '\0';
 
     for (int i = max_len - 1; i >= 0; i--)
@@ -149,8 +158,7 @@ enum status_code sum_in_base(int base, int count, char** result, ...)
     {
         return ERROR_WITH_MEMORY_ALLOCATION;
     }
-    
-    // first_num[0] = '0';
+
     first_num[1] = '\0';
 
     for (int i = 0; i < count; i++) 
@@ -176,11 +184,11 @@ enum status_code sum_in_base(int base, int count, char** result, ...)
 int main() 
 {
     char *result = 0;
-    char* num1 = "0005";
+    char* num1 = "-0005A";
     char* num2 = "0005";
 
     enum status_code sum;
-    sum = sum_in_base(10, 2, &result, num1, num2);
+    sum = sum_in_base(16, 2, &result, num1, num2);
 
     if (sum == OK) 
     {
