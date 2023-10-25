@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <stdarg.h>
+#include <math.h>
 
 
 enum status_code
@@ -95,32 +96,60 @@ int greatest_common_divisor(int first, int second)
 {
     if (first == 0) 
     {
-        // **result = second;
-        // return OK;
         return second;
     }
 
-    // **result = greatest_common_divisor(second % first, first, result);
-
     return greatest_common_divisor(second % first, first);
-
-    // return OK;
 }
 
+// проверка, что число простое
+bool is_prime(int num) 
+{
+    if (num > 1) 
+    {
+        for (int i = 2; i < sqrt(num); i++)
 
+            if (num % i == 0)
 
+                return false;
+
+        return true;
+    }
+
+    else
+
+        return false;
+}
+
+// является ли число base простым по основанию numerator 
+// и показателю denominator
+bool prime_in_base(int base, int numerator, int denominator) 
+{
+    int i = 2;
+
+    while (denominator > 1) 
+    {
+        if (denominator % i == 0) 
+        {
+            if (is_prime(i) && base % i != 0) 
+            {
+                return false;
+            }
+            denominator /= i;
+        } 
+        else 
+        {
+            i++;
+        }
+    }
+
+    return true;
+}
 
 // перевод числа из десятичной в дробь, где numerator - числитель, denominator - знаменатель
 enum status_code decimal_to_fraction(double num, int* numerator, int* denominator) 
 {
     double remainder = num;
-
-    int *result = (int*)malloc(sizeof(int));
-
-    if (!result)
-    {
-        return ERROR_WITH_MEMORY_ALLOCATION;
-    }
 
     *numerator = 1;
     *denominator = 1;
@@ -133,19 +162,18 @@ enum status_code decimal_to_fraction(double num, int* numerator, int* denominato
 
     *numerator = (int)remainder;
 
-    // int gcd_result;
 
-    enum status_code gcd = greatest_common_divisor(*numerator, *denominator);
+    int gcd = greatest_common_divisor(*numerator, *denominator);
 
-    // if (gcd == OK)
-    // {
-        *numerator /= gcd;
-        *denominator /= gcd;
-    // }
+
+    *numerator /= gcd;
+    *denominator /= gcd;
+
 
     return OK;
 }
 
+// 
 enum status_code finite_representation(char** result, int base, int count, ...) 
 {
     if (base < 2 || base > 36)
@@ -193,8 +221,7 @@ enum status_code finite_representation(char** result, int base, int count, ...)
             return INVALID_VALUE;
         }
 
-        sprintf(*result, "%s%d/%d ", *result, numerator, denominator);
-
+        (*result)[i] = prime_in_base(base, numerator, denominator);
     }
 
     va_end(args);
@@ -210,19 +237,16 @@ int main()
 
     if (scanf("%d", &base) != 1)
     {
-        return WRONG_BASE;
+        printf("Wrong base\n");
     }
 
-
-    double num1 = 0.045;
-    double num2 = 0.4737;
-    double num3 = 0.2545;
-    double num4 = 0.1;
+    double num1 = -0.3455, num2 = 0.32433, num3 = -0.1, num4 = 0.343445, num5 = 0.13333;
+    
+    int count = 5;
 
     char* result;
-    int count = 4;
 
-    enum status_code status = finite_representation(&result, base, count, num1, num2, num3, num4);
+    enum status_code status = finite_representation(&result, base, count, num1, num2, num3, num4, num5);
 
     if (status != OK) 
     {
@@ -231,7 +255,7 @@ int main()
 
     for (int i = 0; i < count; i++) 
     {
-        printf("%s\n", result);
+        printf("Number %d: %d\n", i + 1, result[i]);
     }
 
     printf("\n");
