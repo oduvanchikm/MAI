@@ -43,14 +43,13 @@ enum status_code decomposition_of_polynomial(double eps, double a, int degree, d
 {
     va_list arg;
 
-    va_start(arg, result);
+    va_start(arg, result); 
 
     double* array_for_coefficient = (double*)malloc((degree + 1) * sizeof(double));
 
     if (!array_for_coefficient)
     {
         free(array_for_coefficient);
-
         return ERROR_WITH_MEMORY_ALLOCATION;
     }
 
@@ -72,19 +71,23 @@ enum status_code decomposition_of_polynomial(double eps, double a, int degree, d
     for (int i = 0; i <= degree; i++)
     {
         double c = va_arg(arg, double);
+
         array_for_coefficient[i] = power * c;
+
         power *= a;
     }
 
     va_end(arg);
 
 
-    (*result)[0] = array_for_coefficient[0];
+    (*result)[0] = array_for_coefficient[0]; // тут
 
     for (int i = 1; i <= degree; i++)
     {
         double prev_result = (*result)[i];
-        (*result)[i] = array_for_coefficient[i] / factorial(i) - a * (*result)[i - 1];
+
+        (*result)[i] = (array_for_coefficient[i] / factorial(i)) - a * (*result)[i - 1];
+
         if (fabs((*result)[i] - prev_result) < eps) 
         {
             free(array_for_coefficient);
@@ -100,7 +103,7 @@ int main()
 {
     double* result;
     int degree = 3;
-    int coef = decomposition_of_polynomial(0.00001, 2.0, degree, &result, 1.0, 3.0, -5.0, 2.0);
+    int coef = decomposition_of_polynomial(0.00001, 2.0, degree, &result, 2.0, -5.0, 3.0, 1.0);
     if (coef != OK) 
     {
         print_errors(coef);
