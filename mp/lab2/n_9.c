@@ -90,38 +90,6 @@ bool check_string(char *str)
     return true;
 }
 
-// проверка на целое число для base
-bool is_integer(const char *str) 
-{ 
-    int length = strlen(str);
-    if (*str == '\0') 
-    {
-        return false;
-    }
-
-    if (*str == '-' || *str == '+') 
-    {
-        str++;
-    }
-
-    if (*str == '0' && *(str + 1) != '\0') 
-    {
-        return false;
-    }
-
-    while (*str) 
-    {
-        if (*str < '0' || *str > '9') 
-        {
-            return false;
-        }
-        
-        str++;
-    }
-
-    return true;
-}
-
 // алгоритм Евклда поиска наибольшего общего делителя
 int greatest_common_divisor(int first, int second) 
 {
