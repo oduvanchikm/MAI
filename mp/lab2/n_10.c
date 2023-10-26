@@ -39,11 +39,11 @@ double factorial(int n)
     return fact;
 }
 
-enum status_code decomposition_of_polynomial(double eps, double a, int degree, double** result, ...)
+enum status_code decomposition_of_polynomial(double eps, double a, double** result, int degree, ...)
 {
     va_list arg;
 
-    va_start(arg, result); 
+    va_start(arg, degree); 
 
     double* array_for_coefficient = (double*)malloc((degree + 1) * sizeof(double));
 
@@ -80,7 +80,7 @@ enum status_code decomposition_of_polynomial(double eps, double a, int degree, d
     va_end(arg);
 
 
-    (*result)[0] = array_for_coefficient[0]; // тут
+    (*result)[0] = array_for_coefficient[0]; 
 
     for (int i = 1; i <= degree; i++)
     {
@@ -103,7 +103,7 @@ int main()
 {
     double* result;
     int degree = 3;
-    int coef = decomposition_of_polynomial(0.00001, 2.0, degree, &result, 2.0, -5.0, 3.0, 1.0);
+    int coef = decomposition_of_polynomial(0.00001, 2.0, &result, degree, 2.0, -5.0, 3.0, 1.0);
     if (coef != OK) 
     {
         print_errors(coef);
