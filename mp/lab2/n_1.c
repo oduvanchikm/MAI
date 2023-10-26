@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <stdbool.h>
-#include <stdarg.h>
-#include <stdlib.h>
 
 enum status_code
 {
@@ -14,18 +12,9 @@ enum status_code
     WRONG_ARGUMENTS = -4
 };
 
-enum flag
+void print_errors(int flag)
 {
-    FLAG_L,
-    FLAG_R,
-    FLAG_U,
-    FLAG_N,
-    FLAG_C
-};
-
-void print_errors(int flag) 
-{
-    switch(flag) 
+    switch(flag)
     {
         case ERROR_WITH_NUMBER_OF_ARGUMENTS:
             printf("Invalid value\n");
@@ -48,15 +37,14 @@ void print_errors(int flag)
     }
 }
 
-enum status_code my_strlen(const char *str)
+enum status_code my_strlen(const char *str, int *length)
 {
-    int length = 0;
-    while (*str != '\0') 
+    while (*str != '\0')
     {
-        length++;
+        (*length)++;
         str++;
     }
-     
+
     return OK;
 }
 
@@ -73,66 +61,14 @@ bool checking_unsigned_int(char *str)
     return false;
 }
 
-enum status_code choose_flag(char* str_1, char* str_2, int argc)
-{
-    if (argc < 3 || argc > 10)
-    {
-        return ERROR_WITH_NUMBER_OF_ARGUMENTS;
-    }
-
-    else if (argc == 3)
-    {
-        if (my_strlen(str_1) != 2 || str_1[0] != '-' && str_1[0] != '/') 
-        {
-           return WRONG_ARGUMENTS; 
-        }
-
-        if (str_1[1] == 'l')
-        {
-            return FLAG_L;
-        }
-
-        if (str_1[1] == 'r')
-        {
-            return FLAG_R;
-        }
-
-        if (str_1[1] == 'u')
-        {
-            return FLAG_U;
-        }
-
-        if (str_1[1] == 'n')
-        {
-            return FLAG_N;
-        }
-    }
-
-    else 
-    {
-        if (str_1[1] == 'c')
-        {
-            if (my_strlen(str_2) == 10 && checking_unsigned_int(str_2) )
-            {
-                return FLAG_C;
-            }
-
-            else 
-            {
-                return WRONG_ARGUMENTS;
-            }
-
-        }
-    }
-    return OK;
-}
 
 enum status_code reversed_function(char* string, char** new_string)
 {
-    int len = my_strlen(string);
+    int len = 0;
+    my_strlen(string, &len);
 
     *new_string = (char*)malloc((len + 1) * sizeof(char));
-    
+
     if (*new_string == NULL)
     {
         return ERROR_WITH_MEMORY_ALLOCATION;
@@ -148,7 +84,8 @@ enum status_code reversed_function(char* string, char** new_string)
 
 enum status_code string_conversion(char* string, char** new_string)
 {
-    int len = my_strlen(string);
+    int len = 0;
+    my_strlen(string, &len);
 
     *new_string = (char*)malloc((len + 1) * sizeof(char));
 
@@ -175,7 +112,8 @@ enum status_code string_conversion(char* string, char** new_string)
 
 enum status_code string_digits_letters_symbols(char **new_string, char* string)
 {
-    int len = my_strlen(string);
+    int len = 0;
+    my_strlen(string, &len);
 
     *new_string = (char*)malloc((len + 1) * sizeof(char));
 
@@ -219,164 +157,181 @@ enum status_code string_digits_letters_symbols(char **new_string, char* string)
 
 }
 
+void concatination(char *str1, char*str2)
+{
+    while (*str1)
+    {
+        str1++;
+    }
+    while(*str2)
+    {
+        *str1 = *str2;
+        str1++;
+        str2++;
+    }
+    *str1 = '\0';
+}
 
-// void concatination(char* str, char** result, int* len)
-// {
-//     for (int i = 0; str[i] != '\0'; ++i)
-//     {
-//         (*result)[(*len)++] = str[i];
-//     }
+void shuffle(char** array, int count)
+{
+    for (int i = count - 1; i >= 1; i--)
+    {
+        int j = rand() % (i + 1);
+        int tmp = *array[j];
+        *array[j] = *array[i];
+        *array[i] = tmp;
+    }
+}
 
-//     (*result)[(*len)] = '\0';
-// }
+enum status_code concat_strings(char **result, int count, char **strings, unsigned int seed)
+{
+    srand(seed);
 
+    int result_len = 0;
 
-// // char max_string(char* string_1, char* string_2)
-// // {
-// //     char max_elem;
+    for (int i = 0; i < count; ++i)
+    {
+        int string_length = 0;
+        my_strlen(strings[i], &string_length);
+        result_len += string_length;
+    }
 
-// //     // Проверка, не пусты ли строки
-// //     if (string_1 == NULL && string_2 == NULL) {
-// //         return '\0';  
-// //     }
-// //     else if (string_1 == NULL) {
-// //         return *string_2;  
-// //     }
-// //     else if (string_2 == NULL) {
-// //         return *string_1;  
-// //     }
+    *result = (char*)malloc(sizeof(char) * (result_len + 1));
+    if (!(*result))
+    {
+        return ERROR_WITH_MEMORY_ALLOCATION;
+    }
+    (*result)[0] = '\0';
 
-// //    
-// //     if (*string_1 > *string_2) {
-// //         max_elem = *string_1;
-// //     }
-// //     else {
-// //         max_elem = *string_2;
-// //     }
+    shuffle(strings, count);
 
-// //     return max_elem;
-// // }
+    for (int i = 0; i < count; ++i)
+    {
+        concatination(*result, strings[i]);
+    }
 
-// enum status_code generating_numbers(unsigned int seed, char **numbers, int count, char **string)
-// {
-//     int len = 0;
-//     char max_string;
-
-//     if (count == 0)
-//     {
-//         return WRONG_ARGUMENTS;
-//     }
-
-//     for (int i = 0; i < count; i++)
-//     {
-//         len = my_strlen(string[i]);
-//         // max_elem = max_string(string[i], &max_elem);
-//         if (len > max_string) 
-//         {
-//             max_string = len;
-//         }
-//     }
-
-//     max_string * count;
-
-//     *numbers = (char*)malloc((max_string + 1) * sizeof(char));
-
-//     if (!*numbers)
-//     {
-//         return ERROR_WITH_MEMORY_ALLOCATION;
-//     }
-
-//     int rand_number;
-
-//     srand(seed);
-
-//     for (int i = 0; i < count; i++)
-//     {
-//         rand_number = rand() % count;
-//         concatination(string[rand_number], numbers, &len);
-//     }
-
-//     return OK;
-
-// }
+    return OK;
+}
 
 int main(int argc, char* argv[])
 {
-    int flag = choose_flag(argv[1], argv[3], argc);
-    int len = my_strlen(argv[2]);
-    int len_str = argc - 3;
-    unsigned int seed = atoi(argv[3]);
-    char* string = argv[2];
-    char* new_string;
-    enum status_code result_r;
-    enum status_code result_u;
-    enum status_code result_n;
-    enum status_code result_c;
-
-    switch (flag)
+    if (argc == 3 || ((argc > 2) && argv[1][1] == 'c'))
     {
-        case FLAG_L:
-            printf("%d\n", len);
-            break;
+        if (argv[1][0] != '-')
+        {
+            printf("invalid symbol\n");
+        }
 
-        case FLAG_R:
-            result_r = reversed_function(string, &new_string);
+        int len = 0;
+        my_strlen(argv[2], &len);
 
-            if (result_r == OK)
-            {
-                printf("%s\n", new_string);
-            }
 
-            print_errors(result_r);
+        unsigned int seed = 0;
+        char* string = argv[2];
+        char* new_string;
+        enum status_code result_r;
+        enum status_code result_u;
+        enum status_code result_n;
+        enum status_code result_c;
+        int count;
 
-            free(new_string);
-            break;
-        
-        case FLAG_U:
-            result_u = string_conversion(string, &new_string);
+        char flag = argv[1][1];
 
-            if (result_u == OK)
-            {
-                printf("%s\n", new_string);
-            }
+        switch (flag)
+        {
+            case 'l':
+                printf("%d\n", len);
+                break;
 
-            print_errors(result_u);
+            case 'n':
+                result_n = string_digits_letters_symbols(&new_string, string);
 
-            free(new_string);
-            break;
-        
-        case FLAG_N:
-            result_n = string_digits_letters_symbols(&new_string, string);
+                if (result_n == OK)
+                {
+                    printf("%s\n", new_string);
+                }
 
-            if (result_n == OK)
-            {
-                printf("%s\n", new_string);
-            }
+                else
+                {
+                    print_errors(result_n);
+                }
 
-            print_errors(result_n); 
+                free(new_string);
+                break;
 
-            free(new_string);
+            case 'u':
+                result_u = string_conversion(string, &new_string);
 
-            break;
-        
-        case FLAG_C:
+                if (result_u == OK)
+                {
+                    printf("%s\n", new_string);
+                }
 
-            // result_c = generating_numbers(seed, &new_string, len_str, argv + 3);
+                else
+                {
+                    print_errors(result_u);
+                }
 
-            // if (result_c != OK)
-            // {
-            //     print_errors(result_c);
-            // }
+                free(new_string);
+                break;
 
-            // printf("%s\n", new_string);
+            case 'r':
+                result_r = reversed_function(string, &new_string);
 
-            // free(new_string);
+                if (result_r == OK)
+                {
+                    printf("%s\n", new_string);
+                }
 
-            // break;
+                else
+                {
+                    print_errors(result_r);
+                }
 
-    default:
-        break;
+                free(new_string);
+                break;
+
+            case 'c':
+
+                count = argc - 3;
+
+                char **strings = (char**)malloc(sizeof(char*) * count);
+                if (!string)
+                {
+                    print_errors(ERROR_WITH_MEMORY_ALLOCATION);
+                }
+
+                strings[0] = string;
+                for (int i = 1; i < count; i++)
+                {
+                    strings[i] = argv[i + 3];
+                }
+                char *result;
+
+                result_c = concat_strings(&result, count, strings, seed);
+
+                if (result_c == OK)
+                {
+                    printf("%s\n", result);
+                }
+
+                else
+                {
+                    print_errors(result_c);
+                }
+
+                free(strings);
+                free(result);
+                break;
+
+            default:
+                print_errors(WRONG_ARGUMENTS);
+        }
     }
+    else
+    {
+        print_errors(WRONG_ARGUMENTS);
+    }
+
     return 0;
 }
-
