@@ -6,7 +6,6 @@
 enum status_code
 {
     OK,
-    INVALID_INPUT,
     ERROR_WITH_MEMORY_ALLOCATION,
     INVALID_VALUE
 };
@@ -14,6 +13,7 @@ enum status_code
 typedef struct
 {
     double x, y;
+
 } point;
 
 void print_errors(int flag)
@@ -28,16 +28,12 @@ void print_errors(int flag)
         printf("Error with memory allocation\n");
         break;
 
-    case INVALID_INPUT:
-        printf("Invalid input\n");
-        break;
-
     default:
         break;
     }
 }
 
-enum status_code value_of_polynomial(double** result, double a, int degree, ...)
+enum status_code value_of_polynomial(double* result, double a, int degree, ...)
 {
     va_list args;
 
@@ -45,22 +41,22 @@ enum status_code value_of_polynomial(double** result, double a, int degree, ...)
 
     if (degree >= 0)
     {
-        if (a == 0)
-        {
-            return INVALID_VALUE;
-        }
-
         for (int i = 0; i <= degree; i++)
         {
-            **result = **result * a + va_arg(args, double);
+            *result = *result * a + va_arg(args, double);
         }
     }
 
     else
     {
+        if (a == 0)
+        {
+            return INVALID_VALUE;
+        }
+
         for (int i = 0; i >= degree; i--)
         {
-            **result = **result / a + va_arg(args, double);
+            *result = *result / a + va_arg(args, double);
         }
     }
 
@@ -70,6 +66,10 @@ enum status_code value_of_polynomial(double** result, double a, int degree, ...)
 
 enum status_code is_convex(int n, ...)
 {
+    if (n < 3)
+    {
+        return INVALID_VALUE;
+    }
     va_list args;
     va_start(args, n);
 
@@ -77,37 +77,32 @@ enum status_code is_convex(int n, ...)
 
     va_end(args);
 
-    int POS = 0;
     int NEG = 0;
+
     for (int a = 0; a < n; a++)
     {
         int b = (a + 1) % n;
 
-        int c;
+        int c = (a + 2) % n;
 
-        for (c = 0; c < n; c++)
+        double xA = points[a].x;
+        double yA = points[a].y;
+        double xB = points[b].x;
+        double yB = points[b].y;
+        double xC = points[c].x;
+        double yC = points[c].y;
+
+        double POS = (xB - xA) * (yC - yB) - (yB - yA) * (xC - xB);
+
+        if (POS > 0)
         {
-            if (c != a && c != b)
-            {
-                double xA = points[a].x;
-                double yA = points[a].y;
-                double xB = points[b].x;
-                double yB = points[b].y;
-                double xC = points[c].x;
-                double yC = points[c].y;
-
-                double POS = (xB - xA) * (yC - yA) - (yB - yA) * (xC - xA);
-
-                if (POS > 0)
-                {
-                    POS++;
-                }
-                else if (POS < 0)
-                {
-                    NEG++;
-                }
-            }
+            POS++;
         }
+        else if (POS < 0)
+        {
+            NEG++;
+        }
+
         if (POS > 0 && NEG > 0)
         {
             return INVALID_VALUE;
@@ -118,7 +113,7 @@ enum status_code is_convex(int n, ...)
 
 int main()
 {
-    double* result = malloc(sizeof(double));
+    double result = 0;
 
     double a = 1.0;
 
@@ -133,13 +128,14 @@ int main()
 
     if (result_pol == OK)
     {
-        printf("The result of polynom is %f\n", *result);
+        printf("The result of polynom is %f\n", result);
     }
 
-    int n = 4;
-    point points[] = {{0, 0}, {1, 0}, {1, 1}, {0, 1}};
+    int n = 3;
 
-    enum status_code polygon_res = is_convex(n, points);
+    point point[3] = {{1, 2}, {4, 2}, {7, 2}};
+
+    enum status_code polygon_res = is_convex(n, point[0], point[1], point[2]);
 
     if (polygon_res == INVALID_VALUE)
     {
@@ -150,7 +146,7 @@ int main()
         printf("Yes, this polygon is convex\n");
     }
     
-    free(result);
+    // free(result);
     return 0;
 }
 
