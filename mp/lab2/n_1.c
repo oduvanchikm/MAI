@@ -177,9 +177,9 @@ void shuffle(char** array, int count)
     for (int i = count - 1; i >= 1; i--)
     {
         int j = rand() % (i + 1);
-        int tmp = *array[j];
-        *array[j] = *array[i];
-        *array[i] = tmp;
+        char* tmp = array[j];
+        array[j] = array[i];
+        array[i] = tmp;
     }
 }
 
@@ -215,16 +215,16 @@ enum status_code concat_strings(char **result, int count, char **strings, unsign
 
 int main(int argc, char* argv[])
 {
-    if (argc == 3 || ((argc > 2) && argv[1][1] == 'c'))
+    if ((argc == 3 && argv[1][1] != 'c') || ((argc > 4) && argv[1][1] == 'c'))
     {
         if (argv[1][0] != '-')
         {
             printf("invalid symbol\n");
+            return 0;
         }
 
         int len = 0;
         my_strlen(argv[2], &len);
-
 
         unsigned int seed = 0;
         char* string = argv[2];
@@ -293,9 +293,17 @@ int main(int argc, char* argv[])
 
             case 'c':
 
+                if (!checking_unsigned_int(argv[3]))
+                {
+                    print_errors(WRONG_ARGUMENTS);
+                    break;
+                }
+
+                seed = atoi(argv[3]);
                 count = argc - 3;
 
                 char **strings = (char**)malloc(sizeof(char*) * count);
+
                 if (!string)
                 {
                     print_errors(ERROR_WITH_MEMORY_ALLOCATION);
@@ -332,6 +340,5 @@ int main(int argc, char* argv[])
     {
         print_errors(WRONG_ARGUMENTS);
     }
-
     return 0;
 }
