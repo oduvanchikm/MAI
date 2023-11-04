@@ -68,52 +68,53 @@ enum status_code converting_number(long long int number, unsigned int r, char** 
     }
 
     int count = 0;
+    int flag = 0;
+    
+
+    if (number < 0)
+    {
+        number = negative_digit(number);
+        count = sum_digits(count, 1);
+        flag = 1;
+    }
 
     long long int new_number = number;
 
-    while (count == 0 || new_number > 0)
+    while (new_number > 0)
     {
         count = sum_digits(count, 1);
         new_number >>= r;
     }
     // printf("%d\n", count);
 
-    if (count <= 0)
+    if (flag)
     {
-        return WRONG_ARGUMENT;
+        *result = (char*)malloc(sizeof(char) * sum_digits(count,1));
+
+        if (*result == NULL)
+        {
+            return ERROR_WITH_MEMORY_ALLOCATION;
+        }
+
+        (*result)[count] = '\0';
+        (*result)[0] = '-';
     }
-
-    char* array = (char*)malloc(sizeof(char) * (count + 1));
-
-    if (!array)
+    else 
     {
-        return ERROR_WITH_MEMORY_ALLOCATION;
+        *result = (char*)malloc(sizeof(char) * sum_digits(count, 1));
+        if (*result == NULL)
+        {
+            return ERROR_WITH_MEMORY_ALLOCATION;
+        }
+        (*result)[count] = '\0';
     }
-
-    array[count] = '\0';
-
-    if (number < 0)
+    while (number)
     {
-        number = number * -1;
-        array[0] = '-';
-    }
-
-    while (number > 0 && count > 0)
-    {
-        count = subtraction(count, 1);
         remainder = number & subtraction((1 << r), 1);
-        array[count] = (remainder < 10) ? sum_digits(remainder, '0') : subtraction(sum_digits(remainder, 'A'),10);
+        count = subtraction(count, 1);
+        (*result)[count] = (remainder < 10) ? sum_digits(remainder, '0') : subtraction(sum_digits(remainder, 'A'), 10);
         number >>= r;
     }
-
-    for (int i = count; i >= 0; i--)
-    {
-        for (int j = 0; j <= count; j++)
-        {
-            result[j] = &array[i];
-        }
-    }
-
     return OK;
 }
 
@@ -121,6 +122,7 @@ int main()
 {
     long long int number;
     printf("Enter a digit in 10 in decimal notation: \n");
+
     if (scanf("%lld", &number) != 1)
     {
         return WRONG_ARGUMENT;
@@ -128,6 +130,7 @@ int main()
 
     int r;
     printf("Enter degree of 2: \n");
+
     if (scanf("%d", &r) != 1)
     {
         return WRONG_BASE;
@@ -140,7 +143,6 @@ int main()
     {
         printf("A %lld in %d system: \n", number, 1 << r);
         printf("%s\n", result);
-
     }
     else
     {
@@ -148,4 +150,3 @@ int main()
     }
     free(result);
 }
-
