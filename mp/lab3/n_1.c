@@ -85,11 +85,10 @@ enum status_code converting_number(long long int number, unsigned int r, char** 
         count = sum_digits(count, 1);
         new_number >>= r;
     }
-    // printf("%d\n", count);
 
     if (flag)
     {
-        *result = (char*)malloc(sizeof(char) * sum_digits(count,1));
+        *result = (char*)malloc(sizeof(char) * sum_digits(count, 1));
 
         if (*result == NULL)
         {
@@ -99,6 +98,7 @@ enum status_code converting_number(long long int number, unsigned int r, char** 
         (*result)[count] = '\0';
         (*result)[0] = '-';
     }
+
     else 
     {
         *result = (char*)malloc(sizeof(char) * sum_digits(count, 1));
