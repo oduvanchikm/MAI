@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct Employee
 {
@@ -12,8 +13,8 @@ typedef struct Employee
 
 enum status_flag
 {
-    FLAG_A,
-    FLAG_D
+    ASCENDING,
+    DESCENDING
 };
 
 enum status_code
@@ -23,6 +24,27 @@ enum status_code
     INVALID_VALUE,
     ERROR_WITH_OPENING_FILE
 };
+
+void print_errors(int flag)
+{
+    switch(flag)
+    {
+        case ERROR_WITH_MEMORY_ALLOCATION:
+            printf("Error with memory allocation\n");
+            break;
+        
+        case INVALID_VALUE:
+            printf("Invalid value\n");
+            break;
+        
+        case ERROR_WITH_OPENING_FILE:
+            printf("Error with opening file\n");
+            break;
+
+        default:
+            break;
+    }
+}
 
 // сравнение сотрудников по убыванию: 
 // 1) сравнение по зарплате
@@ -63,28 +85,29 @@ int compare_employees(const void *a, const void *b)
 
 enum status_code read_from_file(const char *file_input, Employee **result, int *count_of_employees)
 {
+    // printf("njfgfhg\n");
     FILE *file = fopen(file_input, "r");
     
     if (!file)
     {
         return ERROR_WITH_OPENING_FILE;
     }
-
-    *result = (Employee*)malloc(sizeof(Employee) * (*count_of_employees));
-
+    // printf("njfgfhg\n");
+    *result = (Employee*)malloc(sizeof(Employee) * (*count_of_employees + 1));
+    // printf("njfgfhg\n");
     if (!(*result))
     {
         return ERROR_WITH_MEMORY_ALLOCATION;
     }
 
     char buffer[256];
-
+    // printf("njfgfhg\n");
     while (fgets(buffer, sizeof(buffer), file) != NULL)
     {
         Employee employee;
 
-        sscanf(buffer, "%u %s %s %f", &employee.id, &employee.name, &employee.surname, &employee.salary);
-
+        sscanf(buffer, "%u %s %s %lf", &employee.id, employee.name, employee.surname, &employee.salary);
+        // printf("njfgfhg\n");
         *result = realloc(*result, (*count_of_employees + 1) * sizeof(Employee));
 
         if (!(*result))
@@ -101,19 +124,31 @@ enum status_code read_from_file(const char *file_input, Employee **result, int *
     return OK;
 }
 
-enum status_code write_employers_in_file(const char *file_output, Employee *result, int count_of_employees)
+
+enum status_code write_employers_in_file(const char *file_output, Employee *result, int count_of_employees, enum status_flag st_flag)
 {
     FILE *file = fopen(file_output, "w");
+    // printf("njfgfhg\n");
     
     if (!file)
     {
         return ERROR_WITH_OPENING_FILE;
     }
 
-    for (int i = 0; i < count_of_employees; i++)
+    if (st_flag == ASCENDING)
     {
-        fprintf(file, "%u %s %s %f\n", result[i].id, result[i].name, result[i].surname, result[i].salary);
+        for (int i = 0; i < count_of_employees; i++)
+        {
+            fprintf(file, "%u %s %s %f\n", result[i].id, result[i].name, result[i].surname, result[i].salary);
+        }
     }
+
+    if (st_flag == DESCENDING)
+        for (int i = count_of_employees - 1; i >= 0; i--)
+        {
+            // printf("njfgfhg\n");
+            fprintf(file, "%u %s %s %f\n", result[i].id, result[i].name, result[i].surname, result[i].salary);
+        }
 
     fclose(file);
 }
@@ -143,27 +178,46 @@ int main(int argc, char *argv[])
         return 1; 
     }
 
-    if (argv[2][1] != 'a' || argv[2][1] != 'd')
+    Employee *employees = NULL;
+    int count_of_employees = 0;
+
+    enum status_code read_status = read_from_file(argv[1], &employees, &count_of_employees);
+    if (read_status != OK)
     {
-        printf("Invalid arguments.\n");
-        printf("You enter a wrong flag\n");
-        return 1;
+        print_errors(read_status);
+        return 0;
     }
 
-    Employee *employees = NULL;
-    int count_of_employees;
-
-    qsort(employees, count_of_employees, sizeof(Employee), compare_employees);
+    enum status_flag st_sort;
 
     switch (argv[2][1])
     {
         case 'a':
-
+            st_sort = ASCENDING;
             break;
-
+        
         case 'd':
+            st_sort = DESCENDING;
+            break;
+        
+        default:
+            printf("Invalid arguments.\n");
+            printf("You enter a wrong flag\n");
             break;
     }
+        
+    qsort(employees, count_of_employees, sizeof(Employee), compare_employees);
 
+    enum status_code write_status = write_employers_in_file(argv[3], employees, count_of_employees, st_sort);
+    if (write_status != OK)
+    {
+        print_errors(write_status);
+        return 0;
+    }
 
+    fclose(input_file);
+    fclose(output_file);
+    free(employees);
+
+    return 0;
 }
