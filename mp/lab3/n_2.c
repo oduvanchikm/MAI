@@ -167,20 +167,6 @@ enum status_code marix_vector_norma(int n, vector *vector, int p, double *result
     return OK;
 }
 
-// double find_max_value(double *result, int count)
-// {
-//     double max = result[0];
-//     for (int i = 1; i < count; i++)
-//     {
-//         if (result[i] > max)
-//         {
-//             max = result[i];
-//         }
-//     }
-
-//     return max;
-// }
-
 enum status_code the_longest_vector
 (
     vector *max_vector, double *res,
@@ -224,15 +210,16 @@ enum status_code the_longest_vector
             if (result[j] - max_res[j] > eps)
             {
                 max_res[j] = result[j];
-                max_vector[0] = vectorr;
-            }
-
-            else if (fabs(result[j] - max_res[j]) < eps)
-            {
-                max_vector[j++] = vectorr;
+                max_vector[j] = vectorr;
             }
         }
     }
+
+    for (int i = 0; i < 3; i++)
+    {
+        res[i] = max_res[i];
+    }
+
     va_end(args);
     return OK;
 }
