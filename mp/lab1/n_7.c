@@ -11,6 +11,7 @@ typedef enum
     WRONG_ARGUMENTS,
     ERROR_WITH_OPENING_FILE,
     ERROR_WITH_MEMORY_ALLOCATION
+
 } status_code;
 
 void print_errors(int flag)
@@ -38,17 +39,26 @@ void print_errors(int flag)
     }
 }
 
-int convert_from_decimal(int num, int base) 
+void to_lower(char str)
 {
-    int number = 0, k = 1;
+    if (str >= 'A' && str <= 'Z')
+    {
+        str = tolower(str);
+    }
+}
+
+int convert_from_decimal(char str, int base) 
+{
+    int num = str;
+    int result = 0, k = 1;
     while (num > 0) 
     {
         int remainder = num % base;
-        number += remainder * k;
+        result += remainder * k;
         num /= base;
         k *= 10;
     }
-    return number;
+    return result;
 }
 
 status_code flag_r(char *file_1, char *file_2, char *file_3) 
@@ -103,47 +113,6 @@ status_code flag_r(char *file_1, char *file_2, char *file_3)
     return OK;
 }
 
-int ascii_in_forth_base(char string)
-{
-    if (string >= 'A' && string <= 'Z')
-    {
-        string = tolower(string);
-    }
-
-    int ascii = string;
-    int result = 0;
-    int remainder = 0;
-    int k = 1;
-
-    while (ascii != 0)
-    {
-        remainder = ascii % 4;
-        result += remainder * k;
-        ascii /= 4;
-        k *= 10;
-    }
-
-    return result;
-}
-
-int ascii_in_eighth_base(char string)
-{
-    int ascii = string;
-    int result = 0;
-    int remainder = 0;
-    int k = 1;
-
-    while (ascii != 0)
-    {
-        remainder = ascii % 8;
-        result += remainder * k;
-        ascii /= 8;
-        k *= 10;
-    }
-
-    return result;
-}
-
 status_code flag_a(char *file_1, char *file_2)
 {
     FILE *file1 = fopen(file_1, "r");
@@ -168,7 +137,9 @@ status_code flag_a(char *file_1, char *file_2)
         {
             while (!isspace(c) && c != EOF)
             {
-                int symbol1 = ascii_in_forth_base(c);
+                to_lower(c);
+
+                int symbol1 = convert_from_decimal(c, 4);
                 fprintf(file2, "%d", symbol1);
                 c = fgetc(file1);
             }
@@ -187,7 +158,7 @@ status_code flag_a(char *file_1, char *file_2)
         {
             while (!isspace(c) && c != EOF)
             {
-                int symbol2 = ascii_in_eighth_base(c);
+                int symbol2 = convert_from_decimal(c, 8);
                 fprintf(file2, "%d", symbol2);
                 c = fgetc(file1);
             }
