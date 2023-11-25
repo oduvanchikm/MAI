@@ -161,7 +161,7 @@ status_code flag_a(char *file_1, char *file_2)
     {
         while(isspace(c)) 
         {
-            c = fgetc(file1);  // Исправлено на fgetc(file1)
+            c = fgetc(file1); 
         }
 
         if (count % 10 == 0)
