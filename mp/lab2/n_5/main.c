@@ -21,16 +21,8 @@ void print_errors(int flag)
 {
     switch(flag)
     {
-        case NEGATIVE_NUMBER:
-            printf("Invalid value\n");
-            break;
-
         case ERROR_WITH_MEMORY_ALLOCATION:
             printf("Error with memory allocation\n");
-            break;
-
-        case ERROR:
-            printf("out of range\n");
             break;
 
         case INVALID_ARGUMENT:
@@ -108,7 +100,15 @@ status_code zeckendorf(unsigned int n, char **result)
 
     int i = 0;
 
-    *result = malloc(sizeof(char) * 50);
+    int fib = find_max_fibonacci(n);
+
+    char *array = (char*)malloc(sizeof(char) * (fib + 1));
+    printf("error\n");
+
+    if (!array)
+    {
+        return ERROR_WITH_MEMORY_ALLOCATION;
+    }
 
     while (n != 0)
     {
@@ -120,7 +120,7 @@ status_code zeckendorf(unsigned int n, char **result)
         }
         else    
         {
-            (*result)[i] = fib_curr;
+            array[i] = '1';
             n -= fib_curr;
             fib_next = fib_curr;
             fib_curr = fib_prev;
@@ -128,8 +128,8 @@ status_code zeckendorf(unsigned int n, char **result)
             i++;
         }
     }
-
-    (*result)[i] = '\0';
+    array[i] = '\0';
+    (*result) = array;
 
     return OK;
 }
@@ -430,6 +430,7 @@ void overfprintf(FILE *file, const char *format, ...)
                     if (Cv_st == OK)
                     {
                         fprintf(file, "%s", Cv_result);
+                        printf("r\n");
                     }
 
                     else
@@ -545,11 +546,206 @@ void overfprintf(FILE *file, const char *format, ...)
         }
     }
     va_end(args);
+}
 
-    // if (roman_result)
-    // {
-    //     free(roman_result);
-    // }
+void oversprintf(char *buffer, const char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    
+    int index = 0;
+    char* roman_result = NULL;
+    char* zeck_result = NULL;
+    char* Cv_result = NULL;
+    char* CV_result = NULL;
+    char* mi_result = NULL;
+    char* mu_result = NULL;
+    char* md_result = NULL;
+    char* mf_result = NULL;
+
+    while (format[index] != '\0') 
+    {
+        if (format[index] != '%') 
+        {
+            sprintf(buffer, "%c", format[index]);
+            index++;
+        } 
+        else 
+        {
+            int next_index = index + 1;
+
+            if (format[next_index] == '%') 
+            {
+                sprintf(buffer, "%c", '%');
+                index = next_index + 1;
+            } 
+            else 
+            {
+                char flag[25];
+                int flag_index = 0;
+                
+                while (format[next_index] != '\0' && (isalnum(format[next_index]) || format[next_index] == '.')) 
+                {
+                    flag[flag_index++] = format[next_index++];
+                }
+
+                flag[flag_index] = '\0';
+
+                if (flag[0] == 'R' && flag[1] == 'o') 
+                {
+                    int arg = va_arg(args, int);
+                    status_code st_roman = roman_digits_flag(arg, &roman_result);
+                    if (st_roman == OK)
+                    {
+                        sprintf(buffer, "%s", roman_result);
+                    }
+                    else
+                    {
+                        print_errors(st_roman);
+                    }
+                    free(roman_result);
+                }
+
+                if (flag[0] == 'Z' && flag[1] == 'r')
+                {
+                    unsigned int arg = va_arg(args, unsigned int);
+                    status_code st_zc = zeckendorf(arg, &zeck_result);
+                    if (st_zc == OK)
+                    {
+                        sprintf(buffer, "%s", zeck_result);
+                    }
+                    else
+                    {
+                        print_errors(st_zc);
+                    }
+                    free(zeck_result);
+                }
+
+                if (flag[0] == 'C' && flag[1] == 'v')
+                {
+                    int arg = va_arg(args, int);
+                    int system = va_arg(args, int);
+                    status_code Cv_st = decemal_to_other_base_l(&Cv_result, arg, system);
+
+                    if (Cv_st == OK)
+                    {
+                        sprintf(buffer, "%s", Cv_result);
+                        printf("r\n");
+                    }
+
+                    else
+                    {
+                        print_errors(Cv_st);
+                    }
+                    free(Cv_result);
+                }
+
+                if (flag[0] == 'C' && flag[1] == 'V')
+                {
+                    int arg = va_arg(args, int);
+                    int system = va_arg(args, int);
+                    status_code CV_st = decemal_to_other_base_l(&CV_result, arg, system);
+
+                    if (CV_st == OK)
+                    {
+                        sprintf(buffer, "%s", CV_result);
+                    }
+                    else
+                    {
+                        print_errors(CV_st);
+                    }
+                    free(CV_result);
+                }
+
+                if (flag[0] == 't' && flag[1] == 'o')
+                {
+                    char* arg = va_arg(args, char*);
+                    int system = va_arg(args, int);
+                    int to_st = other_base_to_ten_l(arg, system);
+                    sprintf(buffer, "%d", to_st);
+                }
+
+                if (flag[0] == 'T' && flag[1] == 'O')
+                {
+                    char* arg = va_arg(args, char*);
+                    int system = va_arg(args, int);
+                    int TO_st = other_base_to_ten_h(arg, system);
+                    sprintf(buffer, "%d", TO_st);
+                }
+
+                if (flag[0] == 'm' && flag[1] == 'i')
+                {
+                    int arg = va_arg(args, int);
+                    status_code mi_st = print_damp_memory(&mi_result, &arg, sizeof(arg));
+
+                    if (mi_st == OK)
+                    {
+                        sprintf(buffer, "%s", mi_result);
+                    }
+                    else
+                    {
+                        print_errors(mi_st);
+                    }
+                    free(mi_result);
+                }
+
+                if (flag[0] == 'm' && flag[1] == 'u')
+                {
+                    unsigned int arg = va_arg(args, unsigned int);
+                    status_code mu_st = print_damp_memory(&mu_result, &arg, sizeof(arg));
+
+                    if (mu_st == OK)
+                    {
+                        sprintf(buffer, "%s", mu_result);
+                    }
+                    else
+                    {
+                        print_errors(mu_st);
+                    }
+                    free(mu_result);
+                }
+
+                if (flag[0] == 'm' && flag[1] == 'd')
+                {
+                    double arg = va_arg(args, double);
+                    status_code md_st = print_damp_memory(&md_result, &arg, sizeof(arg));
+
+                    if (md_st == OK)
+                    {
+                        sprintf(buffer, "%s", md_result);
+                    }
+                    else
+                    {
+                        print_errors(md_st);
+                    }
+                    free(md_result);
+                }
+
+                if (flag[0] == 'm' && flag[1] == 'f')
+                {
+                    float arg = va_arg(args, double);
+                    status_code mf_st = print_damp_memory(&mf_result, &arg, sizeof(arg));
+
+                    if (mf_st == OK)
+                    {
+                        sprintf(buffer, "%s", mf_result);
+                    }
+                    else
+                    {
+                        print_errors(mf_st);
+                    }
+                    free(mf_result);
+                }
+
+                else 
+                {
+                    vsprintf(buffer, flag, args);
+                }
+                index = next_index;
+            }
+        }
+    }
+    va_end(args);
 }
 
 int main()
@@ -560,8 +756,9 @@ int main()
         printf("Error with opening file\n");
         return 0;
     }
+
     overfprintf(file, "Roman: %Ro\n", 56);
-    overfprintf(file, "Zeckendorf: %Zr\n", 56);
+    // overfprintf(file, "Zeckendorf: %Zr\n", 56);
     overfprintf(file, "System low: %Cv\n", 4375687, 16);
     overfprintf(file, "System high: %CV\n", 455439, 7);
     overfprintf(file, "System 10 low: %to\n", "agfyee", 32);
@@ -570,6 +767,24 @@ int main()
     overfprintf(file, "Bytes signed unsighted int: %mu\n", 485);
     overfprintf(file, "Bytes signed double: %md\n", 45.546);
     overfprintf(file, "Bytes signed float: %mf\n", 45.3463);
+
+    int size = 256;
+    char buffer[size];
+
+    oversprintf(buffer, "Roman: %Ro\n", 56);
+    // overfprintf(file, "Zeckendorf: %Zr\n", 56);
+    oversprintf(buffer, "System low: %Cv\n", 4375687, 16);
+    oversprintf(buffer, "System high: %CV\n", 455439, 7);
+    oversprintf(buffer, "System 10 low: %to\n", "agfyee", 32);
+    oversprintf(buffer, "System 10 high: %TO\n", "123A", 16);
+    oversprintf(buffer, "Bytes signed int: %mi\n", 45);
+    oversprintf(buffer, "Bytes signed unsighted int: %mu\n", 485);
+    oversprintf(buffer, "Bytes signed double: %md\n", 45.546);
+    oversprintf(buffer, "Bytes signed float: %mf\n", 45.3463);
+
+    // buffer[size - 1] = '\0';
+
+    printf("%s", buffer);
 
     fclose(file);
     return 0;
