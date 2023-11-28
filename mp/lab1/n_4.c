@@ -181,7 +181,7 @@ int main(int argc, char* argv[])
     if (argv[1][0] != '-' && argv[1][0] != '/')
     {
         printf("Your flag must start with '-' or '/' symbol\n");
-        exit(1);
+        return 0;
     }
 
     char flag;
