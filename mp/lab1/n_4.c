@@ -86,12 +86,14 @@ enum status_code latin_alphabet(const char *file_input, const char *file_output)
         {
             count++;
         }
-        else if (alphabet == '\n')
+        // else if (alphabet == '\n')
+        else
         {
-            fprintf(file_2, "%d\n", count);
             count = 0;
+            // fprintf(file_2, "%d\n", count);
         }
     }
+    fprintf(file_2, "%d\n", count);
 
     fclose(file_1);
     fclose(file_2);
@@ -197,6 +199,7 @@ int main(int argc, char* argv[])
             printf("Please enter: flag, input file, and output file\n");
             return 0;
         }
+        // printf("ererere\n");
 
         output = argv[3];
 
@@ -206,11 +209,14 @@ int main(int argc, char* argv[])
             return 0;
         }
 
+        // printf("ererere\n");
+
         if (strcmp(argv[2], argv[3]) == 0)
         {
             printf("You have to enter different files\n");
             return 0;
         }
+        // printf("ererere\n");
 
         flag = argv[1][2];
     }
@@ -243,6 +249,7 @@ int main(int argc, char* argv[])
         }
 
         sprintf(output, "out_%s", input_file);
+        free(output);
     }
 
     switch (flag)
@@ -251,6 +258,7 @@ int main(int argc, char* argv[])
             remove_arabic_nums(input, output);
             break;
         case 'i':
+            // printf("ererere\n");
             latin_alphabet(input, output);
             break;
         case 's':
@@ -264,6 +272,6 @@ int main(int argc, char* argv[])
             break;
     }
 
-    free(output);
+    // free(output);
     return 0;
 }
