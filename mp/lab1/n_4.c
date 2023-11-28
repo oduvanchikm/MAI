@@ -41,16 +41,12 @@ void print_errors(int flag)
 enum status_code remove_arabic_nums(const char *file_input, const char *file_output)
 {
     FILE *file_1 = fopen(file_input, "r");
-
-    if (!file_1)
-    {
-        return ERROR_WITH_OPENING_FILE;
-    }
-
     FILE *file_2 = fopen(file_output, "w");
 
-    if (!file_2)
+    if (!file_1 || !file_2)
     {
+        fclose(file_1);
+        fclose(file_2);
         return ERROR_WITH_OPENING_FILE;
     }
 
@@ -73,16 +69,12 @@ enum status_code remove_arabic_nums(const char *file_input, const char *file_out
 enum status_code latin_alphabet(const char *file_input, const char *file_output)
 {
     FILE *file_1 = fopen(file_input, "r");
-
-    if (!file_1)
-    {
-        return ERROR_WITH_OPENING_FILE;
-    }
-
     FILE *file_2 = fopen(file_output, "w");
 
-    if (!file_2)
+    if (!file_1 || !file_2)
     {
+        fclose(file_1);
+        fclose(file_2);
         return ERROR_WITH_OPENING_FILE;
     }
 
@@ -109,16 +101,12 @@ enum status_code latin_alphabet(const char *file_input, const char *file_output)
 enum status_code s_flag(const char *file_input, const char *file_output)
 {
     FILE *file_1 = fopen(file_input, "r");
-
-    if (!file_1)
-    {
-        return ERROR_WITH_OPENING_FILE;
-    }
-
     FILE *file_2 = fopen(file_output, "w");
 
-    if (!file_2)
+    if (!file_1 || !file_2)
     {
+        fclose(file_1);
+        fclose(file_2);
         return ERROR_WITH_OPENING_FILE;
     }
 
@@ -142,19 +130,15 @@ enum status_code s_flag(const char *file_input, const char *file_output)
     return OK;
 }
 
-enum status_code ascii_code(const char *file_input, const char *file_output)
-{
+enum status_code ascii_code(const char *file_input, const char *file_output) 
+{  
     FILE *file_1 = fopen(file_input, "r");
-
-    if (!file_1)
-    {
-        return ERROR_WITH_OPENING_FILE;
-    }
-
     FILE *file_2 = fopen(file_output, "w");
 
-    if (!file_2)
+    if (!file_1 || !file_2)
     {
+        fclose(file_1);
+        fclose(file_2);
         return ERROR_WITH_OPENING_FILE;
     }
 
@@ -176,6 +160,22 @@ enum status_code ascii_code(const char *file_input, const char *file_output)
     return OK;
 }
 
+const char* get_file_name(const char *string) 
+{
+    const char* file_name = strrchr(string, '/');
+
+    if (file_name != NULL) 
+    {
+        file_name++;
+    } 
+    else 
+    {
+        file_name = string;
+    }
+
+    return file_name;
+}
+
 int main(int argc, char* argv[])
 {
     if (argv[1][0] != '-' && argv[1][0] != '/')
@@ -185,19 +185,17 @@ int main(int argc, char* argv[])
     }
 
     char flag;
-    // printf("error\n");
     const char *input = argv[2];
 
     char *output = NULL;
-    // printf("error\n");
+
     if (argv[1][1] == 'n')
     {
-        // printf("error\n");
         if (argc != 4)
         {
             printf("Invalid number of arguments\n");
             printf("Please enter: flag, input file, and output file\n");
-            exit(1);
+            return 0;
         }
 
         output = argv[3];
@@ -205,16 +203,14 @@ int main(int argc, char* argv[])
         if (strlen(argv[1]) != 3)
         {
             printf("Wrong enter\n");
-            exit(1);
+            return 0;
         }
-        // printf("error\n");
 
         if (strcmp(argv[2], argv[3]) == 0)
         {
             printf("You have to enter different files\n");
-            exit(1);
+            return 0;
         }
-        // printf("error\n");
 
         flag = argv[1][2];
     }
@@ -223,29 +219,30 @@ int main(int argc, char* argv[])
         if (strlen(argv[1]) != 2)
         {
             printf("Wrong enter\n");
-            exit(1);
+            return 0;
         }
 
         if (argc != 3)
         {
             printf("Invalid number of arguments\n");
             printf("Please enter: flag, input file, and output file\n");
-            exit(1);
+            return 0;
         }
 
         flag = argv[1][1];
 
         char *prefix = "out_";
+        const char *input_file = get_file_name(input);
 
-        output = (char*)malloc(strlen(input) + strlen(prefix) + 1);
+        output = (char*)malloc(strlen(input_file) + strlen(prefix) + 1);
 
         if (!output) 
         {
             printf("Error with memory allocation\n");
-            exit(1);
+            return 0;
         }
 
-        sprintf(output, "out_%s", argv[2]);
+        sprintf(output, "out_%s", input_file);
     }
 
     switch (flag)
@@ -264,7 +261,7 @@ int main(int argc, char* argv[])
             break;
         default:
             printf("Invalid flag argument\n");
-            exit(1);
+            break;
     }
 
     free(output);
