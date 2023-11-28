@@ -4,6 +4,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <math.h>
+#include <limits.h>
 
 typedef enum
 {
@@ -11,6 +12,8 @@ typedef enum
     ERROR_WITH_NUMBER_OF_ARGUMENTS,
     WRONG_ARGUMENT,
     ERROR_WITH_OPENING_FILE,
+    OVERFLOW
+
 } status_code;
 
 void print_errors(int flag)
@@ -76,9 +79,13 @@ status_code find_min_base(char *number, int *base)
         {
             max = fmax(max, number[i] - '0');
         }
-        else if (number[i] >= 'A' && number[i] <= 'Z')
+        else if ((number[i] >= 'A' && number[i] <= 'Z') || (number[i] >= 'a' && number[i] <= 'z'))
         {
             max = fmax(max, number[i] - 'A' + 10);
+        }
+        else
+        {
+            return WRONG_ARGUMENT;
         }
     }
 
@@ -109,6 +116,11 @@ int other_base_to_ten(char* number, int base)
 
     while (*ptr)
     {
+        if (result > INT_MAX / base || (isdigit(*ptr) ? *ptr  - '0' : *ptr - 'A' + 10) > INT_MAX - result * base)
+        {
+            return OVERFLOW;
+        }
+
         result = result * base + (isdigit(*ptr) ? *ptr  - '0' : *ptr - 'A' + 10);
         ptr++;
     }
@@ -116,13 +128,20 @@ int other_base_to_ten(char* number, int base)
     return result * symbol;
 }
 
-status_code in_file(char *file1, char *file2)
+status_code in_file(const char *file1, const char *file2)
 {
+    if (strcmp(file1, file2) == 0)
+    {
+        return ERROR_WITH_OPENING_FILE;
+    }
+
     FILE *input = fopen(file1, "r");
     FILE *output = fopen(file2, "w");
 
     if (!input || !output)
     {
+        fclose(input);
+        fclose(output);
         return ERROR_WITH_OPENING_FILE;
     }
 
@@ -130,25 +149,30 @@ status_code in_file(char *file1, char *file2)
     status_code st;
     int base, res;
 
-    ;
-
     while (fscanf(input, "%s", mas) != EOF)
     {
         char *new_nums = remove_zeros(mas);
 
         st = find_min_base(new_nums, &base);
 
-        if (st != OK)
+        if (st == WRONG_ARGUMENT)
         {
-            print_errors(st);
+            fprintf(output, "INVALID INPUT\n");
         }
 
-        fprintf(output, "%s %d %d\n", new_nums, base, other_base_to_ten(new_nums, base));
+        else if (st == OVERFLOW)
+        {
+            fprintf(output, "Overflow\n");
+        }
 
+        else
+        {
+            fprintf(output, "%s %d %d\n", new_nums, base, other_base_to_ten(new_nums, base));
+        }
     }
+    
     fclose(input);
     fclose(output);
-
     return OK;
 }
 
@@ -157,7 +181,7 @@ int main(int argc, char*argv[])
     if (argc != 3 )
     {
         printf("Wrong number of arguments\n");
-        exit(1);
+        return 0;
     }
 
     char *input = argv[1];
@@ -174,6 +198,5 @@ int main(int argc, char*argv[])
     {
         printf("Good!\n");
     }
-
     return 0;
 }
