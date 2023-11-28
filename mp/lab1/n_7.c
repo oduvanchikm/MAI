@@ -61,8 +61,13 @@ int convert_from_decimal(char str, int base)
     return result;
 }
 
-status_code flag_r(char *file_1, char *file_2, char *file_3) 
+status_code flag_r(const char *file_1, const char *file_2, const char *file_3) 
 {
+    if ((strcmp(file_1, file_3) == 0) || (strcmp(file_2, file_3) == 0))
+    {
+        return ERROR_WITH_OPENING_FILE;
+    }
+
     FILE *file1 = fopen(file_1, "r");
     FILE *file2 = fopen(file_2, "r");
     FILE *outfile = fopen(file_3, "w");
@@ -113,8 +118,13 @@ status_code flag_r(char *file_1, char *file_2, char *file_3)
     return OK;
 }
 
-status_code flag_a(char *file_1, char *file_2)
+status_code flag_a(const char *file_1, const char *file_2)
 {
+    if (strcmp(file_1, file_2) == 0)
+    {
+        return ERROR_WITH_OPENING_FILE;
+    }
+
     FILE *file1 = fopen(file_1, "r");
     FILE *file2 = fopen(file_2, "w");
 
@@ -185,6 +195,12 @@ bool validation(char* flag)
 
 int main(int argc, char *argv[])
 {
+    if (argc < 4 || argc > 5)
+    {
+        printf("Error with number of argument\n");
+        return 0;
+    }
+
     if (!validation(argv[1]))
     {
         printf("Error with input data\n");
