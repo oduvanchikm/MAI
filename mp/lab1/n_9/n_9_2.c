@@ -86,8 +86,8 @@ int main()
 {
     srand(time(NULL));
 
-    int a_size = rand() % 9991 + 10;
-    int b_size = rand() % (10000 - 10 + 1) + 10;
+    int a_size = rand() % 20 + 10;
+    int b_size = rand() % (5 - 10 + 1) + 10;
 
     int *a_array;
     int *b_array;
@@ -98,7 +98,7 @@ int main()
     if (st_random_a == ERROR_WITH_MEMORY_ALLOCATION)
     {
         print_errors(st_random_a);
-        exit(1);
+        return 0;
     }
 
     int st_random_b = generate_random_array(&b_array, b_size, -1000, 1000);
@@ -106,7 +106,7 @@ int main()
     if (st_random_b == ERROR_WITH_MEMORY_ALLOCATION)
     {
         print_errors(st_random_b);
-        exit(1);
+        return 0;
     }
 
     printf("array a: ");
@@ -134,7 +134,7 @@ int main()
         print_errors(st_new);
         free(a_array);
         free(b_array);
-        exit(1);
+        return 0;
     }
 
     printf("array c: ");
