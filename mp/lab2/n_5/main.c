@@ -71,66 +71,65 @@ status_code roman_digits_flag(int num, char **result)
     return OK;
 }
 
-int find_max_fibonacci(int n)
+int find_max_fibonacci(int *fib_digit, int number)
 {
-    int fib1 = 0, fib2 = 1, fib3 = 1;
-    int max_fib = 0;
-
-    while (fib3 <= n)
+    int fib_cur = 1;
+    int fib_prev = 1;
+    int fib_next;
+    int count = 0;
+    while (number >= fib_cur)
     {
-        max_fib = fib3;
-        fib1 = fib2;
-        fib2 = fib3;
-        fib3 = fib1 + fib2;
+        fib_next = fib_prev + fib_cur;
+        fib_prev = fib_cur;
+        fib_cur = fib_next;
+        count++;
     }
+    if (number == fib_cur)
+    {
+        *fib_digit = fib_cur;
+        return count;
+    }
+    count--;
+    *fib_digit = fib_prev;
 
-    return max_fib;
+    return count;
 }
 
 status_code zeckendorf(unsigned int n, char **result)
 {
-    if (n == 0)
+    if (n == 0) 
     {
         return INVALID_ARGUMENT;
     }
+    int fib = 0;
+    int length = find_max_fibonacci(&fib, n);
+    
+    char *array = (char*) malloc(length * sizeof(char));
 
-    int fib_prev = 0;
-    int fib_curr = 1;
-    int fib_next = fib_prev + fib_curr;
-
-    int i = 0;
-
-    int fib = find_max_fibonacci(n);
-
-    char *array = (char*)malloc(sizeof(char) * (fib + 1));
-    printf("error\n");
-
-    if (!array)
+    if (!array) 
     {
         return ERROR_WITH_MEMORY_ALLOCATION;
     }
 
-    while (n != 0)
+    for (int i = 0; i < length; ++i) 
     {
-        if (fib_next <= n)
-        {
-            fib_prev = fib_curr;
-            fib_curr = fib_next;
-            fib_next = fib_prev + fib_curr;
-        }
-        else    
-        {
-            array[i] = '1';
-            n -= fib_curr;
-            fib_next = fib_curr;
-            fib_curr = fib_prev;
-            fib_prev = fib_next - fib_curr;
-            i++;
-        }
+        array[i] = '0';
     }
-    array[i] = '\0';
-    (*result) = array;
 
+    array[length + 2] = '\0';
+    array[length + 1] = '1';
+    array[length] = '1';
+
+    n -= fib;
+
+    int index = find_max_fibonacci(&fib, n);
+    while (n > 0)
+    {
+        array[index] = '1';
+        n -= fib;
+        index = find_max_fibonacci(&fib, n);
+    }
+    *result = array;
     return OK;
 }
 
@@ -342,9 +341,7 @@ status_code print_damp_memory(char **result, void *num, size_t size)
             buffer[k++] = bit + '0'; 
         }
     }
-
     *result = buffer;
-
     return OK;
 }
 
@@ -384,14 +381,14 @@ void overfprintf(FILE *file, const char *format, ...)
                 char flag[25];
                 int flag_index = 0;
                 
-                while (format[next_index] != '\0' && (isalnum(format[next_index]) || format[next_index] == '.')) 
+                while (format[next_index] != '\0' && (isalnum(format[next_index]))) 
                 {
                     flag[flag_index++] = format[next_index++];
                 }
 
                 flag[flag_index] = '\0';
 
-                if (flag[0] == 'R' && flag[1] == 'o') 
+                if (strcmp(flag, "Ro") == 0)
                 {
                     int arg = va_arg(args, int);
                     status_code st_roman = roman_digits_flag(arg, &roman_result);
@@ -406,7 +403,7 @@ void overfprintf(FILE *file, const char *format, ...)
                     free(roman_result);
                 }
 
-                if (flag[0] == 'Z' && flag[1] == 'r')
+                if (strcmp(flag, "Zr") == 0)
                 {
                     unsigned int arg = va_arg(args, unsigned int);
                     status_code st_zc = zeckendorf(arg, &zeck_result);
@@ -421,7 +418,7 @@ void overfprintf(FILE *file, const char *format, ...)
                     free(zeck_result);
                 }
 
-                if (flag[0] == 'C' && flag[1] == 'v')
+                if (strcmp(flag, "Cv") == 0)
                 {
                     int arg = va_arg(args, int);
                     int system = va_arg(args, int);
@@ -430,7 +427,6 @@ void overfprintf(FILE *file, const char *format, ...)
                     if (Cv_st == OK)
                     {
                         fprintf(file, "%s", Cv_result);
-                        printf("r\n");
                     }
 
                     else
@@ -440,7 +436,7 @@ void overfprintf(FILE *file, const char *format, ...)
                     free(Cv_result);
                 }
 
-                if (flag[0] == 'C' && flag[1] == 'V')
+                if (strcmp(flag, "CV") == 0)
                 {
                     int arg = va_arg(args, int);
                     int system = va_arg(args, int);
@@ -457,7 +453,7 @@ void overfprintf(FILE *file, const char *format, ...)
                     free(CV_result);
                 }
 
-                if (flag[0] == 't' && flag[1] == 'o')
+                if (strcmp(flag, "to") == 0)
                 {
                     char* arg = va_arg(args, char*);
                     int system = va_arg(args, int);
@@ -465,7 +461,7 @@ void overfprintf(FILE *file, const char *format, ...)
                     fprintf(file, "%d", to_st);
                 }
 
-                if (flag[0] == 'T' && flag[1] == 'O')
+                if (strcmp(flag, "TO") == 0)
                 {
                     char* arg = va_arg(args, char*);
                     int system = va_arg(args, int);
@@ -473,7 +469,7 @@ void overfprintf(FILE *file, const char *format, ...)
                     fprintf(file, "%d", TO_st);
                 }
 
-                if (flag[0] == 'm' && flag[1] == 'i')
+                if (strcmp(flag, "mi") == 0)
                 {
                     int arg = va_arg(args, int);
                     status_code mi_st = print_damp_memory(&mi_result, &arg, sizeof(arg));
@@ -489,7 +485,7 @@ void overfprintf(FILE *file, const char *format, ...)
                     free(mi_result);
                 }
 
-                if (flag[0] == 'm' && flag[1] == 'u')
+                if (strcmp(flag, "mu") == 0)
                 {
                     unsigned int arg = va_arg(args, unsigned int);
                     status_code mu_st = print_damp_memory(&mu_result, &arg, sizeof(arg));
@@ -505,7 +501,7 @@ void overfprintf(FILE *file, const char *format, ...)
                     free(mu_result);
                 }
 
-                if (flag[0] == 'm' && flag[1] == 'd')
+                if (strcmp(flag, "md") == 0)
                 {
                     double arg = va_arg(args, double);
                     status_code md_st = print_damp_memory(&md_result, &arg, sizeof(arg));
@@ -521,7 +517,7 @@ void overfprintf(FILE *file, const char *format, ...)
                     free(md_result);
                 }
 
-                if (flag[0] == 'm' && flag[1] == 'f')
+                if (strcmp(flag, "mf") == 0)
                 {
                     float arg = va_arg(args, double);
                     status_code mf_st = print_damp_memory(&mf_result, &arg, sizeof(arg));
@@ -539,7 +535,15 @@ void overfprintf(FILE *file, const char *format, ...)
 
                 else 
                 {
-                    vfprintf(file, flag, args);
+                    if (strcmp(flag, "n") == 0) 
+                    {
+                        int *n_ptr = va_arg(args, int*);
+                        *n_ptr = ftell(file);
+                    }
+                    else 
+                    {
+                        vfprintf(file, flag, args);
+                    }
                 }
                 index = next_index;
             }
@@ -553,7 +557,8 @@ void oversprintf(char *buffer, const char *format, ...)
     va_list args;
     va_start(args, format);
     
-    int index = 0;
+    size_t index = 0;
+
     char* roman_result = NULL;
     char* zeck_result = NULL;
     char* Cv_result = NULL;
@@ -572,7 +577,7 @@ void oversprintf(char *buffer, const char *format, ...)
         } 
         else 
         {
-            int next_index = index + 1;
+            size_t next_index = index + 1;
 
             if (format[next_index] == '%') 
             {
@@ -582,22 +587,22 @@ void oversprintf(char *buffer, const char *format, ...)
             else 
             {
                 char flag[25];
-                int flag_index = 0;
+                size_t flag_index = 0;
                 
-                while (format[next_index] != '\0' && (isalnum(format[next_index]) || format[next_index] == '.')) 
+                while (format[next_index] != '\0' && (isalnum(format[next_index]))) 
                 {
                     flag[flag_index++] = format[next_index++];
                 }
 
                 flag[flag_index] = '\0';
 
-                if (flag[0] == 'R' && flag[1] == 'o') 
+                if (strcmp(flag, "Ro") == 0)
                 {
                     int arg = va_arg(args, int);
                     status_code st_roman = roman_digits_flag(arg, &roman_result);
                     if (st_roman == OK)
                     {
-                        sprintf(buffer, "%s", roman_result);
+                        sprintf(buffer, "%s\n", roman_result);
                     }
                     else
                     {
@@ -606,13 +611,13 @@ void oversprintf(char *buffer, const char *format, ...)
                     free(roman_result);
                 }
 
-                if (flag[0] == 'Z' && flag[1] == 'r')
+                if (strcmp(flag, "Zr") == 0)
                 {
                     unsigned int arg = va_arg(args, unsigned int);
                     status_code st_zc = zeckendorf(arg, &zeck_result);
                     if (st_zc == OK)
                     {
-                        sprintf(buffer, "%s", zeck_result);
+                        sprintf(buffer, "%s\n", zeck_result);
                     }
                     else
                     {
@@ -621,7 +626,7 @@ void oversprintf(char *buffer, const char *format, ...)
                     free(zeck_result);
                 }
 
-                if (flag[0] == 'C' && flag[1] == 'v')
+                if (strcmp(flag, "Cv") == 0)
                 {
                     int arg = va_arg(args, int);
                     int system = va_arg(args, int);
@@ -629,8 +634,7 @@ void oversprintf(char *buffer, const char *format, ...)
 
                     if (Cv_st == OK)
                     {
-                        sprintf(buffer, "%s", Cv_result);
-                        printf("r\n");
+                        sprintf(buffer, "%s\n", Cv_result);
                     }
 
                     else
@@ -640,7 +644,7 @@ void oversprintf(char *buffer, const char *format, ...)
                     free(Cv_result);
                 }
 
-                if (flag[0] == 'C' && flag[1] == 'V')
+                if (strcmp(flag, "CV") == 0)
                 {
                     int arg = va_arg(args, int);
                     int system = va_arg(args, int);
@@ -648,7 +652,7 @@ void oversprintf(char *buffer, const char *format, ...)
 
                     if (CV_st == OK)
                     {
-                        sprintf(buffer, "%s", CV_result);
+                        sprintf(buffer, "%s\n", CV_result);
                     }
                     else
                     {
@@ -657,30 +661,30 @@ void oversprintf(char *buffer, const char *format, ...)
                     free(CV_result);
                 }
 
-                if (flag[0] == 't' && flag[1] == 'o')
+                if (strcmp(flag, "to") == 0)
                 {
                     char* arg = va_arg(args, char*);
                     int system = va_arg(args, int);
                     int to_st = other_base_to_ten_l(arg, system);
-                    sprintf(buffer, "%d", to_st);
+                    sprintf(buffer, "%d\n", to_st);
                 }
 
-                if (flag[0] == 'T' && flag[1] == 'O')
+                if (strcmp(flag, "TO") == 0)
                 {
                     char* arg = va_arg(args, char*);
                     int system = va_arg(args, int);
                     int TO_st = other_base_to_ten_h(arg, system);
-                    sprintf(buffer, "%d", TO_st);
+                    sprintf(buffer, "%d\n", TO_st);
                 }
 
-                if (flag[0] == 'm' && flag[1] == 'i')
+                if (strcmp(flag, "mi") == 0)
                 {
                     int arg = va_arg(args, int);
                     status_code mi_st = print_damp_memory(&mi_result, &arg, sizeof(arg));
 
                     if (mi_st == OK)
                     {
-                        sprintf(buffer, "%s", mi_result);
+                        sprintf(buffer, "%s\n", mi_result);
                     }
                     else
                     {
@@ -689,14 +693,14 @@ void oversprintf(char *buffer, const char *format, ...)
                     free(mi_result);
                 }
 
-                if (flag[0] == 'm' && flag[1] == 'u')
+                if (strcmp(flag, "mu") == 0)
                 {
                     unsigned int arg = va_arg(args, unsigned int);
                     status_code mu_st = print_damp_memory(&mu_result, &arg, sizeof(arg));
 
                     if (mu_st == OK)
                     {
-                        sprintf(buffer, "%s", mu_result);
+                        sprintf(buffer, "%s\n", mu_result);
                     }
                     else
                     {
@@ -705,14 +709,14 @@ void oversprintf(char *buffer, const char *format, ...)
                     free(mu_result);
                 }
 
-                if (flag[0] == 'm' && flag[1] == 'd')
+                if (strcmp(flag, "md") == 0)
                 {
                     double arg = va_arg(args, double);
                     status_code md_st = print_damp_memory(&md_result, &arg, sizeof(arg));
 
                     if (md_st == OK)
                     {
-                        sprintf(buffer, "%s", md_result);
+                        sprintf(buffer, "%s\n", md_result);
                     }
                     else
                     {
@@ -721,14 +725,14 @@ void oversprintf(char *buffer, const char *format, ...)
                     free(md_result);
                 }
 
-                if (flag[0] == 'm' && flag[1] == 'f')
+                if (strcmp(flag, "mf") == 0)
                 {
                     float arg = va_arg(args, double);
                     status_code mf_st = print_damp_memory(&mf_result, &arg, sizeof(arg));
 
                     if (mf_st == OK)
                     {
-                        sprintf(buffer, "%s", mf_result);
+                        sprintf(buffer, "%s\n", mf_result);
                     }
                     else
                     {
@@ -739,12 +743,22 @@ void oversprintf(char *buffer, const char *format, ...)
 
                 else 
                 {
-                    vsprintf(buffer, flag, args);
+                    if (strcmp(flag, "n") == 0) 
+                    {
+                        int *n_ptr = va_arg(args, int*);
+                        *n_ptr = index;
+                    }
+                    else 
+                    {
+                        vsprintf(buffer, flag, args);
+                    }
                 }
                 index = next_index;
             }
         }
+
     }
+    buffer[index] = '\0';
     va_end(args);
 }
 
@@ -756,9 +770,10 @@ int main()
         printf("Error with opening file\n");
         return 0;
     }
+    int x;
 
     overfprintf(file, "Roman: %Ro\n", 56);
-    // overfprintf(file, "Zeckendorf: %Zr\n", 56);
+    overfprintf(file, "Zeckendorf: %Zr\n", 56);
     overfprintf(file, "System low: %Cv\n", 4375687, 16);
     overfprintf(file, "System high: %CV\n", 455439, 7);
     overfprintf(file, "System 10 low: %to\n", "agfyee", 32);
@@ -767,12 +782,13 @@ int main()
     overfprintf(file, "Bytes signed unsighted int: %mu\n", 485);
     overfprintf(file, "Bytes signed double: %md\n", 45.546);
     overfprintf(file, "Bytes signed float: %mf\n", 45.3463);
+    overfprintf(file, "%n\n", &x);
 
     int size = 256;
     char buffer[size];
 
     oversprintf(buffer, "Roman: %Ro\n", 56);
-    // overfprintf(file, "Zeckendorf: %Zr\n", 56);
+    oversprintf(buffer, "Zeckendorf: %Zr\n", 56);
     oversprintf(buffer, "System low: %Cv\n", 4375687, 16);
     oversprintf(buffer, "System high: %CV\n", 455439, 7);
     oversprintf(buffer, "System 10 low: %to\n", "agfyee", 32);
@@ -781,8 +797,7 @@ int main()
     oversprintf(buffer, "Bytes signed unsighted int: %mu\n", 485);
     oversprintf(buffer, "Bytes signed double: %md\n", 45.546);
     oversprintf(buffer, "Bytes signed float: %mf\n", 45.3463);
-
-    // buffer[size - 1] = '\0';
+    oversprintf(buffer, "%n\n", &x);
 
     printf("%s", buffer);
 
