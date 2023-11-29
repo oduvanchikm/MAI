@@ -1,11 +1,10 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-typedef enum 
+typedef enum
 {
     OK,
-    ERROR_WITH_OPENING_FILE,
-    ERROR_ARGUMENT
+    ERROR_WITH_OPENING_FILE 
 
 } status_code;
 
@@ -16,110 +15,107 @@ void print_errors(int flag)
         case ERROR_WITH_OPENING_FILE:
             printf("Error with opening file\n");
             break;
-        
-        case ERROR_ARGUMENT:
-            printf("Error argument\n");
+
+        default:
             break;
     }
 }
 
-void print_result(const char* file_name, int line_number, int pos)
+void print_result(char* file_name, int line_number, int position)
 {
-    printf("File %s: line - %d, pos - %d\n", file_name, line_number, pos);
+    printf("File %s: line is %d and position is %d\n", file_name, line_number, position);
 }
 
-void print_no_sub(const char* file_name)
+void print_no_sub(char* file_name)
 {
     printf("No sub in file: %s\n", file_name);
 }
 
-status_code find_sub(FILE* file, const char* sub, const char* file_name)
+status_code find_sub(FILE* file, char* sub, char* file_name)
 {
     char line[256];
-    int line_count = 1;
-    int s = 0;
+    int count = 1;
+    int success = 0;
 
-    while (fgets(line, sizeof(line), file) != NULL)
+    while(fgets(line, sizeof(line), file) != NULL)
     {
-        char* pos = line;
+        char* position = line;
         int file_index = 1;
 
-        while (*pos != '\0')
+        while(*position != '\0')
         {
-            int sub_index = 0;
+            int index = 0;
             int flag = 1;
 
-            while (sub[sub_index] != '\0')
+            while(sub[index] != '\0')
             {
-                if (sub[sub_index] != pos[sub_index])
+                if(sub[index] != position[index])
                 {
                     flag = 0;
                     break;
                 }
-
-                sub_index++;
+                index++;
             }
 
-            if (flag)
+            if(flag)
             {
-                print_result(file_name, line_count, file_index);
-                s = 1;
+                print_result(file_name, count, file_index);
+                success = 1;
             }
 
-            pos++;
+            position++;
             file_index++;
         }
 
-        line_count++;
+        count++;
     }
 
-    if (!s)
+    if(!success)
     {
         print_no_sub(file_name);
     }
+
     return OK;
 }
 
-status_code file(const char* sub, int num_files, ...)
+status_code get_file(char* sub, int count, ...)
 {
-    va_list arg;
-    va_start(arg, num_files);
+    va_list ptr;
+    va_start(ptr, count);
 
-    for (int i = 0; i < num_files; i++)
+    for(int i = 0; i < count; i++)
     {
-        const char* file_name = va_arg(arg, const char*);
+        char* file_name = va_arg(ptr, char*);
         FILE* file = fopen(file_name, "r");
 
-        if (!file)
+        if(!file)
         {
-            va_end(arg);
             return ERROR_WITH_OPENING_FILE;
         }
 
-        if (find_sub(file, sub, file_name) == OK)
+        if (find_sub(file, sub, file_name) != OK)
         {
-            va_end(arg);
-            return OK;
+            fclose(file);
+            print_errors(find_sub(file, sub, file_name));
         }
         fclose(file);
     }
-    va_end(arg);
-
-    return ERROR_ARGUMENT;
+    va_end(ptr);
+    
+    return OK;
 }
 
 int main()
 {
-    const char* sub = "4";
-    const char* file_1 = "t1.txt";
-    const char* file_2 = "t2.txt";
+    char* sub = "4";
+    char* file_1 = "t1.txt";
+    char* file_2 = "t2.txt";
     int count = 2;
 
-    status_code st = file(sub, count, file_1, file_2);
-
-    if (st != OK)
+    if(get_file(sub, count, file_1, file_2) == ERROR_WITH_OPENING_FILE)
     {
-        print_errors(st);
+        print_errors(get_file(sub, count, file_1, file_2));
     }
+
     return 0;
 }
