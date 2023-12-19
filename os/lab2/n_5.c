@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
     if (argc != 2)
     {
         printf("Error with number of arguments\n");
-        exit(1);
+        return 1;
     }
 
     int n = atoi(argv[1]);
