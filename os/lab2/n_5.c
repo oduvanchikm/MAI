@@ -12,6 +12,7 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void woman_wants_to_enter()
 {
+    int flag = 0;
     pthread_mutex_lock(&mutex);
 
     printf("A women wants to enter\n");
@@ -22,6 +23,7 @@ void woman_wants_to_enter()
 
         women_count++;
         printf("Women: %d\n", women_count);
+        flag = 1;
 
         pthread_mutex_unlock(&mutex);
     }
@@ -30,11 +32,32 @@ void woman_wants_to_enter()
         printf("A women cannot enter, either men in bathroom or bathroom is full\n");
 
         pthread_mutex_unlock(&mutex);
+        while(!flag)
+        {
+            pthread_mutex_lock(&mutex);
+
+            if (men_count == 0 && women_count < max)
+            {
+                printf("A women entered\n");
+
+                women_count++;
+                printf("Women: %d\n", women_count);
+                flag = 1;
+
+                pthread_mutex_unlock(&mutex);
+            }
+
+            else
+            {
+                pthread_mutex_unlock(&mutex);
+            }
+        }
     }
 }
 
 void man_wants_to_enter()
 {
+    int flag = 0;
     pthread_mutex_lock(&mutex);
 
     printf("A man wants to enter\n");
@@ -45,6 +68,7 @@ void man_wants_to_enter()
 
         men_count++;
         printf("Men: %d\n", men_count);
+        flag = 1;
 
         pthread_mutex_unlock(&mutex);
     }
@@ -53,6 +77,27 @@ void man_wants_to_enter()
         printf("A man cannot enter, either women in bathroom or bathroom is full\n");
 
         pthread_mutex_unlock(&mutex);
+
+        while(!flag)
+        {
+            pthread_mutex_lock(&mutex);
+
+            if (women_count == 0 && men_count < max)
+            {
+                printf("A man entered\n");
+
+                men_count++;
+                printf("Men: %d\n", men_count);
+                flag = 1;
+
+                pthread_mutex_unlock(&mutex);
+            } 
+
+            else
+            {
+                pthread_mutex_unlock(&mutex);
+            }
+        }
     }
 }
 
@@ -127,3 +172,5 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+
+
