@@ -1,23 +1,17 @@
 #include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <stdbool.h>
-#include <ctype.h>
 #include <stdarg.h>
+#include <stdlib.h>
 #include <math.h>
 
-#define eps 1e-12
-#define MAX_ITERATIONS 10000
-
-
-enum status_code
+typedef enum
 {
     OK,
     INVALID_INPUT,
     ERROR_WITH_MEMORY_ALLOCATION,
     WRONG_BASE,
     INVALID_VALUE
-};
+} status_code;
 
 void print_errors(int flag) 
 {
@@ -40,119 +34,100 @@ void print_errors(int flag)
     }
 }
 
-// алгоритм Евклда поиска наибольшего общего делителя
-int greatest_common_divisor(long long first, long long second) 
+int greatest_common_divisor(int a, int b)
 {
-    if (first == 0) 
+    if (a == 0)
     {
-        return second;
+        return b;
     }
-    return greatest_common_divisor(second % first, first);
+    else if (a < 0 || b < 0)
+    {
+        return greatest_common_divisor(abs(a), abs(b));
+    }
+    else
+    {
+        return greatest_common_divisor(b % a, a);
+    }
 }
 
-// перевод числа из десятичной в дробь, где numerator - числитель, denominator - знаменатель
-enum status_code decimal_to_fraction(double num, long long* numerator, long long* denominator) 
+bool is_prime(int a)
 {
-    if (!numerator && !denominator)
+    if (a <= 1) 
     {
-        return INVALID_VALUE;
+        return false;
     }
-
-    double remainder = num;
-
-    *numerator = 1;
-    *denominator = 1;
-
-    while (fabs(remainder - floor(remainder)) >= eps) 
+    for (int i = 2; i * i <= a; i++) 
     {
-        remainder *= 10;
-        *denominator *= 10;
-    }
-
-    *numerator = (long long)remainder;
-
-    int gcd = greatest_common_divisor(*numerator, *denominator);
-
-    *numerator /= gcd;
-    *denominator /= gcd;
-
-    return OK;
-}
-
-// если дробь имеет период, то не она не имеет конечного представления, в обратном случае, имеет
-enum status_code has_finite_representation(long long numerator, long long denominator, int base, int* result) 
-{
-    if (base < 2 || base > 36)
-    {
-        return WRONG_BASE;
-    }
-
-    int iterations = 0;
-
-    int remainder = numerator % denominator;
-    int remainder_array[denominator];
-    
-    for (int i = 0; i < denominator; i++)
-    {
-        remainder_array[i] = -1; 
-    }
-    
-    while (remainder != 0 && iterations < MAX_ITERATIONS) 
-    {
-        if (remainder_array[remainder] != -1 || remainder == 0)
+        if (a % i == 0) 
         {
-            *result = 0; 
-            return OK;
+            return false;
         }
-        
-        remainder_array[remainder] = remainder;
-        
-        remainder *= base;
-        remainder %= denominator;
-        
-        iterations++;
     }
-    
-    *result = 1;
+    return true;
+}
+
+status_code prime_in_base(int base, int numerator, int denominator)
+{
+    for (int i = 2; i <= denominator; i++)
+    {
+        if(denominator % i == 0)
+        {
+            if(is_prime(i) && base % i != 0)
+            {
+                return INVALID_INPUT;
+            }
+        }
+    }
     return OK;
 }
 
-enum status_code finite_representation(int** result, int base, int count, ...) 
+status_code finite_representation(int** res, unsigned int base, int count, ...)
 {
-    if (count <= 0)
+    if (base < 2 || base > 36 || count < 1)
     {
-        return INVALID_VALUE;
+        return INVALID_INPUT;
     }
 
-    *result = (int*)malloc((count + 1) * sizeof(int));
-
-    if (!*result) 
+    *res = (int*)malloc(sizeof(int) * count);
+    if (*res == NULL)
     {
         return ERROR_WITH_MEMORY_ALLOCATION;
     }
-    (*result)[count] = '\0';
+    
+    va_list ptr;
+    va_start(ptr, count);
 
-    va_list args;
-
-    va_start(args, count);
-
-    for (int i = 0; i < count; i++) 
+    for (int i = 0; i < count; i++)
     {
-        double num = va_arg(args, double);
+        double value = va_arg(ptr, double);
 
-        long long numerator = 1;
-        long long denominator = 1;
+        int numerator, denominator = 1;
 
-        enum status_code status = decimal_to_fraction(num, &numerator, &denominator);
-
-        if (status != OK)
+        while(value > (int)value)
         {
-            return INVALID_VALUE;
+            value *= 10;
+            denominator *= 10;
         }
 
-        (*result)[i] = has_finite_representation(numerator, denominator, base, *result);
+        numerator = (int)value; 
+
+        int nod = greatest_common_divisor(numerator,denominator); 
+        
+        numerator /= nod;
+        denominator /= nod;
+
+        status_code res_prime_in_base = prime_in_base(base, numerator, denominator);
+        
+        if (res_prime_in_base == OK)
+        {
+            (*res)[i] = 1; 
+        }
+        else
+        {
+            (*res)[i] = 0; 
+        }
     }
-    va_end(args);
+    va_end(ptr);
     return OK;
 }
 
@@ -166,14 +141,10 @@ int main()
     {
         printf("Wrong base\n");
     }
-
-    double num1 = 0.25, num2 = 0.3;
     
     int count = 2;
-
     int* result;
-
-    enum status_code status = finite_representation(&result, base, count, num1, num2);
+    status_code status = finite_representation(&result, base, count, 0.0002, 0.9439);
 
     if (status != OK) 
     {
@@ -186,9 +157,7 @@ int main()
     }
 
     printf("\n");
-
     free(result);
-
     return 0;
 }
 
