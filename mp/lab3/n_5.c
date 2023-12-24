@@ -211,14 +211,14 @@ status_code info_from_file(FILE *filename, Student **result, int *number_of_stud
             return ERROR_WITH_MEMORY_ALLOCATION;
         }
 
-//        if (!(isdigit((*result)[i].ID)) || !(isalpha((*result)[i].name)) || !(isalpha((*result)[i].surname)))
-//        {
-//            return INVALID_INPUT;
-//        }
+       if (!(isdigit((*result)[i].id)) || !(isalpha((*result)[i].name)) || !(isalpha((*result)[i].surname)))
+       {
+           return INVALID_INPUT;
+       }
 
         for (int j = 0; j < 5; j++)
         {
-            if (fscanf(filename, " %c", &((*result)[i].mark[j])) != 1 || !is_mark((*result)[i].mark[j]))
+            if ((fscanf(filename, " %c", &((*result)[i].mark[j]))) != 1 || !is_mark((*result)[i].mark[j]))
             {
                 for (int k = 0; k <= i; k++)
                 {
@@ -269,7 +269,7 @@ status_code print_students(Student* students, int count_of_students)
     int i = 0;
     if (students == NULL || students[i].id == -1 || count_of_students == 0)
     {
-        printf("Студентов нет\n");
+        printf("There are no students\n");
     }
     while (i < count_of_students)
     {
@@ -445,10 +445,7 @@ int main(int argc, char *argv[])
                 }
             }
             break;
-        
-        case 5:
-            break;
-
+            
         default:
             printf("Invalid option\n");
             break;
