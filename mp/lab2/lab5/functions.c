@@ -120,15 +120,8 @@ void overfprintf(FILE *file, const char *format, ...)
                 {
                     char* arg = va_arg(args, char*);
                     int system = va_arg(args, int);
-                    status_code TO_st = other_base_to_ten_h(arg, system);
-                    if (TO_st == OK)
-                    {
-                        fprintf(file, "%d", TO_st);
-                    }
-                    else 
-                    {
-                        print_errors(TO_st);
-                    }
+                    int TO_st = other_base_to_ten_h(arg, system);
+                    fprintf(file, "%d", TO_st);
                 }
 
                 else if (strcmp(flag, "%mi") == 0)
@@ -228,7 +221,7 @@ void oversprintf(char *buffer, const char *format, ...)
     int index = 0;
     int buffer_index = 0;
 
-    
+    //printf("%s\n", format);
     char* zeck_result = NULL;
     char* Cv_result = NULL;
     char* CV_result = NULL;
@@ -241,20 +234,21 @@ void oversprintf(char *buffer, const char *format, ...)
 
     while (format[index] != '\0')
     {
+        //printf("%c\n", format[index]);
+        //printf("%d\n", buffer_index);
         if (format[index] != '%')
         {
             buffer[buffer_index] = format[index];
+            //printf("%c\n", format[index]);
             buffer_index++;
             index++;
         }
         else
         {
-            int next_index = index + 1;
-
+            int next_index = index;
             if (format[next_index] == '%')
             {
                 sprintf(&(buffer[buffer_index]), "%c", '%');
-                // value += sprintf(buffer + value, "%c", '%');
                 index = next_index + 1;
                 buffer_index++;
             }
@@ -270,7 +264,6 @@ void oversprintf(char *buffer, const char *format, ...)
                 }
 
                 flag[flag_index] = '\0';
-
                 if (strcmp(flag, "%Ro") == 0)
                 {
                     char* roman_result = NULL;
@@ -294,17 +287,20 @@ void oversprintf(char *buffer, const char *format, ...)
                     status_code st_zc = zecedorf_representation(arg, &zeck_result);
                     if (st_zc == OK)
                     {
-                        sprintf((buffer + buffer_index), "%s", zeck_result);
-                        buffer_index += strlen(zeck_result) + 1;
+                        //printf("%d\n", buffer_index);
+                        buffer_index += sprintf((buffer + buffer_index), "%s", zeck_result) + 1;
+                        printf("%s\n", buffer);
+                        // strlen(zeck_result) + 1;
                     }
                     else
                     {
+                        printf("lalal\n");
                         print_errors(st_zc);
                     }
                     free(zeck_result);
                 }
 
-                else if (strcmp(flag, "Cv") == 0)
+                else if (strcmp(flag, "%Cv") == 0)
                 {
                     int arg = va_arg(args, int);
                     int system = va_arg(args, int);
@@ -323,7 +319,7 @@ void oversprintf(char *buffer, const char *format, ...)
                     free(Cv_result);
                 }
 
-                else if (strcmp(flag, "CV") == 0)
+                else if (strcmp(flag, "%CV") == 0)
                 {
                     int arg = va_arg(args, int);
                     int system = va_arg(args, int);
@@ -341,7 +337,7 @@ void oversprintf(char *buffer, const char *format, ...)
                     free(CV_result);
                 }
 
-                else if (strcmp(flag, "to") == 0)
+                else if (strcmp(flag, "%to") == 0)
                 {
                     char* arg = va_arg(args, char*);
                     int system = va_arg(args, int);
@@ -350,16 +346,17 @@ void oversprintf(char *buffer, const char *format, ...)
                     buffer_index += 1;
                 }
 
-                if (strcmp(flag, "TO") == 0)
+                if (strcmp(flag, "%TO") == 0)
                 {
                     char* arg = va_arg(args, char*);
                     int system = va_arg(args, int);
                     int TO_st = other_base_to_ten_h(arg, system);
-                    sprintf(&(buffer[buffer_index]), "%d\n", system);
-                    buffer_index += 1;
+                    //printf("%d\n", TO_st);
+                    buffer_index += (sprintf(&(buffer[buffer_index]), "%d", TO_st) + 1);
+                    //printf("%s\n", buffer);
                 }
 
-                if (strcmp(flag, "mi") == 0)
+                if (strcmp(flag, "%mi") == 0)
                 {
                     int arg = va_arg(args, int);
                     status_code mi_st = print_dump_memory(&mi_result, &arg, sizeof(arg));
@@ -376,7 +373,7 @@ void oversprintf(char *buffer, const char *format, ...)
                     free(mi_result);
                 }
 
-                else if (strcmp(flag, "mu") == 0)
+                else if (strcmp(flag, "%mu") == 0)
                 {
                     unsigned int arg = va_arg(args, unsigned int);
                     status_code mu_st = print_dump_memory(&mu_result, &arg, sizeof(arg));
@@ -393,7 +390,7 @@ void oversprintf(char *buffer, const char *format, ...)
                     free(mu_result);
                 }
 
-                else if (strcmp(flag, "md") == 0)
+                else if (strcmp(flag, "%md") == 0)
                 {
                     double arg = va_arg(args, double);
                     status_code md_st = print_dump_memory(&md_result, &arg, sizeof(arg));
@@ -410,7 +407,7 @@ void oversprintf(char *buffer, const char *format, ...)
                     free(md_result);
                 }
 
-                else if (strcmp(flag, "mf") == 0)
+                else if (strcmp(flag, "%mf") == 0)
                 {
                     float arg = va_arg(args, double);
                     status_code mf_st = print_dump_memory(&mf_result, &arg, sizeof(arg));
@@ -444,6 +441,6 @@ void oversprintf(char *buffer, const char *format, ...)
         }
 
     }
-    buffer[index] = '\0';
     va_end(args);
+    buffer[buffer_index] = '\0';
 }

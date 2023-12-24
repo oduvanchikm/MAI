@@ -51,21 +51,22 @@ int main()
 
     char buffer[256];
 
-    // oversprintf(buffer, "Roman: %Ro", 56);
-    oversprintf(buffer, "Zeckendorf: %Zr\n", 100);
+    oversprintf(buffer, "Roman: %Ro Zek: %Zr", 56, 100);
+    // oversprintf(buffer, "Zeckendorf: %Zr", 100);
     // oversprintf(buffer, "System low: %Cv\n", 4375687, 16);
     // oversprintf(buffer, "System high: %CV\n", 455439, 7);
     // oversprintf(buffer, "System 10 low: %to\n", "aa", 32); 
-    // oversprintf(buffer, "System 10 high: %TO\n", "123A", 16);
+    // oversprintf(buffer, "System 10 high: %TO", "123AA", 15);
     // oversprintf(buffer, "Bytes signed int: %mi\n", 45);
     // oversprintf(buffer, "Bytes signed unsighted int: %mu\n", 485);
     // oversprintf(buffer, "Bytes signed double: %md\n", 45.546);
     // oversprintf(buffer, "Bytes signed float: %mf\n", 45.3463);
     // oversprintf(buffer, "%n\n", &x);
 
+
     char mas[150];
-    oversprintf(mas, "I want%%%d", 52);
-    printf("%s\n", mas);
+    //oversprintf(mas, "I want %Ro", 52);
+    //printf("%s\n", mas);
 
     printf("%s\n", buffer);
 
