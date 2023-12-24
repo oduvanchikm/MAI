@@ -99,7 +99,7 @@ status_code zecedorf_representation(unsigned int num, char **result)
             num -= fibonacci(index);
             (*result)[index] = '1';
         }
-
+        
         (*result)[fib_num] = '\0';
     }
     return OK;
@@ -207,35 +207,13 @@ status_code decemal_to_other_base_h(char **result, int number, int base)
     return OK;
 }
 
-bool is_low(char string)
-{
-    if (string >= 'a' && string <= 'z')
-    {
-        return true;
-    }
-    return false;
-}
-
-// bool is_high(char* string)
-// {
-//     if (string >= 'A' && string <= 'Z')
-//     {
-//         return true;
-//     }
-//     return false;
-// }
-
 int other_base_to_ten_h(char* number, int base)
 {
     if (!number)
     {
         return INVALID_ARGUMENT;
     }
-    // if (!is_high(*number))
-    // {
-    //     return INVALID_ARGUMENT;
-    // }
-    // printf("%s\n", number);
+
     int symbol = 1;
     char *ptr = NULL;
     int result = 0;
@@ -260,11 +238,6 @@ int other_base_to_ten_h(char* number, int base)
 int other_base_to_ten_l(char* number, int base)
 {
     if (!number)
-    {
-        return INVALID_ARGUMENT;
-    }
-
-    if (!is_low(*number))
     {
         return INVALID_ARGUMENT;
     }

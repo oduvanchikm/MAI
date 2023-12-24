@@ -221,7 +221,6 @@ void oversprintf(char *buffer, const char *format, ...)
     int index = 0;
     int buffer_index = 0;
 
-    //printf("%s\n", format);
     char* zeck_result = NULL;
     char* Cv_result = NULL;
     char* CV_result = NULL;
@@ -234,30 +233,29 @@ void oversprintf(char *buffer, const char *format, ...)
 
     while (format[index] != '\0')
     {
-        //printf("%c\n", format[index]);
-        //printf("%d\n", buffer_index);
         if (format[index] != '%')
         {
             buffer[buffer_index] = format[index];
-            //printf("%c\n", format[index]);
             buffer_index++;
             index++;
         }
         else
         {
-            int next_index = index;
+            int g = 0;
+            int next_index = index + 1;
             if (format[next_index] == '%')
             {
                 sprintf(&(buffer[buffer_index]), "%c", '%');
-                index = next_index + 1;
+                g = next_index + 1;
                 buffer_index++;
             }
             else
             {
+                next_index = index;
                 char flag[25];
                 int flag_index = 0;
                 flag[flag_index++] = '%';
-
+                next_index++;
                 while (format[next_index] != '\0' && (isalnum(format[next_index])))
                 {
                     flag[flag_index++] = format[next_index++];
@@ -272,7 +270,7 @@ void oversprintf(char *buffer, const char *format, ...)
                     if (st_roman == OK)
                     {
                         sprintf((buffer + buffer_index), "%s", roman_result);
-                        buffer_index += strlen(roman_result) + 1;
+                        buffer_index += strlen(roman_result);
                     }
                     else
                     {
@@ -287,14 +285,12 @@ void oversprintf(char *buffer, const char *format, ...)
                     status_code st_zc = zecedorf_representation(arg, &zeck_result);
                     if (st_zc == OK)
                     {
-                        //printf("%d\n", buffer_index);
-                        buffer_index += sprintf((buffer + buffer_index), "%s", zeck_result) + 1;
-                        printf("%s\n", buffer);
-                        // strlen(zeck_result) + 1;
+                        printf("%d\n", buffer_index);
+                        sprintf((buffer + buffer_index), "%s", zeck_result);
+                        buffer_index += strlen(zeck_result);
                     }
                     else
                     {
-                        printf("lalal\n");
                         print_errors(st_zc);
                     }
                     free(zeck_result);
@@ -308,8 +304,8 @@ void oversprintf(char *buffer, const char *format, ...)
 
                     if (Cv_st == OK)
                     {
-                        sprintf((buffer + buffer_index), "%s\n", Cv_result);
-                        buffer_index += strlen(Cv_result) + 1;
+                        sprintf((buffer + buffer_index), "%s", Cv_result);
+                        buffer_index += strlen(Cv_result);
                     }
 
                     else
@@ -327,8 +323,8 @@ void oversprintf(char *buffer, const char *format, ...)
 
                     if (CV_st == OK)
                     {
-                        sprintf(&(buffer[buffer_index]), "%s\n", CV_result);
-                        buffer_index += strlen(CV_result) + 1;
+                        sprintf(&(buffer[buffer_index]), "%s", CV_result);
+                        buffer_index += strlen(CV_result);
                     }
                     else
                     {
@@ -342,29 +338,26 @@ void oversprintf(char *buffer, const char *format, ...)
                     char* arg = va_arg(args, char*);
                     int system = va_arg(args, int);
                     int to_st = other_base_to_ten_l(arg, system);
-                    sprintf(&(buffer[buffer_index]), "%d\n", system);
-                    buffer_index += 1;
+                    buffer_index += sprintf(&(buffer[buffer_index]), "%d", to_st);;
                 }
 
-                if (strcmp(flag, "%TO") == 0)
+                else if (strcmp(flag, "%TO") == 0)
                 {
                     char* arg = va_arg(args, char*);
                     int system = va_arg(args, int);
                     int TO_st = other_base_to_ten_h(arg, system);
-                    //printf("%d\n", TO_st);
-                    buffer_index += (sprintf(&(buffer[buffer_index]), "%d", TO_st) + 1);
-                    //printf("%s\n", buffer);
+                    buffer_index += (sprintf(&(buffer[buffer_index]), "%d", TO_st));
                 }
 
-                if (strcmp(flag, "%mi") == 0)
+                else if (strcmp(flag, "%mi") == 0)
                 {
                     int arg = va_arg(args, int);
                     status_code mi_st = print_dump_memory(&mi_result, &arg, sizeof(arg));
 
                     if (mi_st == OK)
                     {
-                        sprintf(&(buffer[buffer_index]), "%s\n", mi_result);
-                        buffer_index += strlen(mi_result) + 1;
+                        sprintf(&(buffer[buffer_index]), "%s", mi_result);
+                        buffer_index += strlen(mi_result);
                     }
                     else
                     {
@@ -380,8 +373,8 @@ void oversprintf(char *buffer, const char *format, ...)
 
                     if (mu_st == OK)
                     {
-                        sprintf(&(buffer[buffer_index]), "%s\n", mu_result);
-                        buffer_index += strlen(mu_result) + 1;
+                        sprintf(&(buffer[buffer_index]), "%s", mu_result);
+                        buffer_index += strlen(mu_result);
                     }
                     else
                     {
@@ -397,8 +390,8 @@ void oversprintf(char *buffer, const char *format, ...)
 
                     if (md_st == OK)
                     {
-                        sprintf(&(buffer[buffer_index]), "%s\n", md_result);
-                        buffer_index += strlen(md_result) + 1;
+                        sprintf(&(buffer[buffer_index]), "%s", md_result);
+                        buffer_index += strlen(md_result);
                     }
                     else
                     {
@@ -414,8 +407,8 @@ void oversprintf(char *buffer, const char *format, ...)
 
                     if (mf_st == OK)
                     {
-                        sprintf(&(buffer[buffer_index]), "%s\n", mf_result);
-                        buffer_index += strlen(mf_result) + 1;
+                        sprintf(&(buffer[buffer_index]), "%s", mf_result);
+                        buffer_index += strlen(mf_result);
                     }
                     else
                     {
@@ -433,7 +426,7 @@ void oversprintf(char *buffer, const char *format, ...)
                     }
                     else
                     {
-                        vsprintf(buffer + buffer_index, flag, args);
+                       buffer_index += vsprintf(buffer + buffer_index, flag, args);
                     }
                 }
                 index = next_index;
