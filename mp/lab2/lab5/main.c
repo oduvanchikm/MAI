@@ -1,11 +1,4 @@
 #include <stdio.h>
-#include <stdarg.h>
-#include <stdbool.h>
-#include <string.h>
-#include <ctype.h>
-#include <math.h>
-#include <stdlib.h>
-#include <limits.h>
 #include "lab.h"
 
 
@@ -36,9 +29,9 @@ int main()
     }
     
     int x;
-    overfprintf(file, "Roman: %Ro Zek: %Zr %TO %Cv \n %d %c", 56, 100, "123AA", 16, 123, 16, 555, 'c');
+    overfprintf(file, "Roman: %Ro Zek: %Zr %TO %CV \n %d %c", 56, 100, "123AA", 16, 123, 16, 555, 'c');
     char buffer[256];
-    oversprintf(buffer, "Roman: %Ro Zek: %Zr %TO %Cv %d %c", 56, 100, "123AA", 16, 123, 16, 555, 'c');
+    oversprintf(buffer, "Roman: %Ro Zek: %Zr %TO %CV \n%d %c", 56, 100, "123AA", 16, 123, 16, 555, 'c');
     printf("%s\n", buffer);
     fclose(file);
     return 0;
