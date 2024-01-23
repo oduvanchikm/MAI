@@ -171,20 +171,17 @@ int find_student_by_surname(Student* students, int count_of_students, char* buff
     return -1;
 }
 
-Student search_by_id(unsigned int id, Student* result)
+int find_student_by_id(Student* students, int count_of_students, int id_for_search)
 {
-    int i = 0;
-    while (result[i].id != -1)
+    for (int i = 0; i < count_of_students; i++)
     {
-        if (result[i].id == id)
+        if(students[i].id == id_for_search)
         {
-            return result[i];
+            return i;
         }
-        i++;
     }
-    Student student;
-    student.id = -1;
-    return student;
+
+    return  -1;
 }
 
 status_code info_from_file(FILE *filename, Student **result, int *number_of_students)
@@ -212,6 +209,10 @@ status_code info_from_file(FILE *filename, Student **result, int *number_of_stud
         }
 
     //    if (!(isdigit((*result)[i].id)) || !(isalpha((*result)[i].name)) || !(isalpha((*result)[i].surname)))
+    //    {
+    //        return INVALID_INPUT;
+    //    }
+    //    if (!(isdigit((*result)[i].id)))
     //    {
     //        return INVALID_INPUT;
     //    }
@@ -281,14 +282,17 @@ status_code print_students(Student* students, int count_of_students)
 
 int main(int argc, char *argv[])
 {
-    if (argc != 3)
-    {
-        printf("Invalid number of arguments\nPlease enter an input file and output file\n");
-        return 0;
-    }
+   if (argc != 3)
+   {
+       printf("Invalid number of arguments\nPlease enter an input file and output file\n");
+       return 0;
+   }
 
-    FILE *input_file = fopen(argv[1], "r");
-    FILE *output_file = fopen(argv[2], "w");
+   FILE *input_file = fopen(argv[1], "r");
+   FILE *output_file = fopen(argv[2], "w");
+
+    // FILE *input_file = fopen("../input.txt", "r");
+    // FILE *output_file = fopen("../output.txt", "w");
 
     if (!input_file || !output_file)
     {
@@ -352,32 +356,65 @@ int main(int argc, char *argv[])
                     case 1:
                         printf("Enter ID:\n");
                         int id;
+                        scanf("%d", &id);
                         if (scanf("%d", &id) != 1)
                         {
                             printf("Error with enter ID\n");
+
                         }
-                        print_student(search_by_id(id, students));
+
+                        res_id = find_student_by_id(students, count_of_students, id);
+                        if (res_id != -1)
+                        {
+                            print_students(students, res_id);
+                        }
+                        else
+                        {
+                            printf("Wrong id\n");
+                        }
                         break;
 
                     case 2:
                         printf("Enter name:\n");
                         scanf("%s", buffer);
                         res_name = find_student_by_name(students, count_of_students, buffer);
-                        print_students(students, res_name);
+                        if (res_name != -1)
+                        {
+                            print_students(students, res_name);
+                        }
+                        else
+                        {
+                            printf("Wrong name\n");
+                        }
+                        
                         break;
 
                     case 3:
                         printf("Enter surname:\n");
                         scanf("%s", buffer);
                         res_surname = find_student_by_surname(students, count_of_students, buffer);
-                        print_students(students, res_surname);
+                        if (res_surname != -1)
+                        {
+                            print_students(students, res_surname);
+                        }
+                        else
+                        {
+                            printf("Wrong surname\n");
+                        }
                         break;
 
                     case 4:
                         printf("Enter gruop:\n");
                         scanf("%s", buffer);
                         res_group = find_student_by_group(students, count_of_students, buffer);
-                        print_students(students, res_group);
+                        if (res_group != -1)
+                        {
+                            print_students(students, res_group);
+                        }
+                        else
+                        {
+                            printf("Wrong group\n");
+                        }
                         break;
 
                     default:
@@ -420,7 +457,6 @@ int main(int argc, char *argv[])
                         printf("Invalid input\n");
                         break;
                 }
-
                 break;
 
             case 3:
@@ -440,16 +476,18 @@ int main(int argc, char *argv[])
                 }
                 else
                 {
-                    Student stud = search_by_id(id, students);
-                    if (stud.id != -1)
+                    int stud = find_student_by_id(students, count_of_students, id);
+                    if (stud != -1)
                     {
-                        double middle_mark = average_grade(&stud);
-                        fprintf(output_file, "%s %s %s %f\n", stud.name, stud.surname, stud.group, middle_mark);
+                        double middle_mark = average_grade(students);
+                        fprintf(output_file, "%s %s %s %f\n", students->name, students->surname, students->group, middle_mark);
                         printf("Data is in the output file\n");
+                        return INVALID_INPUT;
                     }
                     else
                     {
                         printf("Student with ID %d not found\n", id);
+                        return INVALID_INPUT;
                     }
                 }
                 break;
@@ -459,6 +497,7 @@ int main(int argc, char *argv[])
                 break;
         }
     }
+    free(students);
     return 0;
 }
 
