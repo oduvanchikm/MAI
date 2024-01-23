@@ -319,7 +319,7 @@ void oversprintf(char *buffer, const char *format, ...)
                 {
                     int arg = va_arg(args, int);
                     int system = va_arg(args, int);
-                    status_code CV_st = decemal_to_other_base_l(&CV_result, arg, system);
+                    status_code CV_st = decemal_to_other_base_h(&CV_result, arg, system);
 
                     if (CV_st == OK)
                     {

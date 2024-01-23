@@ -193,7 +193,6 @@ status_code decemal_to_other_base_h(char **result, int number, int base)
     while(number > 0)
     {
         r = number % base;
-        // *--ptr = (r > 9)? r - 10 + 'A' : r + '0';
         *--ptr = (r > 9)? (char)(r - 10 + 'A') : (char)(r + '0');
         number /= base;
     }
