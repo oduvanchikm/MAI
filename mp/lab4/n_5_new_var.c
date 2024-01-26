@@ -583,22 +583,6 @@ status_code file_works(char* argv[], int argc)
                                     break;
 
                                 case OK:
-                                    //                        infix_len = my_strlen(string);
-                                    //                        postfix_len = my_strlen(postfix);
-                                    //                        for (int i = 0; i < infix_len; i++)
-                                    //                        {
-                                    //                            if (string[i] == '~')
-                                    //                            {
-                                    //                                string[i] = '-';
-                                    //                            }
-                                    //                        }
-                                    //                        for (int j = 0; j < postfix_len; j++)
-                                    //                        {
-                                    //                            if (postfix[j] == '~')
-                                    //                            {
-                                    //                                postfix[j] = '-';
-                                    //                            }
-                                    //                        }
                                     printf("Expression: %s\n", string);
                                     printf("Postfix: %s\n", postfix);
                                     printf("Result: %d\n", digit);
