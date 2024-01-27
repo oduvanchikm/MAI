@@ -281,6 +281,19 @@ bool is_number(const char* str)
     return true;
 }
 
+void print_studentts(Student* students, int count_of_students)
+{
+    for(int i = 0; i < count_of_students; i++)
+    {
+        printf("%d %s %s %s ", students[i].id, students[i].name, students[i].surname, students[i].group);
+        for (int j = 0; j < 5; j++)
+        {
+            printf("%c ", students[i].mark[j]);
+        }
+        printf("\n");
+    }
+}
+
 int main(int argc, char *argv[])
 {
    if (argc != 3)
@@ -434,27 +447,27 @@ int main(int argc, char *argv[])
                 {
                     qsort(students, count_of_students, sizeof(Student), compare_students_by_id);
                     printf("Sorted by ID\n");
-                    print_students(students, count_of_students);
+                    print_studentts(students, count_of_students);
                 }
                 else if (flag_sort == 2)
                 {
                     qsort(students, count_of_students, sizeof(Student), compare_students_by_name);
                     printf("Sorted by name\n");
-                    print_students(students, count_of_students);
+                    print_studentts(students, count_of_students);
                 }
 
                 else if (flag_sort == 3)
                 {
                     qsort(students, count_of_students, sizeof(Student), compare_students_by_surname);
                     printf("Sorted by surname\n");
-                    print_students(students, count_of_students);
+                    print_studentts(students, count_of_students);
                 }
 
                 else if (flag_sort == 4)
                 {
                     qsort(students, count_of_students, sizeof(Student), compare_students_by_group);
                     printf("Sorted by group\n");
-                    print_students(students, count_of_students);
+                    print_studentts(students, count_of_students);
                 }
                 break;
 
