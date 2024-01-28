@@ -96,7 +96,7 @@ void push(Stack* stack, int data)
     stack->top = new_node;
 }
 
-char pop(Stack** stack)
+int pop(Stack** stack)
 {
     if (*stack == NULL)
     {
@@ -104,14 +104,14 @@ char pop(Stack** stack)
     }
 
     Node* out = (*stack)->top;
-    char value = out->data;
+    int value = out->data;
     (*stack)->top = (*stack)->top->next;
     free(out);
     return value;
 }
 
 
-char peek(Stack* stack)
+int peek(Stack* stack)
 {
     if (stack->top == NULL) 
     {
@@ -135,10 +135,6 @@ int get_priority(const char operator)
 {
     switch (operator)
     {
-//        case '(':
-//        case ')':
-//            return 1;
-
         case '+':
         case '-':
             return 1;
@@ -211,7 +207,7 @@ status_code infix_to_postfix(const char* infix, char** postfix)
 
     initialize(stack);
 
-    int len = strlen(infix);
+    int len = my_strlen(infix);
     *postfix = (char*)malloc((len + 1) * sizeof(char));
     if (!(*postfix))
     {
@@ -220,6 +216,7 @@ status_code infix_to_postfix(const char* infix, char** postfix)
 
     int postfix_size = 0;
     bool is_last_add_operator = true;
+    int binary_minus = 0;
 
     for (int i = 0; i < len; i++)
     {
@@ -230,8 +227,7 @@ status_code infix_to_postfix(const char* infix, char** postfix)
 
         else if (infix[i] == '-' && is_last_add_operator)
         {
-            (*postfix)[postfix_size] = '~';
-            postfix_size++;
+            binary_minus = 1;
             is_last_add_operator = true;
         }
 
@@ -243,10 +239,19 @@ status_code infix_to_postfix(const char* infix, char** postfix)
                 postfix_size++;
                 i++;
             }
+
+            if (binary_minus == 1)
+            {
+                (*postfix)[postfix_size] = '~';
+                postfix_size++;
+                binary_minus = 0;
+            }
+
             (*postfix)[postfix_size] = ' ';
             postfix_size++;
             i--;
             is_last_add_operator = false;
+
         }
 
         else if (infix[i] == '(')
@@ -332,62 +337,113 @@ status_code solve_expression(char* postfix, int* result)
         {
             number = number * 10 + (postfix[i] - '0');
         }
-        else if (postfix[i] == ' ' && isdigit(postfix[i - 1]))
+
+        else if ((postfix[i] == ' ' || postfix[i] == '~') && isdigit(postfix[i - 1]))
         {
             push(stack, number);
             number = 0;
+            if (postfix[i] == '~')
+            {
+                number = pop(&stack);
+                push(stack, (-1 * number));
+                number = 0;
+            }
         }
-        else if (postfix[i] == '~')
-        {
-            number = pop(&stack);
-            push(stack, -number);
-        }
-        else if (postfix[i] == ' ')
+
+        else if (isspace(postfix[i]))
         {
             continue;
         }
+
         else
         {
             number_2 = pop(&stack);
             number_1 = pop(&stack);
+
             if ((number_1 >= INT_MAX && number_2 >= INT_MAX) || (number_1 <= INT_MIN && number_2 <= INT_MIN))
             {
                 return OVERFLOW;
             }
+
             switch(postfix[i])
             {
                 case '+':
-                    push(stack, number_1 + number_2);
+                    if (number_1 + number_2 > INT_MAX)
+                    {
+                        return OVERFLOW;
+                    }
+                    else
+                    {
+                        push(stack, number_1 + number_2);
+                    }
                     break;
+
                 case '-':
-                    push(stack, number_1 - number_2);
+                    if (number_1 - number_2 < INT_MIN)
+                    {
+                        return OVERFLOW;
+                    }
+                    else
+                    {
+                        push(stack, number_1 - number_2);
+                    }
                     break;
+
                 case '*':
-                    push(stack, number_1 * number_2);
+                    if ((number_1 * number_2 > INT_MAX) || (number_1 * number_2 < INT_MIN))
+                    {
+                        return OVERFLOW;
+                    }
+                    else
+                    {
+                        push(stack, number_1 * number_2);
+                    }
                     break;
                 case '/':
                     if (number_2 != 0)
                     {
-                        push(stack, number_1 / number_2);
+                        if ((number_1 / number_2 > INT_MAX) || (number_1 / number_2 < INT_MIN))
+                        {
+                            return OVERFLOW;
+                        }
+                        else
+                        {
+                            push(stack, number_1 / number_2);
+                        }
                     }
                     else
                     {
                         return NEGATIVE_DIGIT;
                     }
                     break;
+
                 case '%':
                     if (number_2 != 0)
                     {
-                        push(stack, number_1 % number_2);
+                        if ((number_1 % number_2 > INT_MAX) || (number_1 % number_2 < INT_MIN))
+                        {
+                            return OVERFLOW;
+                        }
+                        else
+                        {
+                            push(stack, number_1 % number_2);
+                        }
                     }
                     else
                     {
                         return NEGATIVE_DIGIT;
                     }
                     break;
+
                 case '^':
-                    push(stack, my_pow(number_1, number_2));
-                    break;
+                    if (my_pow(number_1, number_2) > INT_MAX)
+                    {
+                        return OVERFLOW;
+                    }
+                    else
+                    {
+                        push(stack, my_pow(number_1, number_2));
+                    }
 
                 default:
                     return INVALID_INPUT;
@@ -424,14 +480,6 @@ status_code read_string(FILE* file, char** string)
         }
         (*string)[index] = (char)symbol;
         index++;
-//        if (symbol == '\n')
-//        {
-//            (*string)[index] = '\0';
-//            (*number_of_string)++;
-//            index = 0;
-//            return OK;
-//        }
-//        (*string)[index] = '\0';
         symbol = fgetc(file);
     }
     (*string)[index] = '\0';
@@ -611,7 +659,6 @@ status_code file_works(char* argv[], int argc)
                                     printf("Result: %d\n", digit);
                             }
                     }
-
             }
             str_count++;
             free(string);
