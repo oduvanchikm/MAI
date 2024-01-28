@@ -211,7 +211,7 @@ status_code infix_to_postfix(const char* infix, char** postfix)
 
     initialize(stack);
 
-    int len = my_strlen(infix);
+    int len = strlen(infix);
     *postfix = (char*)malloc((len + 1) * sizeof(char));
     if (!(*postfix))
     {
@@ -219,6 +219,7 @@ status_code infix_to_postfix(const char* infix, char** postfix)
     }
 
     int postfix_size = 0;
+    bool is_last_add_operator = true;
 
     for (int i = 0; i < len; i++)
     {
@@ -227,10 +228,11 @@ status_code infix_to_postfix(const char* infix, char** postfix)
             continue;
         }
 
-        else if (infix[i] == '-' && (i == 0 || infix[i - 1] == '('))
+        else if (infix[i] == '-' && is_last_add_operator)
         {
             (*postfix)[postfix_size] = '~';
             postfix_size++;
+            is_last_add_operator = true;
         }
 
         else if (isdigit((infix[i])))
@@ -244,11 +246,13 @@ status_code infix_to_postfix(const char* infix, char** postfix)
             (*postfix)[postfix_size] = ' ';
             postfix_size++;
             i--;
+            is_last_add_operator = false;
         }
 
         else if (infix[i] == '(')
         {
             push(stack, infix[i]);
+            is_last_add_operator = true;
         }
 
         else if (infix[i] == ')')
@@ -270,6 +274,7 @@ status_code infix_to_postfix(const char* infix, char** postfix)
             {
                 return WRONG_COUNT_OF_BRACKETS;
             }
+            is_last_add_operator = false;
         }
 
         else if (is_operator(infix[i]))
@@ -282,6 +287,7 @@ status_code infix_to_postfix(const char* infix, char** postfix)
                 postfix_size++;
             }
             push(stack, infix[i]);
+            is_last_add_operator = true;
         }
         else
         {
@@ -382,6 +388,7 @@ status_code solve_expression(char* postfix, int* result)
                 case '^':
                     push(stack, my_pow(number_1, number_2));
                     break;
+
                 default:
                     return INVALID_INPUT;
             }
@@ -468,7 +475,7 @@ status_code file_works(char* argv[], int argc)
             return ERROR_WITH_OPENING_FILE;
         }
         int flag = 1;
-        while (flag)
+        while (flag && !feof(file))
         {
             st_read_string = read_string(file, &string);
             if (strlen(string) == 0)
