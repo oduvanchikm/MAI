@@ -463,6 +463,7 @@ status_code read_string(FILE* file, char** string)
     {
         return ERROR_WITH_MEMORY_ALLOCATION;
     }
+
     int symbol = fgetc(file);
 
     while (symbol != EOF)
@@ -512,8 +513,6 @@ status_code file_works(char* argv[], int argc)
     FILE* output_file = NULL;
     char filename[100];
     char* output = NULL;
-//    int infix_len = 0;
-//    int postfix_len = 0;
 
     for (int i = 1; i < argc; i++)
     {
@@ -532,7 +531,7 @@ status_code file_works(char* argv[], int argc)
                 continue;
             }
 
-            switch(st_read_string)
+            switch (st_read_string)
             {
                 case ERROR_WITH_MEMORY_ALLOCATION:
                     flag = 0;
@@ -638,22 +637,7 @@ status_code file_works(char* argv[], int argc)
                                     break;
 
                                 case OK:
-                                    //                        infix_len = my_strlen(string);
-                                    //                        postfix_len = my_strlen(postfix);
-                                    //                        for (int i = 0; i < infix_len; i++)
-                                    //                        {
-                                    //                            if (string[i] == '~')
-                                    //                            {
-                                    //                                string[i] = '-';
-                                    //                            }
-                                    //                        }
-                                    //                        for (int j = 0; j < postfix_len; j++)
-                                    //                        {
-                                    //                            if (postfix[j] == '~')
-                                    //                            {
-                                    //                                postfix[j] = '-';
-                                    //                            }
-                                    //                        }
+                                    printf("Filename: %s\n", argv[i]);
                                     printf("Expression: %s\n", string);
                                     printf("Postfix: %s\n", postfix);
                                     printf("Result: %d\n", digit);
@@ -666,7 +650,10 @@ status_code file_works(char* argv[], int argc)
         }
         fclose(file);
     }
-    fclose(output_file);
+    if (output_file)
+    {
+        fclose(output_file);
+    }
     return OK;
 }
 
