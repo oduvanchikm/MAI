@@ -455,79 +455,71 @@ status_code file_works(FILE *input_file, FILE *output_file)
 
         string[index] = '\0';
 
-        if (!valid_characters(string))
-        {
-            fprintf(output_file, "Expression: %s\n", string);
-            fprintf(output_file, "In string number: %d\n", line_of_expression);
-            fprintf(output_file, "Problem: wrong characters\n");
-            printf("Wrong expression, wrong characters\n");
-        }
+        if (my_strlen(string) != 0) {
 
-        printf("infix: %s\n", string);
-
-        status_code st_postfix_expression = infix_to_postfix(string, &postfix_expression);
-        if (st_postfix_expression == ERROR_WITH_MEMORY_ALLOCATION)
-        {
-            flag = 0;
-            print_errors(st_postfix_expression);
-            break;
-        }
-        else if (st_postfix_expression == WRONG_COUNT_OF_BRACKETS)
-        {
-            fprintf(output_file, "Expression: %s\n", string);
-            fprintf(output_file, "In string number: %d\n", line_of_expression);
-            fprintf(output_file, "Problem: wrong count of brackets\n");
-            printf("Wrong expression, wrong count of brackets\n");
-        }
-        else if (st_postfix_expression == INVALID_INPUT)
-        {
-            fprintf(output_file, "Expression: %s\n", string);
-            fprintf(output_file, "In string number: %d\n", line_of_expression);
-            fprintf(output_file, "Problem: invalid input\n");
-            printf("Wrong expression, invalid input\n");
-        }
-        else
-        {
-            int result;
-            status_code st_solve_expression = solve_expression(postfix_expression, &result);
-            if (st_solve_expression == ERROR_WITH_MEMORY_ALLOCATION)
-            {
-                flag = 0;
-                print_errors(st_solve_expression);
-                break;
-            }
-            else if (st_solve_expression == OVERFLOW)
-            {
+            if (!valid_characters(string)) {
                 fprintf(output_file, "Expression: %s\n", string);
                 fprintf(output_file, "In string number: %d\n", line_of_expression);
-                fprintf(output_file, "Problem: overflow\n");
-                printf("Wrong expression, overflow\n");
+                fprintf(output_file, "Problem: wrong characters\n");
+                printf("Wrong expression, wrong characters\n");
             }
-            else if (st_solve_expression == INVALID_INPUT)
-            {
+
+            printf("infix: %s\n", string);
+
+            status_code st_postfix_expression = infix_to_postfix(string, &postfix_expression);
+            if (st_postfix_expression == ERROR_WITH_MEMORY_ALLOCATION) {
+                flag = 0;
+                print_errors(st_postfix_expression);
+                break;
+            } else if (st_postfix_expression == WRONG_COUNT_OF_BRACKETS) {
+                fprintf(output_file, "Expression: %s\n", string);
+                fprintf(output_file, "In string number: %d\n", line_of_expression);
+                fprintf(output_file, "Problem: wrong count of brackets\n");
+                printf("Wrong expression, wrong count of brackets\n");
+            } else if (st_postfix_expression == INVALID_INPUT) {
                 fprintf(output_file, "Expression: %s\n", string);
                 fprintf(output_file, "In string number: %d\n", line_of_expression);
                 fprintf(output_file, "Problem: invalid input\n");
                 printf("Wrong expression, invalid input\n");
+            } else {
+                int result;
+                status_code st_solve_expression = solve_expression(postfix_expression, &result);
+                if (st_solve_expression == ERROR_WITH_MEMORY_ALLOCATION) {
+                    flag = 0;
+                    print_errors(st_solve_expression);
+                    break;
+                } else if (st_solve_expression == OVERFLOW) {
+                    fprintf(output_file, "Expression: %s\n", string);
+                    fprintf(output_file, "In string number: %d\n", line_of_expression);
+                    fprintf(output_file, "Problem: overflow\n");
+                    printf("Wrong expression, overflow\n");
+                } else if (st_solve_expression == INVALID_INPUT) {
+                    fprintf(output_file, "Expression: %s\n", string);
+                    fprintf(output_file, "In string number: %d\n", line_of_expression);
+                    fprintf(output_file, "Problem: invalid input\n");
+                    printf("Wrong expression, invalid input\n");
+                } else if (st_solve_expression == NEGATIVE_DIGIT) {
+                    fprintf(output_file, "Expression: %s\n", string);
+                    fprintf(output_file, "In string number: %d\n", line_of_expression);
+                    fprintf(output_file, "Problem: negative digit\n");
+                    printf("Wrong expression, negative digit\n");
+                } else {
+                    printf("Expression: %s\n", string);
+                    printf("Postfix: %s\n", postfix_expression);
+                    printf("Result: %d\n", result);
+                }
             }
-            else if (st_solve_expression == NEGATIVE_DIGIT)
-            {
-                fprintf(output_file, "Expression: %s\n", string);
-                fprintf(output_file, "In string number: %d\n", line_of_expression);
-                fprintf(output_file, "Problem: negative digit\n");
-                printf("Wrong expression, negative digit\n");
-            }
-            else
-            {
-                printf("Expression: %s\n", string);
-                printf("Postfix: %s\n", postfix_expression);
-                printf("Result: %d\n", result);
-            }
+
         }
 
+        else
+        {
+//            здесь надо дописать
+        }
         line_of_expression++;
         free(postfix_expression);
     }
+    free(string);
     return OK;
 }
 
