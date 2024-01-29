@@ -16,17 +16,8 @@ typedef enum
     NEGATIVE_DIGIT,
     WRONG_COUNT_OF_BRACKETS,
     OVERFLOW,
-    STATUS
 
 } status_code;
-
-void print_info(char* filename, char* string, char* postfix, int result)
-{
-    printf("Filename: %s\n", filename);
-    printf("Expression in infix form: %s\n", string);
-    printf("Expression in postfix form: %s\n", postfix);
-    printf("Result of expression: %d\n", result);
-}
 
 void print_errors(int flag)
 {
@@ -96,7 +87,7 @@ void push(Stack* stack, int data)
     stack->top = new_node;
 }
 
-char pop(Stack** stack)
+int pop(Stack** stack)
 {
     if (*stack == NULL)
     {
@@ -104,14 +95,14 @@ char pop(Stack** stack)
     }
 
     Node* out = (*stack)->top;
-    char value = out->data;
+    int value = out->data;
     (*stack)->top = (*stack)->top->next;
     free(out);
     return value;
 }
 
 
-char peek(Stack* stack)
+int peek(Stack* stack)
 {
     if (stack->top == NULL)
     {
@@ -135,10 +126,6 @@ int get_priority(const char operator)
 {
     switch (operator)
     {
-//        case '(':
-//        case ')':
-//            return 1;
-
         case '+':
         case '-':
             return 1;
@@ -219,6 +206,8 @@ status_code infix_to_postfix(const char* infix, char** postfix)
     }
 
     int postfix_size = 0;
+    bool is_last_add_operator = true;
+    int binary_minus = 0;
 
     for (int i = 0; i < len; i++)
     {
@@ -227,10 +216,10 @@ status_code infix_to_postfix(const char* infix, char** postfix)
             continue;
         }
 
-        else if (infix[i] == '-' && (i == 0 || infix[i - 1] == '('))
+        else if (infix[i] == '-' && is_last_add_operator)
         {
-            (*postfix)[postfix_size] = '~';
-            postfix_size++;
+            binary_minus = 1;
+            is_last_add_operator = true;
         }
 
         else if (isdigit((infix[i])))
@@ -241,14 +230,25 @@ status_code infix_to_postfix(const char* infix, char** postfix)
                 postfix_size++;
                 i++;
             }
+
+            if (binary_minus == 1)
+            {
+                (*postfix)[postfix_size] = '~';
+                postfix_size++;
+                binary_minus = 0;
+            }
+
             (*postfix)[postfix_size] = ' ';
             postfix_size++;
             i--;
+            is_last_add_operator = false;
+
         }
 
         else if (infix[i] == '(')
         {
             push(stack, infix[i]);
+            is_last_add_operator = true;
         }
 
         else if (infix[i] == ')')
@@ -270,6 +270,7 @@ status_code infix_to_postfix(const char* infix, char** postfix)
             {
                 return WRONG_COUNT_OF_BRACKETS;
             }
+            is_last_add_operator = false;
         }
 
         else if (is_operator(infix[i]))
@@ -282,6 +283,7 @@ status_code infix_to_postfix(const char* infix, char** postfix)
                 postfix_size++;
             }
             push(stack, infix[i]);
+            is_last_add_operator = true;
         }
         else
         {
@@ -326,62 +328,114 @@ status_code solve_expression(char* postfix, int* result)
         {
             number = number * 10 + (postfix[i] - '0');
         }
-        else if (postfix[i] == ' ' && isdigit(postfix[i - 1]))
+
+        else if ((postfix[i] == ' ' || postfix[i] == '~') && isdigit(postfix[i - 1]))
         {
             push(stack, number);
             number = 0;
+            if (postfix[i] == '~')
+            {
+                number = pop(&stack);
+                push(stack, (-1 * number));
+                number = 0;
+            }
         }
-        else if (postfix[i] == '~')
-        {
-            number = pop(&stack);
-            push(stack, -number);
-        }
-        else if (postfix[i] == ' ')
+
+        else if (isspace(postfix[i]))
         {
             continue;
         }
+
         else
         {
             number_2 = pop(&stack);
             number_1 = pop(&stack);
+
             if ((number_1 >= INT_MAX && number_2 >= INT_MAX) || (number_1 <= INT_MIN && number_2 <= INT_MIN))
             {
                 return OVERFLOW;
             }
+
             switch(postfix[i])
             {
                 case '+':
-                    push(stack, number_1 + number_2);
+                    if (number_1 + number_2 > INT_MAX)
+                    {
+                        return OVERFLOW;
+                    }
+                    else
+                    {
+                        push(stack, number_1 + number_2);
+                    }
                     break;
+
                 case '-':
-                    push(stack, number_1 - number_2);
+                    if (number_1 - number_2 < INT_MIN)
+                    {
+                        return OVERFLOW;
+                    }
+                    else
+                    {
+                        push(stack, number_1 - number_2);
+                    }
                     break;
+
                 case '*':
-                    push(stack, number_1 * number_2);
+                    if ((number_1 > INT_MAX / number_2 || number_1 < INT_MIN / number_2))
+                    {
+                        return OVERFLOW;
+                    }
+                    else
+                    {
+                        push(stack, number_1 * number_2);
+                    }
                     break;
                 case '/':
                     if (number_2 != 0)
                     {
-                        push(stack, number_1 / number_2);
+                        if ((number_1 / number_2 > INT_MAX) || (number_1 / number_2 < INT_MIN))
+                        {
+                            return OVERFLOW;
+                        }
+                        else
+                        {
+                            push(stack, number_1 / number_2);
+                        }
                     }
                     else
                     {
                         return NEGATIVE_DIGIT;
                     }
                     break;
+
                 case '%':
                     if (number_2 != 0)
                     {
-                        push(stack, number_1 % number_2);
+                        if ((number_1 % number_2 > INT_MAX) || (number_1 % number_2 < INT_MIN))
+                        {
+                            return OVERFLOW;
+                        }
+                        else
+                        {
+                            push(stack, number_1 % number_2);
+                        }
                     }
                     else
                     {
                         return NEGATIVE_DIGIT;
                     }
                     break;
+
                 case '^':
-                    push(stack, my_pow(number_1, number_2));
-                    break;
+                    if (my_pow(number_1, number_2) > INT_MAX)
+                    {
+                        return OVERFLOW;
+                    }
+                    else
+                    {
+                        push(stack, my_pow(number_1, number_2));
+                    }
+
                 default:
                     return INVALID_INPUT;
             }
@@ -391,44 +445,17 @@ status_code solve_expression(char* postfix, int* result)
     return OK;
 }
 
-status_code read_string(FILE* file, char** string)
+bool valid_characters(const char* string)
 {
-    int index = 0;
-    int capacity = 10;
-    *string = (char*)malloc(capacity * sizeof(char));
-    if (!(*string))
+    int len_string = my_strlen(string);
+    for (int i = 0; i < len_string; i++)
     {
-        return ERROR_WITH_MEMORY_ALLOCATION;
-    }
-    int symbol = fgetc(file);
-
-    while (symbol != EOF)
-    {
-        if (index == capacity - 1)
+        if (string[i] < '0' && string[i] > '9' && string[i] != '(' && string[i] != ')' && !is_operator(string[i]) && string[i] != ' ')
         {
-            capacity *= 2;
-            char* tmp = realloc(*string, capacity * sizeof(char));
-            if (!tmp)
-            {
-                free(*string);
-                return ERROR_WITH_MEMORY_ALLOCATION;
-            }
-            *string = tmp;
+            return false;
         }
-        (*string)[index] = (char)symbol;
-        index++;
-//        if (symbol == '\n')
-//        {
-//            (*string)[index] = '\0';
-//            (*number_of_string)++;
-//            index = 0;
-//            return OK;
-//        }
-//        (*string)[index] = '\0';
-        symbol = fgetc(file);
     }
-    (*string)[index] = '\0';
-    return OK;
+    return true;
 }
 
 char* error_file(char* filename)
@@ -444,162 +471,175 @@ char* error_file(char* filename)
     return output;
 }
 
-status_code file_works(char* argv[], int argc)
+status_code file_works(FILE* input_file, FILE* output_file)
 {
-    char* string = NULL;
-    char* postfix = NULL;
-    int digit;
-    int str_count = 0;
-    status_code st_read_string;
-    status_code st_postfix;
-    status_code calculate_result;
-    FILE* file = NULL;
-    FILE* output_file = NULL;
-    char filename[100];
-    char* output = NULL;
-//    int infix_len = 0;
-//    int postfix_len = 0;
+    int symbol = fgetc(input_file);
+    int capacity = 10;
 
-    for (int i = 1; i < argc; i++)
+    char* string = (char*)malloc(capacity * sizeof(char));
+    if (!string)
     {
-        file = fopen(argv[i], "r");
-        if (!file)
-        {
-            return ERROR_WITH_OPENING_FILE;
-        }
-        int flag = 1;
-        while (flag)
-        {
-            st_read_string = read_string(file, &string);
-            if (strlen(string) == 0)
-            {
-                str_count++;
-                continue;
-            }
-
-            switch(st_read_string)
-            {
-                case ERROR_WITH_MEMORY_ALLOCATION:
-                    flag = 0;
-                    print_errors(flag);
-                    break;
-
-                case OK:
-                    st_postfix = infix_to_postfix(string, &postfix);
-                    switch (st_postfix)
-                    {
-                        case ERROR_WITH_MEMORY_ALLOCATION:
-                            flag = 0;
-                            print_errors(st_postfix);
-                            break;
-
-                        case WRONG_COUNT_OF_BRACKETS:
-                            if (!output_file)
-                            {
-                                strcpy(filename, argv[i]);
-                                output = error_file(filename);
-                                output_file = fopen(output, "a");
-                                if (!output_file)
-                                {
-                                    return ERROR_WITH_OPENING_FILE;
-                                }
-                            }
-                            fprintf(output_file,
-                                    "Expression: %s\nIn string number: %d\nProblem: wrong bracket balance\n",
-                                    string, str_count);
-                            break;
-
-                        case INVALID_INPUT:
-                            if (!output_file)
-                            {
-                                strcpy(filename, argv[i]);
-                                output = error_file(filename);
-                                output_file = fopen(output, "a");
-                                if (!output_file)
-                                {
-                                    return ERROR_WITH_OPENING_FILE;
-                                }
-                            }
-                            fprintf(output_file, "Expression: %s\nIn string number: %d\nProblem: invalid input\n",
-                                    string,
-                                    str_count);
-                            break;
-
-                        case OK:
-                            calculate_result = solve_expression(postfix, &digit);
-                            switch (calculate_result)
-                            {
-                                case OVERFLOW:
-                                    if (!output_file)
-                                    {
-                                        strcpy(filename, argv[i]);
-                                        output = error_file(filename);
-                                        output_file = fopen(output, "a");
-                                        if (!output_file)
-                                        {
-                                            return ERROR_WITH_OPENING_FILE;
-                                        }
-                                    }
-                                    fprintf(output_file, "Expression: %s\nIn string number: %d\nProblem: overflow\n",
-                                            string,
-                                            str_count);
-                                    break;
-
-                                case ERROR_WITH_MEMORY_ALLOCATION:
-                                    flag = 0;
-                                    free(postfix);
-                                    free(string);
-                                    print_errors(calculate_result);
-                                    break;
-
-                                case NEGATIVE_DIGIT:
-                                    if (!output_file)
-                                    {
-                                        strcpy(filename, argv[i]);
-                                        output = error_file(filename);
-                                        output_file = fopen(output, "a");
-                                        if (!output_file) {
-                                            return ERROR_WITH_OPENING_FILE;
-                                        }
-                                    }
-                                    fprintf(output_file,
-                                            "Expression: %s\nIn string number: %d\nProblem: negative digit\n",
-                                            string, str_count);
-                                    break;
-
-                                case INVALID_INPUT:
-                                    if (!output_file)
-                                    {
-                                        strcpy(filename, argv[i]);
-                                        output = error_file(filename);
-                                        output_file = fopen(output, "a");
-                                        if (!output_file) {
-                                            return ERROR_WITH_OPENING_FILE;
-                                        }
-                                    }
-                                    fprintf(output_file,
-                                            "Expression: %s\nIn string number: %d\nProblem: invalid input\n",
-                                            string, str_count);
-                                    break;
-
-                                case OK:
-                                    printf("Expression: %s\n", string);
-                                    printf("Postfix: %s\n", postfix);
-                                    printf("Result: %d\n", digit);
-                            }
-                    }
-
-            }
-            str_count++;
-            free(string);
-            free(postfix);
-        }
-        fclose(file);
+        return ERROR_WITH_MEMORY_ALLOCATION;
     }
-    fclose(output_file);
+
+    int flag = 1;
+    int index = 0;
+    int line_of_expression = 0;
+
+    while (flag)
+    {
+        char* postfix_expression = NULL;
+        index = 0;
+
+        while (symbol != EOF && symbol != '\n')
+        {
+            if (index == capacity - 1)
+            {
+                capacity *= 2;
+                char* tmp = realloc(string, capacity * sizeof(char));
+                if (!tmp)
+                {
+                    free(string);
+                    return ERROR_WITH_MEMORY_ALLOCATION;
+                }
+                string = tmp;
+            }
+            string[index] = (char)symbol;
+            index++;
+            symbol = fgetc(input_file);
+        }
+
+        if (symbol == EOF)
+        {
+            flag = 0;
+            break;
+        }
+
+        string[index] = '\0';
+//        printf("infix: %s\n", string);
+
+        if (!valid_characters(string))
+        {
+            fprintf(output_file, "Expression: %s\n", string);
+            fprintf(output_file, "In string number: %d\n", line_of_expression);
+            fprintf(output_file, "Problem: wrong characters\n");
+            printf("Wrong expression, wrong characters\n");
+        }
+
+        status_code st_postfix_expression = infix_to_postfix(string, &postfix_expression);
+        if (st_postfix_expression == ERROR_WITH_MEMORY_ALLOCATION)
+        {
+            flag = 0;
+            print_errors(st_postfix_expression);
+            break;
+        }
+
+        else if (st_postfix_expression == WRONG_COUNT_OF_BRACKETS)
+        {
+//            printf("%s\n", output_file);
+            fprintf(output_file, "Expression: %s\n", string);
+            fprintf(output_file, "In string number: %d\n", line_of_expression);
+            fprintf(output_file, "Problem: wrong count of brackets\n");
+            printf("Wrong expression, wrong count of brackets\n");
+        }
+
+        else if (st_postfix_expression == INVALID_INPUT)
+        {
+            fprintf(output_file, "Expression: %s\n", string);
+            fprintf(output_file, "In string number: %d\n", line_of_expression);
+            fprintf(output_file, "Problem: invalid input\n");
+            printf("Wrong expression, invalid input\n");
+        }
+
+        else
+        {
+            int result;
+            status_code st_solve_expression = solve_expression(postfix_expression, &result);
+            if (st_solve_expression == ERROR_WITH_MEMORY_ALLOCATION)
+            {
+                flag = 0;
+                print_errors(st_solve_expression);
+                break;
+            }
+
+            else if (st_solve_expression == OVERFLOW)
+            {
+                fprintf(output_file, "Expression: %s\n", string);
+                fprintf(output_file, "In string number: %d\n", line_of_expression);
+                fprintf(output_file, "Problem: overflow\n");
+                printf("Wrong expression, overflow\n");
+            }
+
+            else if (st_solve_expression == INVALID_INPUT)
+            {
+                fprintf(output_file, "Expression: %s\n", string);
+                fprintf(output_file, "In string number: %d\n", line_of_expression);
+                fprintf(output_file, "Problem: invalid input\n");
+                printf("Wrong expression, invalid input\n");
+            }
+
+            else if (st_solve_expression == NEGATIVE_DIGIT)
+            {
+                fprintf(output_file, "Expression: %s\n", string);
+                fprintf(output_file, "In string number: %d\n", line_of_expression);
+                fprintf(output_file, "Problem: negative digit\n");
+                printf("Wrong expression, negative digit\n");
+            }
+
+            else
+            {
+                printf("Expression: %s\n", string);
+                printf("Postfix: %s\n", postfix_expression);
+                printf("Result: %d\n", result);
+            }
+        }
+
+        line_of_expression++;
+        free(postfix_expression);
+    }
     return OK;
 }
 
+status_code all_functions(int argc, char* argv[])
+{
+    FILE* input_file = NULL;
+    FILE* output_file = NULL;
+    char* new_out_file = NULL;
+    char filename[100];
+
+    for (int i = 1; i < argc; i++)
+    {
+        input_file = fopen(argv[i], "r");
+        if (!input_file)
+        {
+            return ERROR_WITH_OPENING_FILE;
+        }
+
+        printf("Input file: %s\n", argv[i]);
+
+        strcpy(filename, argv[i]);
+
+        new_out_file = error_file(filename);
+
+        output_file = fopen(new_out_file, "a");
+        if (!output_file)
+        {
+            fclose(input_file);
+            return ERROR_WITH_OPENING_FILE;
+        }
+
+        status_code st = file_works(input_file, output_file);
+        if (st != OK)
+        {
+            break;
+        }
+
+        fclose(input_file);
+        fclose(output_file);
+        free(new_out_file);
+    }
+    return OK;
+}
 
 int main(int argc, char* argv[])
 {
@@ -609,14 +649,14 @@ int main(int argc, char* argv[])
         return 0;
     }
 
-    status_code st = file_works(argv, argc);
+    status_code st = all_functions(argc, argv);
     if (st == OK)
     {
-        printf("g\n");
+        printf("The program has finished its work\n");
     }
     else
     {
-        printf("wrong\n");
+        printf("Something went wrong\n");
     }
     return 0;
 }
