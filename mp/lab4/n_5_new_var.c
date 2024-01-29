@@ -409,37 +409,6 @@ char *error_file(char *filename)
     return output;
 }
 
-bool validation(const char *string)
-{
-    int len_string = my_strlen(string);
-
-    // Check for the presence of digits, operators, and valid parentheses
-    bool has_digit = false;
-    bool has_operator = false;
-    int open_parentheses = 0;
-
-    for (int i = 0; i < len_string; i++) {
-        if (isdigit(string[i])) {
-            has_digit = true;
-        } else if (is_operator(string[i])) {
-            has_operator = true;
-        } else if (string[i] == '(') {
-            open_parentheses++;
-        } else if (string[i] == ')') {
-            if (open_parentheses <= 0) {
-                return false;  // Unmatched closing parenthesis
-            }
-            open_parentheses--;
-        } else if (!isspace(string[i])) {
-            return false;  // Invalid character
-        }
-    }
-
-    // Ensure there is at least one digit and one operator
-    // and all parentheses are matched
-    return has_digit && has_operator && open_parentheses == 0;
-}
-
 
 status_code file_works(FILE *input_file, FILE *output_file)
 {
