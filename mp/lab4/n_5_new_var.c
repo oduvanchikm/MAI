@@ -631,7 +631,7 @@ status_code all_functions(int argc, char* argv[])
         status_code st = file_works(input_file, output_file);
         if (st != OK)
         {
-            break;
+            print_errors(st);
         }
 
         fclose(input_file);
