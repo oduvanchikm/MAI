@@ -450,7 +450,7 @@ int is_number(char c)
     return (c >= '0' && c <= '9');
 }
 
-status_code validation(const char* string)
+status_code validation(const char* string, int* error)
 {
     int len_string = my_strlen(string);
 
@@ -469,13 +469,13 @@ status_code validation(const char* string)
         {
             is_digit = true;
             is_oper = false;
-            is_brackets = false;
         }
 
         else if (is_operator(string[i]))
         {
             if (is_oper)
             {
+                *error = INVALID_INPUT;
                 return INVALID_INPUT;
             }
 
@@ -484,12 +484,20 @@ status_code validation(const char* string)
         }
         else if (!isspace(string[i]))
         {
+            *error = INVALID_INPUT;
             return INVALID_INPUT;
         }
     }
 
     if (!is_digit)
     {
+        *error = INVALID_INPUT;
+        return INVALID_INPUT;
+    }
+
+    if (!is_oper)
+    {
+        *error = INVALID_INPUT;
         return INVALID_INPUT;
     }
 
@@ -549,7 +557,7 @@ status_code file_works(FILE *input_file, FILE *output_file)
     int index = 0;
     int line_of_expression = 0;
 
-    while (flag)
+    while (flag && !feof(input_file))
     {
         char *postfix_expression = NULL;
         index = 0;
@@ -579,7 +587,7 @@ status_code file_works(FILE *input_file, FILE *output_file)
 
         string[index] = '\0';
 
-        if (my_strlen(string) != 0)
+        if (my_strlen(string) > 0)
         {
             if (!valid_characters(string))
             {
@@ -588,14 +596,12 @@ status_code file_works(FILE *input_file, FILE *output_file)
                 printf("Wrong expression, wrong characters\n");
             }
 
-//            status_code st_validation = validation(string);
-//            if (st_validation == INVALID_INPUT)
-//            {
-//                fprintf(output_file, "Expression: %s\n", string);
-//                fprintf(output_file, "In string number: %d\n", line_of_expression);
-//                fprintf(output_file, "Problem: wrong characters\n");
-//                printf("Wrong expression, wrong characters\n");
-//            }
+            status_code st_validation = validation(string, &error);
+            if (st_validation == INVALID_INPUT)
+            {
+                print_error_in_file(output_file, error, line_of_expression, string);
+                printf("Wrong expression, wrong characters\n");
+            }
 
             printf("infix: %s\n", string);
 
@@ -651,10 +657,10 @@ status_code file_works(FILE *input_file, FILE *output_file)
 
             }
         }
-        else
-        {
-//            здесь надо дописать
-        }
+//        else
+//        {
+//
+//        }
         line_of_expression++;
         free(postfix_expression);
     }
