@@ -11,7 +11,6 @@ typedef enum {
     INVALID_INPUT,
     ERROR_WITH_COUNT_OF_ARGUMENTS,
     ERROR_WITH_OPENING_FILE,
-    EMPTY,
     NEGATIVE_DIGIT,
     WRONG_COUNT_OF_BRACKETS,
     OVERFLOW,
@@ -158,9 +157,11 @@ int my_strlen(const char *string) {
     return count;
 }
 
-status_code infix_to_postfix(const char *infix, char **postfix) {
+status_code infix_to_postfix(const char *infix, char **postfix, int* error)
+{
     Stack *stack = (Stack *) malloc(sizeof(Stack));
-    if (!stack) {
+    if (!stack)
+    {
         return ERROR_WITH_MEMORY_ALLOCATION;
     }
 
@@ -168,7 +169,8 @@ status_code infix_to_postfix(const char *infix, char **postfix) {
 
     int len = my_strlen(infix);
     *postfix = (char *) malloc((len + 1) * sizeof(char));
-    if (!(*postfix)) {
+    if (!(*postfix))
+    {
         return ERROR_WITH_MEMORY_ALLOCATION;
     }
 
@@ -176,14 +178,21 @@ status_code infix_to_postfix(const char *infix, char **postfix) {
     bool is_last_add_operator = true;
     int binary_minus = 0;
 
-    for (int i = 0; i < len; i++) {
-        if (isspace((infix[i]))) {
+    for (int i = 0; i < len; i++)
+    {
+        if (isspace((infix[i])))
+        {
             continue;
-        } else if (infix[i] == '-' && is_last_add_operator) {
+        }
+        else if (infix[i] == '-' && is_last_add_operator)
+        {
             binary_minus = 1;
             is_last_add_operator = true;
-        } else if (isdigit((infix[i]))) {
-            while (isdigit(infix[i])) {
+        }
+        else if (isdigit((infix[i])))
+        {
+            while (isdigit(infix[i]))
+            {
                 (*postfix)[postfix_size] = infix[i];
                 postfix_size++;
                 i++;
@@ -200,11 +209,16 @@ status_code infix_to_postfix(const char *infix, char **postfix) {
             i--;
             is_last_add_operator = false;
 
-        } else if (infix[i] == '(') {
+        }
+        else if (infix[i] == '(')
+        {
             push(stack, infix[i]);
             is_last_add_operator = true;
-        } else if (infix[i] == ')') {
-            while (!is_empty(stack) && peek(stack) != '(') {
+        }
+        else if (infix[i] == ')')
+        {
+            while (!is_empty(stack) && peek(stack) != '(')
+            {
                 (*postfix)[postfix_size] = pop(&stack);
                 postfix_size++;
 
@@ -212,14 +226,21 @@ status_code infix_to_postfix(const char *infix, char **postfix) {
                 postfix_size++;
             }
 
-            if (!is_empty(stack)) {
+            if (!is_empty(stack))
+            {
                 pop(&stack);
-            } else {
+            }
+            else
+            {
+                *error = WRONG_COUNT_OF_BRACKETS;
                 return WRONG_COUNT_OF_BRACKETS;
             }
             is_last_add_operator = false;
-        } else if (is_operator(infix[i])) {
-            while (!is_empty(stack) && get_priority(peek(stack)) >= get_priority(infix[i])) {
+        }
+        else if (is_operator(infix[i]))
+        {
+            while (!is_empty(stack) && get_priority(peek(stack)) >= get_priority(infix[i]))
+            {
                 (*postfix)[postfix_size] = pop(&stack);
                 postfix_size++;
                 (*postfix)[postfix_size] = ' ';
@@ -227,12 +248,17 @@ status_code infix_to_postfix(const char *infix, char **postfix) {
             }
             push(stack, infix[i]);
             is_last_add_operator = true;
-        } else {
+        }
+        else
+        {
+            *error = INVALID_INPUT;
             return INVALID_INPUT;
         }
     }
     while (!is_empty(stack)) {
-        if (peek(stack) == '(' || peek(stack) == ')') {
+        if (peek(stack) == '(' || peek(stack) == ')')
+        {
+            *error = INVALID_INPUT;
             return INVALID_INPUT;
         }
         (*postfix)[postfix_size] = pop(&stack);
@@ -246,7 +272,7 @@ status_code infix_to_postfix(const char *infix, char **postfix) {
     return OK;
 }
 
-status_code solve_expression(char *postfix, int *result)
+status_code solve_expression(char *postfix, int *result, int* error)
 {
     int number = 0;
     int number_1 = 0;
@@ -289,6 +315,7 @@ status_code solve_expression(char *postfix, int *result)
 
             if ((number_1 >= INT_MAX && number_2 >= INT_MAX) || (number_1 <= INT_MIN && number_2 <= INT_MIN))
             {
+                *error = OVERFLOW;
                 return OVERFLOW;
             }
 
@@ -297,6 +324,7 @@ status_code solve_expression(char *postfix, int *result)
                 case '+':
                     if (number_1 + number_2 > INT_MAX)
                     {
+                        *error = OVERFLOW;
                         return OVERFLOW;
                     }
                     else
@@ -308,6 +336,7 @@ status_code solve_expression(char *postfix, int *result)
                 case '-':
                     if (number_1 - number_2 < INT_MIN)
                     {
+                        *error = OVERFLOW;
                         return OVERFLOW;
                     }
                     else
@@ -319,6 +348,7 @@ status_code solve_expression(char *postfix, int *result)
                 case '*':
                     if ((number_1 > INT_MAX / number_2 || number_1 < INT_MIN / number_2))
                     {
+                        *error = OVERFLOW;
                         return OVERFLOW;
                     }
                     else
@@ -331,6 +361,7 @@ status_code solve_expression(char *postfix, int *result)
                     {
                         if ((number_1 / number_2 > INT_MAX) || (number_1 / number_2 < INT_MIN))
                         {
+                            *error = OVERFLOW;
                             return OVERFLOW;
                         }
                         else
@@ -340,6 +371,7 @@ status_code solve_expression(char *postfix, int *result)
                     }
                     else
                     {
+                        *error = NEGATIVE_DIGIT;
                         return NEGATIVE_DIGIT;
                     }
                     break;
@@ -349,6 +381,7 @@ status_code solve_expression(char *postfix, int *result)
                     {
                         if ((number_1 % number_2 > INT_MAX) || (number_1 % number_2 < INT_MIN))
                         {
+                            *error = OVERFLOW;
                             return OVERFLOW;
                         }
                         else
@@ -358,6 +391,7 @@ status_code solve_expression(char *postfix, int *result)
                     }
                     else
                     {
+                        *error = NEGATIVE_DIGIT;
                         return NEGATIVE_DIGIT;
                     }
                     break;
@@ -365,6 +399,7 @@ status_code solve_expression(char *postfix, int *result)
                 case '^':
                     if (my_pow(number_1, number_2) > INT_MAX)
                     {
+                        *error = OVERFLOW;
                         return OVERFLOW;
                     }
                     else
@@ -373,6 +408,7 @@ status_code solve_expression(char *postfix, int *result)
                     }
 
                 default:
+                    *error = INVALID_INPUT;
                     return INVALID_INPUT;
             }
         }
@@ -409,11 +445,97 @@ char *error_file(char *filename)
     return output;
 }
 
+int is_number(char c)
+{
+    return (c >= '0' && c <= '9');
+}
+
+status_code validation(const char* string)
+{
+    int len_string = my_strlen(string);
+
+    bool is_digit = false;
+    bool is_oper = false;
+    bool is_brackets = false;
+
+    for (int i = 0; i < len_string; i++)
+    {
+        if (isspace(string[i]))
+        {
+            continue;
+        }
+
+        if (isdigit(string[i]))
+        {
+            is_digit = true;
+            is_oper = false;
+            is_brackets = false;
+        }
+
+        else if (is_operator(string[i]))
+        {
+            if (is_oper)
+            {
+                return INVALID_INPUT;
+            }
+
+            is_digit = false;
+            is_oper = true;
+        }
+        else if (!isspace(string[i]))
+        {
+            return INVALID_INPUT;
+        }
+    }
+
+    if (!is_digit)
+    {
+        return INVALID_INPUT;
+    }
+
+    return OK;
+}
+
+void print_result(char* string, char*  postfix_expression, int result)
+{
+    printf("Expression: %s\n", string);
+    printf("Postfix: %s\n", postfix_expression);
+    printf("Result: %d\n", result);
+}
+
+void print_error_in_file(FILE* output_file, int error, int line_of_expression, char* string)
+{
+    fprintf(output_file, "Expression: %s\n", string);
+    fprintf(output_file, "In string number: %d\n", line_of_expression);
+    fprintf(output_file, "Problem: ");
+
+    switch (error)
+    {
+        case INVALID_INPUT:
+            fprintf(output_file, "invalid expression\n");
+            break;
+
+        case WRONG_COUNT_OF_BRACKETS:
+            fprintf(output_file, "wrong count of brackets\n");
+            break;
+
+        case NEGATIVE_DIGIT:
+            fprintf(output_file, "negative digits\n");
+            break;
+
+        case OVERFLOW:
+            fprintf(output_file, "overflowed\n");
+            break;
+
+    }
+    fprintf(output_file, "\n");
+}
 
 status_code file_works(FILE *input_file, FILE *output_file)
 {
     int symbol = fgetc(input_file);
     int capacity = 10;
+    int error;
 
     char* string = (char*) malloc(capacity * sizeof(char));
     if (!string)
@@ -455,63 +577,75 @@ status_code file_works(FILE *input_file, FILE *output_file)
 
         string[index] = '\0';
 
-        if (my_strlen(string) != 0) {
-
-            if (!valid_characters(string)) {
-                fprintf(output_file, "Expression: %s\n", string);
-                fprintf(output_file, "In string number: %d\n", line_of_expression);
-                fprintf(output_file, "Problem: wrong characters\n");
+        if (my_strlen(string) != 0)
+        {
+            if (!valid_characters(string))
+            {
+                error = INVALID_INPUT;
+                print_error_in_file(output_file, error, line_of_expression, string);
                 printf("Wrong expression, wrong characters\n");
             }
 
+//            status_code st_validation = validation(string);
+//            if (st_validation == INVALID_INPUT)
+//            {
+//                fprintf(output_file, "Expression: %s\n", string);
+//                fprintf(output_file, "In string number: %d\n", line_of_expression);
+//                fprintf(output_file, "Problem: wrong characters\n");
+//                printf("Wrong expression, wrong characters\n");
+//            }
+
             printf("infix: %s\n", string);
 
-            status_code st_postfix_expression = infix_to_postfix(string, &postfix_expression);
-            if (st_postfix_expression == ERROR_WITH_MEMORY_ALLOCATION) {
+            status_code st_postfix_expression = infix_to_postfix(string, &postfix_expression, &error);
+            if (st_postfix_expression == ERROR_WITH_MEMORY_ALLOCATION)
+            {
                 flag = 0;
                 print_errors(st_postfix_expression);
                 break;
-            } else if (st_postfix_expression == WRONG_COUNT_OF_BRACKETS) {
-                fprintf(output_file, "Expression: %s\n", string);
-                fprintf(output_file, "In string number: %d\n", line_of_expression);
-                fprintf(output_file, "Problem: wrong count of brackets\n");
+
+            }
+            else if (st_postfix_expression == WRONG_COUNT_OF_BRACKETS)
+            {
+                print_error_in_file(output_file, error, line_of_expression, string);
                 printf("Wrong expression, wrong count of brackets\n");
-            } else if (st_postfix_expression == INVALID_INPUT) {
-                fprintf(output_file, "Expression: %s\n", string);
-                fprintf(output_file, "In string number: %d\n", line_of_expression);
-                fprintf(output_file, "Problem: invalid input\n");
+            }
+            else if (st_postfix_expression == INVALID_INPUT)
+            {
+                print_error_in_file(output_file, error, line_of_expression, string);
                 printf("Wrong expression, invalid input\n");
-            } else {
+            }
+            else
+            {
                 int result;
-                status_code st_solve_expression = solve_expression(postfix_expression, &result);
-                if (st_solve_expression == ERROR_WITH_MEMORY_ALLOCATION) {
+                status_code st_solve_expression = solve_expression(postfix_expression, &result, &error);
+                if (st_solve_expression == ERROR_WITH_MEMORY_ALLOCATION)
+                {
                     flag = 0;
                     print_errors(st_solve_expression);
                     break;
-                } else if (st_solve_expression == OVERFLOW) {
-                    fprintf(output_file, "Expression: %s\n", string);
-                    fprintf(output_file, "In string number: %d\n", line_of_expression);
-                    fprintf(output_file, "Problem: overflow\n");
+                }
+                else if (st_solve_expression == OVERFLOW)
+                {
+                    print_error_in_file(output_file, error, line_of_expression, string);
                     printf("Wrong expression, overflow\n");
-                } else if (st_solve_expression == INVALID_INPUT) {
-                    fprintf(output_file, "Expression: %s\n", string);
-                    fprintf(output_file, "In string number: %d\n", line_of_expression);
-                    fprintf(output_file, "Problem: invalid input\n");
+                }
+                else if (st_solve_expression == INVALID_INPUT)
+                {
+                    print_error_in_file(output_file, error, line_of_expression, string);
                     printf("Wrong expression, invalid input\n");
-                } else if (st_solve_expression == NEGATIVE_DIGIT) {
-                    fprintf(output_file, "Expression: %s\n", string);
-                    fprintf(output_file, "In string number: %d\n", line_of_expression);
-                    fprintf(output_file, "Problem: negative digit\n");
+                }
+                else if (st_solve_expression == NEGATIVE_DIGIT)
+                {
+                    print_error_in_file(output_file, error, line_of_expression, string);
                     printf("Wrong expression, negative digit\n");
-                } else {
-                    printf("Expression: %s\n", string);
-                    printf("Postfix: %s\n", postfix_expression);
-                    printf("Result: %d\n", result);
+                }
+                else
+                {
+                    print_result(string, postfix_expression, result);
                 }
             }
-
         }
-
         else
         {
 //            здесь надо дописать
