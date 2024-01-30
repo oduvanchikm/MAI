@@ -3,17 +3,23 @@
 
 enum status_code
 {
-    ok
+    ok,
+    INVALID_VALUE
 };
 
 double function(double x)
 {
-    return x * x - 4 * x + 6;
+    return x * x + 2 * x + 1;
 }
 
 enum status_code dichotomy_method(double lower_bound, double upper_bound, double eps, double (*f)(double), double *result)
 {
     double middle = 0.0;
+
+    if (f(lower_bound) * f(upper_bound) >= 0)
+    {
+        return INVALID_VALUE;
+    }
 
     do 
     {
