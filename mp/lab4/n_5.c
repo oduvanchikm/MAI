@@ -14,11 +14,14 @@ typedef enum {
     NEGATIVE_DIGIT,
     WRONG_COUNT_OF_BRACKETS,
     OVERFLOW,
+    WRONG_SEQUENCE_OF_BRACKETS
 
 } status_code;
 
-void print_errors(int flag) {
-    switch (flag) {
+void print_errors(int flag)
+{
+    switch (flag)
+    {
         case ERROR_WITH_COUNT_OF_ARGUMENTS:
             printf("Error with count of arguments\n");
             break;
@@ -45,6 +48,10 @@ void print_errors(int flag) {
 
         case OVERFLOW:
             printf("It's very big digit\n");
+            break;
+
+        case WRONG_SEQUENCE_OF_BRACKETS:
+            printf("Wrong sequence of brackets\n");
             break;
 
         default:
@@ -107,23 +114,29 @@ bool is_operator(const char c) {
     return ((c == '+') || (c == '-') || (c == '*') || (c == '/') || (c == '^') || (c == '%') || (c == '~'));
 }
 
-int get_priority(const char operator) {
-    switch (operator) {
+int get_priority(const char operator)
+{
+    switch (operator)
+    {
+        case '(':
+        case ')':
+            return 1;
+
         case '+':
         case '-':
-            return 1;
+            return 2;
 
         case '*':
         case '/':
         case '%':
         case '~':
-            return 2;
-
-        case '^':
             return 3;
 
-        default:
+        case '^':
             return 4;
+
+        default:
+            return 5;
     }
 }
 
@@ -159,7 +172,7 @@ int my_strlen(const char *string) {
 
 status_code infix_to_postfix(const char *infix, char **postfix, int* error)
 {
-    Stack *stack = (Stack *) malloc(sizeof(Stack));
+    Stack* stack = (Stack*)malloc(sizeof(Stack));
     if (!stack)
     {
         return ERROR_WITH_MEMORY_ALLOCATION;
@@ -171,6 +184,7 @@ status_code infix_to_postfix(const char *infix, char **postfix, int* error)
     *postfix = (char *) malloc((len + 1) * sizeof(char));
     if (!(*postfix))
     {
+        free(stack);
         return ERROR_WITH_MEMORY_ALLOCATION;
     }
 
@@ -226,14 +240,9 @@ status_code infix_to_postfix(const char *infix, char **postfix, int* error)
                 postfix_size++;
             }
 
-            if (!is_empty(stack))
+            if (!is_empty(stack) && peek(stack) == '(')
             {
                 pop(&stack);
-            }
-            else
-            {
-                *error = WRONG_COUNT_OF_BRACKETS;
-                return WRONG_COUNT_OF_BRACKETS;
             }
             is_last_add_operator = false;
         }
@@ -255,7 +264,8 @@ status_code infix_to_postfix(const char *infix, char **postfix, int* error)
             return INVALID_INPUT;
         }
     }
-    while (!is_empty(stack)) {
+    while (!is_empty(stack))
+    {
         if (peek(stack) == '(' || peek(stack) == ')')
         {
             *error = INVALID_INPUT;
@@ -268,7 +278,7 @@ status_code infix_to_postfix(const char *infix, char **postfix, int* error)
         postfix_size++;
     }
     (*postfix)[postfix_size] = '\0';
-
+    free(stack);
     return OK;
 }
 
@@ -540,9 +550,46 @@ void print_error_in_file(FILE* output_file, int error, int line_of_expression, c
             fprintf(output_file, "overflowed\n");
             break;
 
+        case WRONG_SEQUENCE_OF_BRACKETS:
+            fprintf(output_file, "wrong sequence of brackets\n");
+            break;
+
     }
     fprintf(output_file, "\n");
 }
+
+status_code check_brackets(const char* string, int* error)
+{
+    int value = 0;
+    int len = my_strlen(string);
+
+    for (int i = 0; i < len; i++)
+    {
+        if (string[i] == '(')
+        {
+            value++;
+        }
+        else if (string[i] == ')')
+        {
+            value--;
+        }
+
+        if (value < 0)
+        {
+            *error = WRONG_COUNT_OF_BRACKETS;
+            return WRONG_COUNT_OF_BRACKETS;
+        }
+    }
+
+    if (value != 0)
+    {
+        *error = WRONG_COUNT_OF_BRACKETS;
+        return WRONG_COUNT_OF_BRACKETS;
+    }
+
+    return OK;
+}
+
 
 status_code file_works(FILE *input_file, FILE *output_file)
 {
@@ -551,8 +598,9 @@ status_code file_works(FILE *input_file, FILE *output_file)
     int error;
     int result;
     status_code st_solve_expression;
+    status_code st_validation;
 
-    char* string = (char*) malloc(capacity * sizeof(char));
+    char* string = (char*)malloc(capacity * sizeof(char));
     if (!string)
     {
         return ERROR_WITH_MEMORY_ALLOCATION;
@@ -568,7 +616,7 @@ status_code file_works(FILE *input_file, FILE *output_file)
         char *postfix_expression = NULL;
         index = 0;
 
-        while (symbol != EOF /*&& symbol != '\n'*/)
+        while (symbol != EOF)
         {
             if (index == capacity - 1)
             {
@@ -584,7 +632,10 @@ status_code file_works(FILE *input_file, FILE *output_file)
             string[index] = (char)symbol;
             index++;
             symbol = fgetc(input_file);
-            if(symbol == '\n') break;
+            if(symbol == '\n')
+            {
+                break;
+            }
         }
 
         if (symbol == EOF)
@@ -611,47 +662,31 @@ status_code file_works(FILE *input_file, FILE *output_file)
                 printf("Wrong expression, wrong characters\n");
             }
 
-            status_code st_validation = validation(string, &error);
-            if (st_validation == INVALID_INPUT)
+            status_code st_check_brackets = check_brackets(string, &error);
+            switch (st_check_brackets)
             {
-                print_error_in_file(output_file, error, line_of_expression, string);
-                printf("Wrong expression, wrong characters\n");
-            }
-
-            printf("infix: %s\n", string);
-
-            status_code st_postfix_expression = infix_to_postfix(string, &postfix_expression, &error);
-
-            switch (st_postfix_expression)
-            {
-                case ERROR_WITH_MEMORY_ALLOCATION:
-                    flag = 0;
-                    print_errors(st_postfix_expression);
-                    break;
-
                 case WRONG_COUNT_OF_BRACKETS:
                     print_error_in_file(output_file, error, line_of_expression, string);
-                    printf("Wrong expression, wrong count of brackets\n");
-                    break;
-
-                case INVALID_INPUT:
-                    print_error_in_file(output_file, error, line_of_expression, string);
-                    printf("Wrong expression, invalid input\n");
+                    printf("Wrong count of brackets\n");
                     break;
 
                 case OK:
-                    st_solve_expression = solve_expression(postfix_expression, &result, &error);
+                    st_validation = validation(string, &error);
+                    if (st_validation == INVALID_INPUT)
+                    {
+                        print_error_in_file(output_file, error, line_of_expression, string);
+                        printf("Wrong expression, wrong characters\n");
+                    }
 
-                    switch (st_solve_expression)
+                    printf("infix: %s\n", string);
+
+                    status_code st_postfix_expression = infix_to_postfix(string, &postfix_expression, &error);
+
+                    switch (st_postfix_expression)
                     {
                         case ERROR_WITH_MEMORY_ALLOCATION:
                             flag = 0;
-                            print_errors(st_solve_expression);
-                            break;
-
-                        case OVERFLOW:
-                            print_error_in_file(output_file, error, line_of_expression, string);
-                            printf("Wrong expression, overflow\n");
+                            print_errors(st_postfix_expression);
                             break;
 
                         case INVALID_INPUT:
@@ -659,17 +694,38 @@ status_code file_works(FILE *input_file, FILE *output_file)
                             printf("Wrong expression, invalid input\n");
                             break;
 
-                        case NEGATIVE_DIGIT:
-                            print_error_in_file(output_file, error, line_of_expression, string);
-                            printf("Wrong expression, negative digit\n");
-                            break;
-
                         case OK:
-                            print_result(string, postfix_expression, result);
-                            break;
-                    }
-                    break;
+                            st_solve_expression = solve_expression(postfix_expression, &result, &error);
 
+                            switch (st_solve_expression)
+                            {
+                                case ERROR_WITH_MEMORY_ALLOCATION:
+                                    flag = 0;
+                                    print_errors(st_solve_expression);
+                                    break;
+
+                                case OVERFLOW:
+                                    print_error_in_file(output_file, error, line_of_expression, string);
+                                    printf("Wrong expression, overflow\n");
+                                    break;
+
+                                case INVALID_INPUT:
+                                    print_error_in_file(output_file, error, line_of_expression, string);
+                                    printf("Wrong expression, invalid input\n");
+                                    break;
+
+                                case NEGATIVE_DIGIT:
+                                    print_error_in_file(output_file, error, line_of_expression, string);
+                                    printf("Wrong expression, negative digit\n");
+                                    break;
+
+                                case OK:
+                                    print_result(string, postfix_expression, result);
+                                    break;
+                            }
+                            break;
+
+                    }
             }
         }
 
@@ -735,7 +791,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        printf("Something went wrong\n");
+        print_errors(st);
     }
     return 0;
 }
