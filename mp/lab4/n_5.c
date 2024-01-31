@@ -346,6 +346,11 @@ status_code solve_expression(char *postfix, int *result, int* error)
                     break;
 
                 case '*':
+                    if(number_2 == 0 || number_1 == 0)
+                    {
+                        push(stack, 0);
+                        break;
+                    }
                     if ((number_1 > INT_MAX / number_2 || number_1 < INT_MIN / number_2))
                     {
                         *error = OVERFLOW;
@@ -556,13 +561,14 @@ status_code file_works(FILE *input_file, FILE *output_file)
     int flag = 1;
     int index = 0;
     int line_of_expression = 0;
+    int length = 0;
 
     while (flag && !feof(input_file))
     {
         char *postfix_expression = NULL;
         index = 0;
 
-        while (symbol != EOF && symbol != '\n')
+        while (symbol != EOF /*&& symbol != '\n'*/)
         {
             if (index == capacity - 1)
             {
@@ -578,6 +584,7 @@ status_code file_works(FILE *input_file, FILE *output_file)
             string[index] = (char)symbol;
             index++;
             symbol = fgetc(input_file);
+            if(symbol == '\n') break;
         }
 
         if (symbol == EOF)
@@ -587,8 +594,16 @@ status_code file_works(FILE *input_file, FILE *output_file)
 
         string[index] = '\0';
 
-        if (my_strlen(string) > 0)
+        length = my_strlen(string);
+        if (length > 0)
         {
+            if(length == 1 && isspace(string[0]))
+            {
+                line_of_expression++;
+                free(postfix_expression);
+                continue;
+            }
+
             if (!valid_characters(string))
             {
                 error = INVALID_INPUT;
@@ -657,10 +672,7 @@ status_code file_works(FILE *input_file, FILE *output_file)
 
             }
         }
-//        else
-//        {
-//
-//        }
+
         line_of_expression++;
         free(postfix_expression);
     }
