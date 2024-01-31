@@ -77,8 +77,14 @@ void print_menu()
     printf("Enter:\n");
 }
 
-void print_in_file_best_students(FILE* file, Student* students, int count_of_students)
+void print_in_file_best_students(char* output, Student* students, int count_of_students)
 {
+    FILE* output_file = fopen(output, "w");
+    if (!output_file)
+    {
+        return;
+    }
+
     double all_average = 0.0;
     double grade_average = 0.0;
     for (int i = 0; i < count_of_students; i++)
@@ -88,16 +94,17 @@ void print_in_file_best_students(FILE* file, Student* students, int count_of_stu
     }
 
     all_average = all_average / count_of_students;
-    fprintf(file, "Average all: %f\n", all_average);
+    fprintf(output_file, "Average all: %f\n", all_average);
 
     for (int i = 0; i < count_of_students; i++)
     {
         grade_average = average_grade(&students[i]);
         if (grade_average > all_average)
         {
-            fprintf(file, "%s %s %f\n", students[i].name, students[i].surname, grade_average);
+            fprintf(output_file, "%s %s %f\n", students[i].name, students[i].surname, grade_average);
         }
     }
+    fclose(output_file);
 }
 
 int compare_students_by_group(const void* a, const void* b)
@@ -238,7 +245,7 @@ status_code info_from_file(FILE *filename, Student **result, int *number_of_stud
 
 bool valid_option(int c)
 {
-    if (c > 4 && c < 1)
+    if (c > 4 || c < 1)
     {
         return false;
     }
@@ -302,20 +309,25 @@ int main(int argc, char *argv[])
        return 0;
    }
 
-   FILE *input_file = fopen(argv[1], "r");
-   FILE *output_file = fopen(argv[2], "w");
-
-    if (!input_file || !output_file)
-    {
-        printf("Error with opening file\n");
-        fclose(input_file);
-        fclose(output_file);
-        return 0;
-    }
-
     if (strcmp(argv[1], argv[2]) == 0)
     {
         printf("I must enter different files\n");
+        return 0;
+    }
+
+    FILE *input_file = fopen(argv[1], "r");
+//    FILE *output_file = fopen(argv[2], "w");
+
+//    if (!input_file || !output_file)
+//    {
+//        printf("Error with opening file\n");
+//        fclose(input_file);
+//        fclose(output_file);
+//        return 0;
+//    }
+    if (!input_file)
+    {
+        printf("Error with opening file\n");
         return 0;
     }
 
@@ -328,7 +340,7 @@ int main(int argc, char *argv[])
     {
         print_errors(st_info);
         fclose(input_file);
-        fclose(output_file);
+//        fclose(output_file);
         return 0;
     }
     int c;
@@ -474,7 +486,7 @@ int main(int argc, char *argv[])
             case 3:
                 printf("\tEnter best students\n");
                 printf("The program will output to a file the average score for all exams of all students and the best students\n");
-                print_in_file_best_students(output_file, students, count_of_students);
+                print_in_file_best_students(argv[2], students, count_of_students);
                 printf("Data is in the output file\n");
                 break;
 
@@ -490,6 +502,13 @@ int main(int argc, char *argv[])
                 }
                 else
                 {
+                    FILE* output_file = fopen(argv[2], "w");
+                    if (!output_file)
+                    {
+                        printf("Error with opening file\n");
+                        return 0;
+                    }
+
                     int id = atoi(id_char);
                     int stud = find_student_by_id(students, count_of_students, id);
                     if (stud != -1)
@@ -502,6 +521,7 @@ int main(int argc, char *argv[])
                     {
                         printf("Student with ID %d not found\n", id);
                     }
+                    fclose(output_file);
                 }
                 break;
 
@@ -510,6 +530,7 @@ int main(int argc, char *argv[])
                 break;
         }
     }
+    fclose(input_file);
     free(students);
     return 0;
 }
