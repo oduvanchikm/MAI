@@ -5,7 +5,8 @@
 #include <limits.h>
 #include <ctype.h>
 
-typedef enum {
+typedef enum
+{
     OK,
     ERROR_WITH_MEMORY_ALLOCATION,
     INVALID_INPUT,
@@ -14,7 +15,6 @@ typedef enum {
     NEGATIVE_DIGIT,
     WRONG_COUNT_OF_BRACKETS,
     OVERFLOW,
-    WRONG_SEQUENCE_OF_BRACKETS
 
 } status_code;
 
@@ -48,10 +48,6 @@ void print_errors(int flag)
 
         case OVERFLOW:
             printf("It's very big digit\n");
-            break;
-
-        case WRONG_SEQUENCE_OF_BRACKETS:
-            printf("Wrong sequence of brackets\n");
             break;
 
         default:
@@ -434,15 +430,14 @@ status_code solve_expression(char *postfix, int *result, int* error)
 
 bool valid_characters(const char *string)
 {
-    int len_string = my_strlen(string);
-
-    for (int i = 0; i < len_string; i++)
+    int i = 0;
+    while (string[i])
     {
-        if (string[i] < '0' && string[i] > '9' && string[i] != '(' && string[i] != ')' && !is_operator(string[i]) &&
-            string[i] != ' ')
+        if (!(is_operator(string[i]) || isdigit(string[i]) || string[i] == '(' || string[i] == ')' || isspace(string[i])))
         {
             return false;
         }
+        i++;
     }
     return true;
 }
@@ -460,64 +455,92 @@ char *error_file(char *filename)
     return output;
 }
 
-int is_number(char c)
+bool check_brackets(const char* string)
 {
-    return (c >= '0' && c <= '9');
+    int value = 0;
+    int len = my_strlen(string);
+
+    for (int i = 0; i < len; i++)
+    {
+        if (string[i] == '(')
+        {
+            value++;
+        }
+        else if (string[i] == ')')
+        {
+            value--;
+        }
+    }
+
+    if (value != 0)
+    {
+        return false;
+    }
+
+    return true;
 }
 
-status_code validation(const char* string, int* error)
+status_code validate_infix_expression(const char *infix, int* error)
 {
-    int len_string = my_strlen(string);
-
-    bool is_digit = false;
-    bool is_oper = false;
-    bool is_brackets = false;
-
-    for (int i = 0; i < len_string; i++)
+    if (!valid_characters(infix))
     {
-        if (isspace(string[i]))
-        {
-            continue;
-        }
+        *error = INVALID_INPUT;
+        return INVALID_INPUT;
+    }
 
-        if (isdigit(string[i]))
+    int i = 0;
+    int digit_flag = 0;
+    while (infix[i] != '\0')
+    {
+        if (isdigit(infix[i]))
         {
-            is_digit = true;
-            is_oper = false;
-        }
-
-        else if (is_operator(string[i]))
-        {
-            if (is_oper)
+            while (isdigit(infix[i]) || infix[i] == ' ')
+            {
+                if (isdigit(infix[i])) digit_flag = 1;
+                i++;
+            }
+            if (digit_flag)
+            {
+                digit_flag = 0;
+                i--;
+            }
+            else
             {
                 *error = INVALID_INPUT;
                 return INVALID_INPUT;
             }
 
-            is_digit = false;
-            is_oper = true;
+            if (isdigit(infix[i + 1]) || (!is_operator(infix[i + 1]) && infix[i + 1] != ')' && infix[i + 1] != ' ' && infix[i + 1] != '\0'))
+            {
+                *error = INVALID_INPUT;
+                return INVALID_INPUT;
+            }
         }
-        else if (!isspace(string[i]))
+        else if (is_operator(infix[i]))
+        {
+            if ((!isdigit(infix[i + 1]) && infix[i + 1] != '(' && infix[i + 1] != ' ') || infix[i + 1] == '\0')
+            {
+                *error = INVALID_INPUT;
+                return INVALID_INPUT;
+            }
+        }
+
+        else if (strchr("0123456789/+-*^()\n ", infix[i]) == NULL)
         {
             *error = INVALID_INPUT;
             return INVALID_INPUT;
         }
+        i++;
     }
 
-    if (!is_digit)
+    if (!check_brackets(infix))
     {
-        *error = INVALID_INPUT;
-        return INVALID_INPUT;
+        *error = WRONG_COUNT_OF_BRACKETS;
+        return WRONG_COUNT_OF_BRACKETS;
     }
-
-    if (!is_oper)
-    {
-        *error = INVALID_INPUT;
-        return INVALID_INPUT;
-    }
-
     return OK;
 }
+
 
 void print_result(char* string, char*  postfix_expression, int result)
 {
@@ -549,47 +572,9 @@ void print_error_in_file(FILE* output_file, int error, int line_of_expression, c
         case OVERFLOW:
             fprintf(output_file, "overflowed\n");
             break;
-
-        case WRONG_SEQUENCE_OF_BRACKETS:
-            fprintf(output_file, "wrong sequence of brackets\n");
-            break;
-
     }
     fprintf(output_file, "\n");
 }
-
-status_code check_brackets(const char* string, int* error)
-{
-    int value = 0;
-    int len = my_strlen(string);
-
-    for (int i = 0; i < len; i++)
-    {
-        if (string[i] == '(')
-        {
-            value++;
-        }
-        else if (string[i] == ')')
-        {
-            value--;
-        }
-
-        if (value < 0)
-        {
-            *error = WRONG_COUNT_OF_BRACKETS;
-            return WRONG_COUNT_OF_BRACKETS;
-        }
-    }
-
-    if (value != 0)
-    {
-        *error = WRONG_COUNT_OF_BRACKETS;
-        return WRONG_COUNT_OF_BRACKETS;
-    }
-
-    return OK;
-}
-
 
 status_code file_works(FILE *input_file, FILE *output_file)
 {
@@ -598,7 +583,6 @@ status_code file_works(FILE *input_file, FILE *output_file)
     int error;
     int result;
     status_code st_solve_expression;
-    status_code st_validation;
 
     char* string = (char*)malloc(capacity * sizeof(char));
     if (!string)
@@ -655,33 +639,22 @@ status_code file_works(FILE *input_file, FILE *output_file)
                 continue;
             }
 
-            if (!valid_characters(string))
-            {
-                error = INVALID_INPUT;
-                print_error_in_file(output_file, error, line_of_expression, string);
-                printf("Wrong expression, wrong characters\n");
-            }
-
-            status_code st_check_brackets = check_brackets(string, &error);
-            switch (st_check_brackets)
+            status_code st_validate_infix_expression = validate_infix_expression(string, &error);
+            switch (st_validate_infix_expression)
             {
                 case WRONG_COUNT_OF_BRACKETS:
                     print_error_in_file(output_file, error, line_of_expression, string);
                     printf("Wrong count of brackets\n");
                     break;
 
+                case INVALID_INPUT:
+                    print_error_in_file(output_file, error, line_of_expression, string);
+                    printf("Invalid input\n");
+                    break;
+
                 case OK:
-                    st_validation = validation(string, &error);
-                    if (st_validation == INVALID_INPUT)
-                    {
-                        print_error_in_file(output_file, error, line_of_expression, string);
-                        printf("Wrong expression, wrong characters\n");
-                    }
-
                     printf("infix: %s\n", string);
-
                     status_code st_postfix_expression = infix_to_postfix(string, &postfix_expression, &error);
-
                     switch (st_postfix_expression)
                     {
                         case ERROR_WITH_MEMORY_ALLOCATION:
@@ -724,11 +697,9 @@ status_code file_works(FILE *input_file, FILE *output_file)
                                     break;
                             }
                             break;
-
                     }
             }
         }
-
         line_of_expression++;
         free(postfix_expression);
     }
