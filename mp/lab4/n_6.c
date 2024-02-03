@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <limits.h>
 #include <ctype.h>
+#include <time.h>
 
 typedef enum
 {
@@ -97,7 +97,7 @@ void push(Stack *stack, char data)
     stack->top = new_node;
 }
 
-int pop(Stack** stack)
+char pop(Stack** stack)
 {
     if (*stack == NULL)
     {
@@ -112,7 +112,7 @@ int pop(Stack** stack)
 }
 
 
-int peek(Stack *stack)
+char peek(Stack *stack)
 {
     if (stack->top == NULL)
     {
@@ -249,11 +249,6 @@ bool check_brackets(const char* string)
     return true;
 }
 
-bool valid_infix_expression(const char* string)
-{
-
-}
-
 int is_operand(const char c)
 {
     return (c == '1' || c == '0');
@@ -357,7 +352,6 @@ void print_tree(Node* root, int level)
     {
         return;
     }
-
 
     print_tree(root->right, level + 1);
     for (int i = 0; i < level; i++)
@@ -496,7 +490,6 @@ status_code infix_to_postfix(const char* infix, char** postfix, int* error)
                 (*postfix)[postfix_size] = ' ';
                 postfix_size++;
             }
-
             if (!is_empty(stack) && peek(stack) == '(')
             {
                 pop(&stack);
@@ -539,9 +532,9 @@ status_code infix_to_postfix(const char* infix, char** postfix, int* error)
         }
         else
         {
-            *error = INVALID_INPUT;
             free(*postfix);
             free(stack);
+            *error = INVALID_INPUT;
             return INVALID_INPUT;
         }
     }
@@ -550,12 +543,13 @@ status_code infix_to_postfix(const char* infix, char** postfix, int* error)
     {
         if (peek(stack) == '(' || peek(stack) == ')')
         {
-            *error = INVALID_INPUT;
+            free(*postfix);
             free(stack);
+            *error = INVALID_INPUT;
             return INVALID_INPUT;
         }
 
-        (*postfix)[postfix_size] = pop(&stack);
+        (*postfix)[postfix_size] = pop(&stack); //
         postfix_size++;
 
         (*postfix)[postfix_size] = ' ';
@@ -563,8 +557,8 @@ status_code infix_to_postfix(const char* infix, char** postfix, int* error)
     }
 
     (*postfix)[postfix_size] = '\0';
+
     free(stack);
-    *error = OK;
     return OK;
 }
 
@@ -619,65 +613,194 @@ status_code read_file(FILE* input_file, char** string, int* error)
     return OK;
 }
 
-void print_error(int error)
+int solve_expression(Node* root, int* values_of_variables, int count_of_variables, char* names_of_variables)
 {
-    printf("Problem: ");
-
-    switch (error)
+    if(!root)
     {
-        case INVALID_INPUT:
-            printf("invalid expression\n");
-            break;
-
-        case WRONG_COUNT_OF_BRACKETS:
-            printf("wrong count of brackets\n");
-            break;
-
-        case NEGATIVE_DIGIT:
-            printf("negative digits\n");
-            break;
-
-        case OVERFLOW:
-            printf("overflowed\n");
-            break;
+        return INVALID_INPUT;
     }
-    printf("\n");
+
+    int left_value = solve_expression(root->left, values_of_variables, count_of_variables, names_of_variables);
+    int right_value = solve_expression(root->right, values_of_variables, count_of_variables, names_of_variables);
+
+    if(root->data == '1')
+    {
+        return root->data - '0';
+    }
+
+    else if (root->data == '0')
+    {
+        return root->data  - '0';
+    }
+
+    else if (isalpha(root->data))
+    {
+        for (int i = 0; i < count_of_variables; i++)
+        {
+            if (root->data == names_of_variables[i])
+            {
+                return values_of_variables[i];
+            }
+        }
+    }
+
+    else
+    {
+        switch(root->data)
+        {
+            case '&':
+                return (left_value && right_value);
+
+            case '|':
+                return (left_value || right_value);
+
+            case '~':
+                return (!left_value);
+
+            case '-':
+                return (!left_value || right_value);
+
+            case '+':
+                return (left_value && !right_value);
+
+            case '<':
+                return (left_value ^ right_value);
+
+            case '=':
+                return (left_value == right_value);
+
+            case '!':
+                return (!left_value && !right_value);
+
+            case '?':
+                return !(left_value || right_value);
+        }
+    }
 }
+
+char generate_random_char()
+{
+    const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    int index = rand() % (strlen(charset));
+    return charset[index];
+}
+
+char* generate_random_filename()
+{
+    srand(time(NULL));
+    char* filename = (char*)malloc(sizeof(char));
+    if (!filename)
+    {
+        return NULL;
+    }
+
+    for (int i = 0; i < 10; i++)
+    {
+        filename[i] = generate_random_char();
+    }
+
+    filename[10] = '.';
+    filename[11] = 't';
+    filename[12] = 'x';
+    filename[13] = 't';
+    filename[14] = '\0';
+
+    return filename;
+}
+
+void create_truth_table(FILE* output_file, char* name_of_variables, int count_of_variables, Node* root)
+{
+    int value;
+    fprintf(output_file, "\tTRUTH TABLE\n");
+    for (int i = 0; i < count_of_variables; i++)
+    {
+        fprintf(output_file, "%c | ", name_of_variables[i]);
+    }
+
+    fprintf(output_file, "Result\n");
+    int num_rows = 1 << count_of_variables;
+
+    for (int row = 0; row < num_rows; row++)
+    {
+        for (int var = 0; var < count_of_variables; var++)
+        {
+            value = (row >> var) & 1;
+            fprintf(output_file, "%d | ", value);
+        }
+
+        int result = solve_expression(root, &value, count_of_variables, name_of_variables);
+        fprintf(output_file, "%d\n", result);
+    }
+}
+
 
 status_code all_functions(char* filename)
 {
-    Node* tree_result;
-    char* infix_expression = NULL;
-    char* postfix_expression = NULL;
-    int error;
-
     FILE *input_file = fopen(filename, "r");
     if (!input_file)
     {
         return ERROR_WITH_OPENING_FILE;
     }
 
+    Node* tree_result;
+    char* infix_expression = NULL;
+    char* postfix_expression = NULL;
+    int error;
+
     status_code st_read = read_file(input_file, &infix_expression, &error);
     if (st_read != OK)
     {
-        print_error(st_read);
+        print_errors(st_read);
+        return INVALID_INPUT;
     }
 
     status_code st_infix_to_postfix = infix_to_postfix(infix_expression, &postfix_expression, &error);
     if (st_infix_to_postfix != OK)
     {
-        print_error(st_infix_to_postfix);
+        print_errors(st_infix_to_postfix);
+        return st_infix_to_postfix;
     }
 
     status_code st_build_tree = build_expression_tree(postfix_expression, &error, &tree_result);
     if (st_build_tree != OK)
     {
-        print_error(st_build_tree);
+        print_errors(st_build_tree);
+        return st_build_tree;
     }
 
-//    print_tree(tree_result, 0);
+    char* output = generate_random_filename();
+    FILE* output_file = fopen(output, "w");
+    if (!output_file)
+    {
+        return ERROR_WITH_OPENING_FILE;
+    }
 
+    int len_postfix_expression = my_strlen(postfix_expression);
+    char* name_of_variables = (char*)malloc(sizeof(char) * (len_postfix_expression + 1));
+    if (!name_of_variables)
+    {
+        return ERROR_WITH_MEMORY_ALLOCATION;
+    }
 
+    int count_of_variables = 0;
+
+    for (int i = 0; i < len_postfix_expression; i++)
+    {
+        if (isalpha(postfix_expression[i]))
+        {
+            if (strchr(name_of_variables, postfix_expression[i]) == NULL)
+            {
+                name_of_variables[count_of_variables] = postfix_expression[i];
+                count_of_variables++;
+                name_of_variables[count_of_variables] = '\0';
+            }
+        }
+    }
+
+    create_truth_table(output_file, name_of_variables, count_of_variables, tree_result);
+
+    fclose(output_file);
+    return OK;
 }
 
 int main(int argc, char* argv[])
@@ -695,11 +818,9 @@ int main(int argc, char* argv[])
     }
     else
     {
-        print_error(st);
+        print_errors(st);
     }
-
     return 0;
-
 }
 
 
