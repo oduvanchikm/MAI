@@ -195,14 +195,14 @@ status_code insert_in_hash_table(Hash_table* hash_table, char* name, char* value
 Hash_items* find_word(Hash_table* hash_table, char* name)
 {
     int index = hash_function(name) % hash_table->hash_size;
-    Hash_items* macro = hash_table->items[index];
+    Hash_items* item = hash_table->items[index];
 
-    while (macro != NULL && strcmp(name, macro->name) != 0)
+    while (item != NULL && strcmp(name, item->name) != 0)
     {
-        macro = macro->next;
+        item = item->next;
     }
 
-    return macro;
+    return item;
 }
 
 bool check_string_with_define(const char* line)
