@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <math.h>
+#include <limits.h>
 
 typedef enum
 {
@@ -14,7 +15,7 @@ typedef enum
     ERROR_WITH_OPENING_FILE,
     NEGATIVE_DIGIT,
     WRONG_COUNT_OF_BRACKETS,
-    OVERFLOW,
+    OVERFLOW
 
 } status_code;
 
@@ -242,7 +243,7 @@ int is_operator(char c)
             (c == '|') || (c == '<') || (c == '=') || (c == '!') || (c == '#'));
 }
 
-// sin - i, sh - s, cos - o, ctg - c, ch - h, ln - n, log - l, lg - g, tg - t, exp - e
+// для упрощения: sin - i, sh - s, cos - o, ctg - c, ch - h, ln - n, log2 - l, lg - g, tg - t, exp - e
 
 int is_standart_elem_functions(char c)
 {
@@ -629,11 +630,11 @@ double my_pow(double base, int power)
     }
 }
 
-double solve_expression(Node* root)
+double solve_expression(Node* root, int* error)
 {
     if (!root)
     {
-        return -1;
+        return INVALID_INPUT;
     }
 
     if (isdigit(root->data))
@@ -641,8 +642,8 @@ double solve_expression(Node* root)
         return root->data - '0';
     }
 
-    double left_node = solve_expression(root->left);
-    double right_node = solve_expression(root->right);
+    double left_node = solve_expression(root->left, error);
+    double right_node = solve_expression(root->right, error);
 
     switch (root->data)
     {
@@ -662,22 +663,91 @@ double solve_expression(Node* root)
             return (int)left_node == (int)right_node;
 
         case '+':
-            return left_node + right_node;
+            if (left_node + right_node > INT_MAX)
+            {
+                *error = OVERFLOW;
+                return OVERFLOW;
+            }
+            else
+            {
+                return left_node + right_node;
+            }
 
         case '-':
-            return left_node - right_node;
+            if (left_node - right_node < INT_MIN)
+            {
+                *error = OVERFLOW;
+                return OVERFLOW;
+            }
+            else
+            {
+                return left_node - right_node;
+            }
 
         case '*':
-            return left_node * right_node;
+            if (left_node == 0 || right_node == 0)
+            {
+                return 0;
+            }
+
+            else if (left_node > INT_MAX / right_node || right_node > INT_MAX / left_node)
+            {
+                *error = OVERFLOW;
+                return OVERFLOW;
+            }
+
+            else
+            {
+                return left_node * right_node;
+            }
 
         case '/':
-            return left_node / right_node;
+            if (right_node == 0)
+            {
+                *error = INVALID_INPUT;
+                return INVALID_INPUT;
+            }
+            else
+            {
+                if (left_node / right_node > INT_MAX || left_node / right_node < INT_MIN)
+                {
+                    *error = OVERFLOW;
+                    return OVERFLOW;
+                }
+                else
+                {
+                    return left_node / right_node;
+                }
+            }
 
         case '%':
-            return (int)left_node % (int)right_node;
+            if (right_node == 0)
+            {
+                *error = INVALID_INPUT;
+                return INVALID_INPUT;
+            }
+            else
+            {
+                if ((int)left_node % (int)right_node > INT_MAX || (int)left_node % (int)right_node < INT_MIN)
+                {
+                    *error = OVERFLOW;
+                    return OVERFLOW;
+                }
+                else
+                {
+                    return (int)left_node % (int)right_node;
+                }
+            }
 
         case '~':
-            return !left_node;
+            if (left_node == 0)
+            {
+                return 0;
+            }
+            else
+            {
+                return !left_node;
+            }
 
         case 'i':
             return sin(left_node);
@@ -689,7 +759,15 @@ double solve_expression(Node* root)
             return cos(left_node);
 
         case 'c':
-            return cos(left_node) / sin(left_node);
+            if (sin(left_node) == 0)
+            {
+                *error = INVALID_INPUT;
+                return INVALID_INPUT;
+            }
+            else
+            {
+                return cos(left_node) / sin(left_node);
+            }
 
         case 'h':
             return cosh(left_node);
@@ -704,41 +782,265 @@ double solve_expression(Node* root)
             return log10(left_node);
 
         case 't':
-            return sin(left_node) / cos(left_node);
+            if (cos(left_node) == 0)
+            {
+                *error = INVALID_INPUT;
+                return INVALID_INPUT;
+            }
+            else
+            {
+                return sin(left_node) / cos(left_node);
+            }
 
         case 'e':
             return exp(left_node);
 
         default:
-            return -1;
+            *error = INVALID_INPUT;
+            return INVALID_INPUT;
     }
 }
 
-
-
-int main()
+void print_result(char* string, char*  postfix_expression, double result)
 {
-    char infix[] = "cos1^2+sin1^2+8+9";
-    char* postfix = NULL;
-    int error;
-    Node* tree_result = NULL;
-    double result;
+    printf("Expression: %s\n", string);
+    printf("Postfix: %s\n", postfix_expression);
+    printf("Result: %f\n", result);
+}
 
-    status_code st = infix_to_postfix(infix, &postfix, &error);
+void print_error_in_file(FILE* output_file, int error, int line_of_expression, char* string)
+{
+    fprintf(output_file, "Expression: %s\n", string);
+    fprintf(output_file, "In string number: %d\n", line_of_expression);
+    fprintf(output_file, "Problem: ");
+
+    switch (error)
+    {
+        case INVALID_INPUT:
+            fprintf(output_file, "invalid expression\n");
+            break;
+
+        case WRONG_COUNT_OF_BRACKETS:
+            fprintf(output_file, "wrong count of brackets\n");
+            break;
+
+        case NEGATIVE_DIGIT:
+            fprintf(output_file, "negative digits\n");
+            break;
+
+        case OVERFLOW:
+            fprintf(output_file, "overflowed\n");
+            break;
+    }
+    fprintf(output_file, "\n");
+}
+
+//status_code validate_infix_expression(char* string, int* error)
+//{
+//
+//}
+
+status_code file_works(FILE *input_file, FILE *output_file)
+{
+    Node* tree_result;
+    int symbol = fgetc(input_file);
+    int capacity = 10;
+    int error;
+
+    char* string = (char*)malloc(capacity * sizeof(char));
+    if (!string)
+    {
+        return ERROR_WITH_MEMORY_ALLOCATION;
+    }
+
+    int flag = 1;
+    int index = 0;
+    int line_of_expression = 0;
+    int length = 0;
+
+    while (flag && !feof(input_file))
+    {
+        char *postfix_expression = NULL;
+        index = 0;
+
+        while (symbol != EOF)
+        {
+            if (index == capacity - 1)
+            {
+                capacity *= 2;
+                char *tmp = realloc(string, capacity * sizeof(char));
+                if (!tmp)
+                {
+                    free(string);
+                    return ERROR_WITH_MEMORY_ALLOCATION;
+                }
+                string = tmp;
+            }
+            string[index] = (char)symbol;
+            index++;
+            symbol = fgetc(input_file);
+            if(symbol == '\n')
+            {
+                break;
+            }
+        }
+
+        if (symbol == EOF)
+        {
+            flag = 0;
+        }
+
+        string[index] = '\0';
+
+        length = my_strlen(string);
+        if (length > 0)
+        {
+            if (length == 1 && isspace(string[0]))
+            {
+                line_of_expression++;
+                free(postfix_expression);
+                continue;
+            }
+
+            if (!check_brackets(string))
+            {
+                error = WRONG_COUNT_OF_BRACKETS;
+                print_error_in_file(output_file, error, line_of_expression, string);
+                printf("Wrong expression, invalid input\n");
+                break;
+            }
+
+            status_code st_infix_to_postfix_expression = infix_to_postfix(string, &postfix_expression, &error);
+            if (st_infix_to_postfix_expression == ERROR_WITH_MEMORY_ALLOCATION)
+            {
+                flag = 0;
+                print_errors(st_infix_to_postfix_expression);
+                break;
+            }
+
+            else if (st_infix_to_postfix_expression == INVALID_INPUT)
+            {
+                print_error_in_file(output_file, error, line_of_expression, string);
+                printf("Wrong expression, invalid input\n");
+                break;
+            }
+
+            else
+            {
+                status_code st_build_binary_expression_tree = build_expression_tree(postfix_expression, &error, &tree_result);
+                if (st_build_binary_expression_tree == ERROR_WITH_MEMORY_ALLOCATION)
+                {
+                    flag = 0;
+                    free(postfix_expression);
+                    print_errors(st_infix_to_postfix_expression);
+                    break;
+                }
+
+                else if (st_build_binary_expression_tree == INVALID_INPUT)
+                {
+                    print_error_in_file(output_file, error, line_of_expression, string);
+                    printf("Wrong expression, invalid input\n");
+                    break;
+                }
+
+                else
+                {
+                    double result_solve_expression = solve_expression(tree_result, &error);
+                    if (result_solve_expression == INVALID_INPUT)
+                    {
+                        print_error_in_file(output_file, error, line_of_expression, string);
+                        printf("Wrong expression, invalid input\n");
+                        break;
+                    }
+
+                    else if (result_solve_expression == OVERFLOW)
+                    {
+                        print_error_in_file(output_file, error, line_of_expression, string);
+                        printf("Wrong expression, overflowed\n");
+                        break;
+                    }
+
+                    else
+                    {
+                        print_tree(tree_result, 0);
+                        print_result(string, postfix_expression, result_solve_expression);
+                    }
+                }
+            }
+        }
+        line_of_expression++;
+        free(postfix_expression);
+    }
+    free_tree(tree_result);
+    free(string);
+    return OK;
+}
+
+char *error_file(char *filename)
+{
+    char *prefix = "error_";
+    char *output = NULL;
+    output = (char*) malloc(my_strlen(prefix) + my_strlen(filename) + 1);
+    if (!output)
+    {
+        return NULL;
+    }
+    sprintf(output, "error_%s", filename);
+    return output;
+}
+
+status_code all_functions(int argc, char* argv[])
+{
+    FILE *input_file = NULL;
+    FILE *output_file = NULL;
+    char *new_out_file = NULL;
+    char filename[100];
+
+    for (int i = 1; i < argc; i++)
+    {
+        input_file = fopen(argv[i], "r");
+        if (!input_file)
+        {
+            return ERROR_WITH_OPENING_FILE;
+        }
+
+        printf("Input file: %s\n", argv[i]);
+
+        strcpy(filename, argv[i]);
+        new_out_file = error_file(filename);
+        output_file = fopen(new_out_file, "a");
+        if (!output_file)
+        {
+            fclose(input_file);
+            return ERROR_WITH_OPENING_FILE;
+        }
+
+        status_code st = file_works(input_file, output_file);
+
+        if (st != OK)
+        {
+            print_errors(st);
+        }
+
+        fclose(input_file);
+        fclose(output_file);
+        free(new_out_file);
+    }
+    return OK;
+}
+
+int main(int argc, char* argv[])
+{
+    if (argc < 2)
+    {
+        printf("Error with count of arguments\n");
+        return 0;
+    }
+
+    status_code st = all_functions(argc, argv);
     if (st == OK)
     {
-        printf("%s\n", postfix);
-        status_code st_build = build_expression_tree(postfix, &error, &tree_result);
-        if (st_build == OK)
-        {
-            print_tree(tree_result, 0);
-            result = solve_expression(tree_result);
-            printf("result: %f\n", result);
-        }
-        else
-        {
-            print_errors(st_build);
-        }
+        printf("have done\n");
     }
     else
     {
