@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <ctype.h>
+#include <math.h>
 
 typedef enum
 {
@@ -602,12 +603,126 @@ status_code infix_to_postfix(const char *infix, char **postfix, int* error)
     return OK;
 }
 
+double my_pow(double base, int power)
+{
+    int result = 0;
+
+    if (power == 0)
+    {
+        return 1;
+    }
+    else if (power == 1)
+    {
+        return base;
+    }
+    else
+    {
+        if (power % 2 == 0)
+        {
+            result = my_pow(base, power / 2);
+            return result * result;
+        }
+        else
+        {
+            return my_pow(base, power - 1) * base;
+        }
+    }
+}
+
+double solve_expression(Node* root)
+{
+    if (!root)
+    {
+        return -1;
+    }
+
+    if (isdigit(root->data))
+    {
+        return root->data - '0';
+    }
+
+    double left_node = solve_expression(root->left);
+    double right_node = solve_expression(root->right);
+
+    switch (root->data)
+    {
+        case '!':
+            return !(int)left_node & (int)right_node;
+
+        case '&':
+            return (int)left_node & (int)right_node;
+
+        case '|':
+            return (int)left_node | (int)right_node;
+
+        case '<':
+            return (int)left_node ^ (int)right_node;
+
+        case '=':
+            return (int)left_node == (int)right_node;
+
+        case '+':
+            return left_node + right_node;
+
+        case '-':
+            return left_node - right_node;
+
+        case '*':
+            return left_node * right_node;
+
+        case '/':
+            return left_node / right_node;
+
+        case '%':
+            return (int)left_node % (int)right_node;
+
+        case '~':
+            return !left_node;
+
+        case 'i':
+            return sin(left_node);
+
+        case 's':
+            return sinh(left_node);
+
+        case 'o':
+            return cos(left_node);
+
+        case 'c':
+            return cos(left_node) / sin(left_node);
+
+        case 'h':
+            return cosh(left_node);
+
+        case 'n':
+            return log(left_node);
+
+        case 'l':
+            return log2(left_node);
+
+        case 'g':
+            return log10(left_node);
+
+        case 't':
+            return sin(left_node) / cos(left_node);
+
+        case 'e':
+            return exp(left_node);
+
+        default:
+            return -1;
+    }
+}
+
+
+
 int main()
 {
-    char infix[] = "cos6+sh9*8&9";
+    char infix[] = "cos1^2+sin1^2+8+9";
     char* postfix = NULL;
     int error;
     Node* tree_result = NULL;
+    double result;
 
     status_code st = infix_to_postfix(infix, &postfix, &error);
     if (st == OK)
@@ -617,8 +732,9 @@ int main()
         if (st_build == OK)
         {
             print_tree(tree_result, 0);
+            result = solve_expression(tree_result);
+            printf("result: %f\n", result);
         }
-
         else
         {
             print_errors(st_build);
