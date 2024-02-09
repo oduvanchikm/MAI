@@ -14,6 +14,10 @@ void print_errors(int flag)
         printf("This is wrong\n");
         break;
 
+    case OVERFLOW:
+        printf("Overflowed\n");
+        break;
+
     default:
         break;
     }
@@ -29,9 +33,9 @@ int main()
     }
     
     int x;
-    overfprintf(file, "Roman: %Ro Zek: %Zr %TO %CV \n %d %c", 56, 100, "123AA", 16, 123, 16, 555, 'c');
+    overfprintf(file, "Roman: %Ro Zek: %Zr %TO %CV \n %d %c", 56, 100, "123aa", 16, 123, 16, 555, 'c');
     char buffer[256];
-    oversprintf(buffer, "Roman: %Ro Zek: %Zr %TO %CV \n%d %c", 56, 100, "123AA", 16, 123, 16, 555, 'c');
+    oversprintf(buffer, "Roman: %Ro Zek: %Zr %TO %CV \n%d %c", 56, 100, "123aa", 16, 123, 16, 555, 'c');
     printf("%s\n", buffer);
     fclose(file);
     return 0;

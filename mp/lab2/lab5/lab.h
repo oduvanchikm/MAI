@@ -14,7 +14,8 @@ typedef enum
 {
     OK,
     INVALID_ARGUMENT,
-    ERROR_WITH_MEMORY_ALLOCATION
+    ERROR_WITH_MEMORY_ALLOCATION,
+    OVERFLOW
 
 } status_code;
 
@@ -24,8 +25,8 @@ status_code zecedorf_representation(unsigned int num, char **result);
 int my_strlen(int number, int base);
 status_code decemal_to_other_base_l(char **result, int number, int base);
 status_code decemal_to_other_base_h(char **result, int number, int base);
-bool is_low(char string);
-bool is_high(char string);
+bool is_low(char* string);
+bool is_high(char* string);
 int other_base_to_ten_h(char *number, int base);
 int other_base_to_ten_l(char *number, int base);
 status_code print_dump_memory(char **result, void *num, size_t size);

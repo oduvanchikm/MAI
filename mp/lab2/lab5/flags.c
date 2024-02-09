@@ -1,7 +1,58 @@
 #include "lab.h"
 
+
+bool is_low(char* string)
+{
+    int i = 0;
+    while (*string)
+    {
+        if (isdigit(string[i]))
+        {
+            i++;
+        }
+
+        else if (string[i] >= 'a' && string[i] <= 'z')
+        {
+            return true;
+        }
+        i++;
+    }
+    return false;
+}
+
+bool is_high(char* string)
+{
+    int i = 0;
+    while (*string)
+    {
+        if (isdigit(string[i]))
+        {
+            i++;
+        }
+
+        else if (string[i] >= 'A' && string[i] <= 'Z')
+        {
+            return true;
+        }
+
+        else
+        {
+            return false;
+        }
+
+        i++;
+    }
+
+    return false;
+}
+
 status_code roman_digits_flag(int num, char **result)
 {
+    if (num > INT_MAX || num < INT_MIN)
+    {
+        return OVERFLOW;
+    }
+
     int roman_value[] = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
     char* roman_char[] = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
 
@@ -51,6 +102,16 @@ int fibonacci(int n)
 
 status_code zecedorf_representation(unsigned int num, char **result)
 {
+    if (num > INT_MAX)
+    {
+        return OVERFLOW;
+    }
+
+    if (num < 0)
+    {
+        return INVALID_ARGUMENT;
+    }
+
     if (num == 0)
     {
         *result = (char*)malloc(sizeof(char) * 3);
@@ -63,6 +124,7 @@ status_code zecedorf_representation(unsigned int num, char **result)
         (*result)[0] = '0';
         (*result)[1] = '1';
         (*result)[2] = '\0';
+        return OK;
     }
     else
     {
@@ -99,7 +161,7 @@ status_code zecedorf_representation(unsigned int num, char **result)
             num -= fibonacci(index);
             (*result)[index] = '1';
         }
-        
+
         (*result)[fib_num] = '\0';
     }
     return OK;
@@ -125,10 +187,16 @@ int my_strlen(int number, int base)
 
 status_code decemal_to_other_base_l(char **result, int number, int base)
 {
+    if (number > INT_MAX || number < INT_MIN)
+    {
+        return OVERFLOW;
+    }
+
     if (base < 2 || base > 36)
     {
         base = 10;
     }
+
     int len = my_strlen(number, base);
     int sign = 1;
     
@@ -168,6 +236,11 @@ status_code decemal_to_other_base_l(char **result, int number, int base)
 
 status_code decemal_to_other_base_h(char **result, int number, int base)
 {
+    if (number > INT_MAX || number < INT_MIN)
+    {
+        return OVERFLOW;
+    }
+
     if (base < 2 || base > 36)
     {
         base = 10;
@@ -209,9 +282,15 @@ status_code decemal_to_other_base_h(char **result, int number, int base)
 
 int other_base_to_ten_h(char* number, int base)
 {
+    int len = strlen(number);
+    if (len > 6)
+    {
+        return 0;
+    }
+
     if (!number)
     {
-        return INVALID_ARGUMENT;
+        return 0;
     }
 
     int symbol = 1;
@@ -237,9 +316,15 @@ int other_base_to_ten_h(char* number, int base)
 
 int other_base_to_ten_l(char* number, int base)
 {
+    int len = strlen(number);
+    if (len > 6)
+    {
+        return 0;
+    }
+
     if (!number)
     {
-        return INVALID_ARGUMENT;
+        return 0;
     }
 
     int symbol = 1;
