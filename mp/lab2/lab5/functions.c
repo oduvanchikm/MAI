@@ -118,7 +118,15 @@ void overfprintf(FILE *file, const char *format, ...)
                     if (is_low(arg))
                     {
                         int to_st = other_base_to_ten_l(arg, system);
-                        fprintf(file, "%d", to_st);
+
+                        if (to_st == 0)
+                        {
+                            fprintf(file, "overflowed or invalid input");
+                        }
+                        else
+                        {
+                            fprintf(file, "%d", to_st);
+                        }
                     }
 
                     else
@@ -135,7 +143,15 @@ void overfprintf(FILE *file, const char *format, ...)
                     if (is_high(arg))
                     {
                         int TO_st = other_base_to_ten_h(arg, system);
-                        fprintf(file, "%d", TO_st);
+
+                        if (TO_st == 0)
+                        {
+                            fprintf(file, "overflowed or invalid input");
+                        }
+                        else
+                        {
+                            fprintf(file, "%d", TO_st);
+                        }
                     }
 
                     else
@@ -358,10 +374,18 @@ void oversprintf(char *buffer, const char *format, ...)
                     char* arg = va_arg(args, char*);
                     int system = va_arg(args, int);
 
-                    if (!is_low(arg))
+                    if (is_low(arg))
                     {
                         int to_st = other_base_to_ten_l(arg, system);
-                        buffer_index += sprintf(&(buffer[buffer_index]), "%d", to_st);;
+
+                        if (to_st == 0)
+                        {
+                            buffer_index += sprintf(&(buffer[buffer_index]), "overflowed or invalid input");
+                        }
+                        else
+                        {
+                            buffer_index += sprintf(&(buffer[buffer_index]), "%d", to_st);;
+                        }
                     }
 
                     else
@@ -378,7 +402,15 @@ void oversprintf(char *buffer, const char *format, ...)
                     if (is_high(arg))
                     {
                         int TO_st = other_base_to_ten_h(arg, system);
-                        buffer_index += (sprintf(&(buffer[buffer_index]), "%d", TO_st));
+
+                        if (TO_st == 0)
+                        {
+                            buffer_index += (sprintf(&(buffer[buffer_index]), "overflowed or invalid input"));
+                        }
+                        else
+                        {
+                            buffer_index += (sprintf(&(buffer[buffer_index]), "%d", TO_st));
+                        }
                     }
 
                     else
@@ -391,6 +423,7 @@ void oversprintf(char *buffer, const char *format, ...)
                 else if (strcmp(flag, "%mi") == 0)
                 {
                     int arg = va_arg(args, int);
+
                     status_code mi_st = print_dump_memory(&mi_result, &arg, sizeof(arg));
 
                     if (mi_st == OK)
@@ -402,6 +435,7 @@ void oversprintf(char *buffer, const char *format, ...)
                     {
                         print_errors(mi_st);
                     }
+
                     free(mi_result);
                 }
 
