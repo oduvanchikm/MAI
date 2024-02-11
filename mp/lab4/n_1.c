@@ -2,12 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <stdbool.h>
-#define HASH_SIZE 128
+#include <limits.h>
 
 typedef enum
 {
-    OK, 
+    OK,
     ERROR_WITH_MEMORY_ALLOCATION,
     INVALID_INPUT,
     ERROR_WITH_OPENING_FILE
@@ -192,157 +191,310 @@ status_code insert_in_hash_table(Hash_table* hash_table, char* name, char* value
     return OK;
 }
 
-Hash_items* find_word(Hash_table* hash_table, char* name)
+char* find_word(Hash_table* hash_table, char *key)
 {
-    int index = hash_function(name) % hash_table->hash_size;
-    Hash_items* item = hash_table->items[index];
+    unsigned long hash_value = hash_function(key);
+    unsigned long hash = hash_value % hash_table->hash_size;
 
-    while (item != NULL && strcmp(name, item->name) != 0)
+    Hash_items* items = hash_table->items[hash];
+    while(items != NULL)
     {
-        item = item->next;
+        if(strcmp(items->name, key) == 0)
+        {
+            return items->value;
+        }
+
+        items = items->next;
     }
 
-    return item;
+    return NULL;
 }
 
-bool check_string_with_define(const char* line)
+status_code read_define(FILE* file, Hash_table* hash_table)
 {
-//    printf("%s\n", line);
-    int count_of_spaces = 0;
-    int i = 0;
-    while (line[i])
+    char define[8];
+    char def_name[100];
+    char value[100];
+
+    fscanf(file, "%s", define);
+    while (strcmp(define, "#define") == 0)
     {
-        if (line[i] == ' ')
+        fscanf(file, "%s %s\n", def_name, value);
+        if (insert_in_hash_table(hash_table, def_name, value) != OK)
         {
-            count_of_spaces++;
+            return ERROR_WITH_MEMORY_ALLOCATION;
         }
-        i++;
+        fscanf(file, "%s", define);
     }
 
-    if (count_of_spaces != 2)
-    {
-        return false;
-    }
+    fseek(file, ftell(file) - strlen(define), SEEK_SET);
 
-    char first_part[8];
-    int index_for_first_part = 0;
-    int j = 0;
-    while (line[j] != ' ')
-    {
-        first_part[index_for_first_part++] = line[j++];
-    }
-    first_part[index_for_first_part] = '\0';
-//    printf("%s\n", first_part);
-
-    if (strcmp(first_part, "#define") != 0)
-    {
-        return false;
-    }
-
-    char second_part[256];
-    int index_for_second_part = 0;
-    j++;
-
-    while (line[j] != ' ')
-    {
-        second_part[index_for_second_part++] = line[j++];
-    }
-    second_part[index_for_second_part] = '\0';
-//    printf("%s\n", second_part);
-
-    for (int k = 0; second_part[k]; k++)
-    {
-        if (!isalnum(second_part[k]))
-        {
-            return false;
-        }
-    }
-    return true;
+    return OK;
 }
 
-status_code process(const char* file_path, Hash_table* hash_table)
+status_code all_functions(Hash_table* hash_table, FILE* file)
 {
-    FILE *file = fopen(file_path, "r+");
-    if (!file)
+    int start_index = ftell(file);
+    char str[256];
+
+    fseek(file, 0, SEEK_END);
+    long file_size = ftell(file) - start_index + 1;
+
+    fseek(file, start_index, SEEK_SET);
+
+    char* buffer = (char*)malloc(file_size);
+    if (buffer == NULL)
     {
-        return ERROR_WITH_OPENING_FILE;
+        return ERROR_WITH_MEMORY_ALLOCATION;
     }
 
-    char line[256];
-    char new_text[256];
-    new_text[0] = '\0';
-    printf("erere\n");
+    int index_buffer = 0;
+    char c = fgetc(file);
+    int flag = 0;
 
-
-    while (fgets(line, sizeof(line), file) != NULL)
+    while(c != EOF && !isalnum(c))
     {
-        if (check_string_with_define(line))
+        if (index_buffer == file_size)
         {
-            char def_name[256];
-            char value[256];
-            if (sscanf(line, "#define %s %s", def_name, value) == 2)
+            char* temp = realloc(buffer,file_size * 2);
+            if (!temp)
             {
-                status_code st = insert_in_hash_table(hash_table, def_name, value);
-                if (st != OK)
+                return ERROR_WITH_MEMORY_ALLOCATION;
+            }
+
+            buffer = temp;
+            file_size *= 2;
+        }
+        buffer[index_buffer] = c;
+        index_buffer++;
+        c = fgetc(file);
+    }
+
+    if (c == EOF)
+    {
+        flag = 1;
+    }
+
+    fseek(file, -1, SEEK_CUR);
+
+    while (!flag && fscanf(file, "%s", str) == 1)
+    {
+        if (index_buffer == file_size)
+        {
+            char* temp = realloc(buffer, file_size * 2);
+            if (!temp)
+            {
+                return ERROR_WITH_MEMORY_ALLOCATION;
+            }
+
+            buffer = temp;
+            file_size *= 2;
+        }
+
+        char *value = find_word(hash_table, str);
+        if (value != NULL)
+        {
+            if (index_buffer + strlen(value) >= file_size)
+            {
+                char *temp = realloc(buffer, file_size * 2);
+                if (!temp)
                 {
-                    fclose(file);
                     return ERROR_WITH_MEMORY_ALLOCATION;
                 }
+
+                buffer = temp;
+                file_size *= 2;
+            }
+
+            for (int j = 0; j < strlen(value); j++)
+            {
+                buffer[index_buffer] = value[j];
+                index_buffer++;
             }
         }
+
         else
         {
-            char word[256];
-            char *buffer = line;
-            new_text[0] = '\0';
-            while (sscanf(buffer, "%s", word) == 1)
+            if (index_buffer + strlen(str) >= file_size)
             {
-                Hash_items *items = find_word(hash_table, word);
-                if (items)
+                char *temp = realloc(buffer, file_size * 2);
+                if (!temp)
                 {
-                    strcat(new_text, items->value);
-                    strcat(new_text, " ");
+                    return ERROR_WITH_MEMORY_ALLOCATION;
                 }
-                else
-                {
-                    strcat(new_text, word);
-                    strcat(new_text, " ");
-                }
-                buffer += strlen(word) + 1;
+
+                buffer = temp;
+                file_size *= 2;
             }
-            printf("%s", new_text);
-            fprintf(file, "%s\n", new_text);
+            index_buffer += sprintf(&(buffer[index_buffer]), "%s", str);
+        }
+
+        c = fgetc(file);
+
+        while (c != EOF && !isalnum(c))
+        {
+            if (index_buffer == file_size)
+            {
+                char *temp = realloc(buffer, file_size * 2);
+                if (!temp)
+                {
+                    return ERROR_WITH_MEMORY_ALLOCATION;
+                }
+                buffer = temp;
+                file_size *= 2;
+            }
+            buffer[index_buffer] = c;
+            index_buffer++;
+            c = fgetc(file);
+        }
+
+        if (c == EOF)
+        {
+            flag = 1;
+        }
+
+        fseek(file, -1, SEEK_CUR);
+    }
+
+    printf("%s\n", buffer);
+
+    fseek(file, start_index, SEEK_SET);
+
+    for (int i = 0; i < index_buffer; i++)
+    {
+        fprintf(file, "%c", buffer[i]);
+    }
+
+    while(( c = fgetc(file)) != EOF )
+    {
+        fprintf(file, "%c", ' ');
+    }
+
+    free(buffer);
+
+    return OK;
+}
+
+status_code check(Hash_table* hash_table, int* count)
+{
+    int min = INT_MAX;
+    int max = INT_MIN;
+
+    for (int i = 0; i < hash_table->hash_size; i++)
+    {
+        int m = 0;
+        Hash_items* current = hash_table->items[i];
+        while (current != NULL)
+        {
+            m++;
+            (*count)++;
+            current = current->next;
+        }
+        if (m > max)
+        {
+            max = m;
+        }
+
+        if (m < min)
+        {
+            min = m;
         }
     }
-    fclose(file);
+    if (min == 0)
+    {
+        if (max >= 2)
+        {
+            return INVALID_INPUT;
+        }
+
+        else
+        {
+            return OK;
+        }
+    }
+
+    if (max / min >= 2)
+    {
+        return INVALID_INPUT;
+    }
     return OK;
+}
+
+int is_prime(int n)
+{
+    if (n <= 1)
+    {
+        return 0;
+    }
+    for (int i = 2; i * i <= n; i++)
+    {
+        if (n % i == 0)
+        {
+            return 0;
+        }
+    }
+    return 1;
 }
 
 int main(int argc, char* argv[])
 {
     if (argc < 2)
     {
-        printf("error with number of arguments\n");
+        printf("Wrong count of arguments\n");
         return 0;
     }
 
-    Hash_table *hash_table = NULL;
-    int size_of_table = 10;
-    int capacity = 10;
-
-    status_code st = create_hash_table(&hash_table, capacity, size_of_table);
-    if (st == OK) {
-        status_code st_file = process(argv[1], hash_table);
-        if (st_file != OK) {
-            printf("Error processing file\n");
-        } else {
-            printf("File processed successfully\n");
-        }
-
-        destroy_table(hash_table);
-    } else {
-        printf("Error creating hash table\n");
+    FILE* input_file = fopen(argv[1], "r+");
+    if (!input_file)
+    {
+        printf("Error with opening file\n");
+        return 0;
     }
 
+    int current_size = 128;
+
+    Hash_table* table;
+    int capacity = 10;
+
+    create_hash_table(&table, capacity, current_size);
+
+    if (read_define(input_file, table) != OK)
+    {
+        print_errors(read_define(input_file, table));
+        destroy_table(table);
+        fclose(input_file);
+        return 0;
+    }
+
+    int count = 0;
+
+    while (check(table, &count) != OK)
+    {
+        int new_size = (int)(count * 2);
+
+        while (!is_prime(new_size))
+        {
+            new_size++;
+        }
+
+        printf("%d\n", new_size);
+
+        Hash_table* new_hash_table;
+        if (resize_hash_table(table, &new_hash_table) != OK)
+        {
+            print_errors(resize_hash_table(table, &new_hash_table));
+            destroy_table(table);
+            fclose(input_file);
+            return 1;
+        }
+    }
+
+    if (all_functions(table, input_file) != OK)
+    {
+        print_errors(all_functions(table, input_file));
+    }
+
+    fclose(input_file);
+    destroy_table(table);
     return 0;
 }
