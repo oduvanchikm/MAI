@@ -468,6 +468,50 @@ void write_tree_to_file(FILE* output_file, Node* root, char* separators)
     save_tree_to_file(output_file, root->right, separators);
 }
 
+void write_words(Node* root, Node** words, int* count, int number)
+{
+    if(root)
+    {
+        for (int i = 0; i < number; i++)
+        {
+            if (words[i] == NULL)
+            {
+                words[i] = root;
+                (*count)++;
+                break;
+            }
+
+            else if(words[i]->count <= root->count)
+            {
+                if((*count) < number)
+                {
+                    for (int j = *count; j > i; j--)
+                    {
+                        words[j] = words[j-1];
+                    }
+
+                    words[i] = root;
+                    (*count)++;
+                    break;
+
+                }
+                else
+                {
+                    for (int j = number - 1; j > i; j--)
+                    {
+                        words[j] = words[j-1];
+                    }
+
+                    words[i] = root;
+                    break;
+                }
+            }
+        }
+        get_words(root->left, words, count, number);
+        get_words(root->right, words, count, number);
+    }
+}
+
 int main(int argc, const char* argv[])
 {
     if (!check_input(argc, argv))
@@ -520,6 +564,7 @@ int main(int argc, const char* argv[])
         char* shortest_word = NULL;
         int depth;
         int index;
+        int count_new = 0;
         char action_char;
         char word_find[100];
         char file_5[32];
@@ -566,7 +611,7 @@ int main(int argc, const char* argv[])
 
                 int number = atoi(&number_of_words);
 
-                printf("%d\n", count);
+//                printf("%d\n", count);
 
                 if (number > count)
                 {
@@ -582,15 +627,19 @@ int main(int argc, const char* argv[])
                     return ERROR_WITH_MEMORY_ALLOCATION;
                 }
 
-                nodes_in_one_place(root, array_of_nodes, &index);
-                printf("erre\n");
-
-                for (int i = 0; i < count; i++)
+                for (int i = 0; i < number; i++)
                 {
-                    printf("%s", array_of_nodes[i]->data);
+                    array_of_nodes[i] = NULL;
                 }
-                printf("\n");
 
+                write_words(root, array_of_nodes, &count_new, number);
+
+                printf("%d the words:\n", number);
+
+                for (int i = 0; i < number; i++)
+                {
+                    printf("%d. %s\n", i + 1, array_of_nodes[i]->data);
+                }
 
             case 3:
                 printf("Program searches the longest and shortest words\n");
