@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 typedef enum
 {
@@ -62,95 +63,65 @@ bool check_action(char action)
 
 typedef struct Node
 {
-    char* word;
+    char* data;
     int count;
     struct Node* left;
     struct Node* right;
 
 } Node;
 
-Node* create_new_node(char* word)
+Node* create_new_node(char *word)
 {
-    Node* new_node = (Node*)malloc(sizeof(Node));
-    if (!new_node)
+    Node *new_node = (Node*)malloc(sizeof(Node));
+    if(!new_node)
     {
         return NULL;
     }
-    new_node->word = (char*)malloc((strlen(word) + 1) * sizeof(char));
 
-    if (!new_node->word)
+    new_node->data = strdup(word);
+    if (!new_node->data)
     {
-        free(new_node);
         return NULL;
     }
 
-    strcpy(new_node->word, word);
     new_node->count = 1;
-    new_node->left = NULL;
-    new_node->right = NULL;
+    new_node->left = new_node->right = NULL;
 
     return new_node;
-
 }
 
 Node* insert_node(Node* root, char* word)
 {
-    if (root == NULL)
+    int compare;
+    if(!root)
     {
         return create_new_node(word);
     }
 
-    int res_strcmp = strcmp(word, root->word);
-
-    if (res_strcmp == 0)
-    {
-        root->count++;
-    }
-    else if (res_strcmp < 0)
-    {
-        root->left = insert_node(root->left, word);
-    }
     else
     {
-        root->right = insert_node(root->right, word);
-    }
-
-    return root;
-}
-
-void read_file(FILE* file, Node** root, const char* separators)
-{
-    char buffer[100];
-    while (fscanf(file, "%s", buffer) != EOF)
-    {
-        char* word = strtok(buffer, separators);
-        while (word != NULL)
+        compare = strcmp(word, root->data);
+        if(!compare)
         {
-            *root = insert_node(*root, word);
-            word = strtok(NULL, separators);
+            root->count++;
+        }
+
+        else if(compare < 0)
+        {
+            root->left = insert_node(root->left, word);
+        }
+
+        else
+        {
+            root->right = insert_node(root->right, word);
         }
     }
-}
-
-void print_tree(Node* root, int depth)
-{
-    if (root == NULL)
-    {
-        return;
-    }
-
-    print_tree(root->left, depth + 1);
-    for (int i = 0; i < depth*3; i++)
-    {
-        printf("     ");
-    }
-    printf("./%s(%d)\n", root->word, root->count);
-    print_tree(root->right, depth + 1);
+    return root;
 }
 
 int count_nodes(Node* root)
 {
-    if(root == NULL)
+    if(!root)
     {
         return 0;
     }
@@ -158,43 +129,21 @@ int count_nodes(Node* root)
     return count_nodes(root->left) + count_nodes(root->right) + 1;
 }
 
-//void count_words(Node* node, char* word, int* count)
-//{
-//    if(!node)
-//    {
-//        return;
-//    }
-//
-//    if(strcmp(node->word, word) == 0)
-//    {
-//        (*count)++;
-//    }
-//
-//    else if (strcmp(node->word, word) < 0)
-//    {
-//        count_words(node->left, word, count);
-//    }
-//
-//    else
-//    {
-//        count_words(node->right, word, count);
-//    }
-//}
-
 int count_words(Node* node, char* word)
 {
+    printf("%s\n", word);
     int count = 0;
     if(!node)
     {
         return -1;
     }
 
-    if(strcmp(node->word, word) == 0)
+    if (strcmp(node->data, word) == 0)
     {
         count++;
     }
 
-    else if (strcmp(node->word, word) < 0)
+    else if (strcmp(node->data, word) < 0)
     {
         count_words(node->left, word);
     }
@@ -207,72 +156,53 @@ int count_words(Node* node, char* word)
     return count;
 }
 
-int compare(const void* a, const void* b)
+int find_word_in_tree(Node* root, char* word)
 {
-    Node* node_a = *(Node**)a;
-    Node* node_b = *(Node**)b;
+    int compare;
+    int count = 0;
+    if (!root)
+    {
+        return count;
+    }
+    else
+    {
+        compare = strcmp(word, root->data);
 
-    return node_b->count - node_a->count;
+        if(!compare)
+        {
+            count += root->count;
+        }
+
+        else if (compare < 0)
+        {
+            count += find_word_in_tree(root->left, word);
+        }
+
+        else
+        {
+            count += find_word_in_tree(root->right, word);
+        }
+    }
+    return count;
 }
 
-void all_nodes(Node* node, Node*** array_of_nodes, int* index_2)
+int get_tree_depth(Node *root)
 {
-
-    if(node == NULL)
+    if (!root)
     {
-        return;
+        return 0;
     }
 
-    all_nodes(node->left, array_of_nodes, index_2);
+    int left_depth = get_tree_depth(root->left);
+    int right_depth = get_tree_depth(root->right);
 
-    (*array_of_nodes)[*index_2] = node;
-    (*index_2)++;
-
-    all_nodes(node->right, array_of_nodes, index_2);
-}
-
-void search_min_and_max_words(Node* root, Node** min_3, Node** max_3)
-{
-    if(!root)
+    if(left_depth > right_depth)
     {
-        return;
+        return left_depth + 1;
     }
-
-    search_min_and_max_words(root->right, min_3, max_3);
-    if(strlen(root->word) > strlen((*max_3)->word))
+    else
     {
-        (*max_3) = root;
-    }
-
-    if(strlen(root->word) < strlen((*min_3)->word))
-    {
-        *min_3 = root;
-    }
-
-    search_min_and_max_words(root->left, min_3, max_3);
-
-}
-
-void find_depth_of_tree(Node* root, unsigned int* max_depth_3, int depth_3)
-{
-    if(!root)
-    {
-        return;
-    }
-
-    if(root->left)
-    {
-        find_depth_of_tree(root->left, max_depth_3, depth_3 + 1);
-    }
-
-    if(root->right)
-    {
-        find_depth_of_tree(root->right, max_depth_3, depth_3 + 1);
-    }
-
-    if(depth_3 > (*max_depth_3))
-    {
-        (*max_depth_3) = depth_3;
+        return right_depth + 1;
     }
 }
 
@@ -282,7 +212,7 @@ Node* destroy_tree(Node* root)
     {
         destroy_tree(root->left);
         destroy_tree(root->right);
-        free(root->word);
+        free(root->data);
         free(root);
     }
 
@@ -296,7 +226,7 @@ void save_tree_to_file(FILE* file_for_save, Node* root, char* separators)
         return;
     }
 
-    fprintf(file_for_save, "%s%c", root->word, separators[0]);
+    fprintf(file_for_save, "%s%c", root->data, separators[0]);
     save_tree_to_file(file_for_save, root->left, separators);
     save_tree_to_file(file_for_save, root->right, separators);
 }
@@ -331,6 +261,213 @@ bool check_input(int argc, const char* argv[])
     return true;
 }
 
+bool is_separator(const char symbol, char *separator)
+{
+    int length = strlen(separator);
+
+    for(int i = 0; i < length; i++)
+    {
+        if (symbol == separator[i] || symbol == ' ')
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+status_code read_file(FILE* input, char* separator, Node** root)
+{
+    char symbol;
+    int size = 10;
+    char* word = (char*)malloc(sizeof(char) * (size + 1));
+    if(!word)
+    {
+        return ERROR_WITH_MEMORY_ALLOCATION;
+    }
+
+    int index = 0;
+    while((symbol = fgetc(input)) != EOF)
+    {
+        if(!is_separator(symbol, separator))
+        {
+            word[index++] = symbol;
+
+            if (index == size - 1)
+            {
+                size *= 2;
+                char *temp = (char*)realloc(word, size * sizeof(char));
+                if (!temp)
+                {
+                    free(word);
+                    return ERROR_WITH_MEMORY_ALLOCATION;
+                }
+                word = temp;
+            }
+        }
+        else
+        {
+            if (index > 0)
+            {
+                word[index] = '\0';
+                printf("%s\n", word);
+                *root = insert_node(*root, word);
+                if (!(*root))
+                {
+                    free(word);
+                    return ERROR_WITH_MEMORY_ALLOCATION;
+                }
+
+                index = 0;
+                free(word);
+
+                word = (char*)malloc(sizeof(char) * (size + 1));
+                if(!word)
+                {
+                    return ERROR_WITH_MEMORY_ALLOCATION;
+                }
+            }
+        }
+    }
+    if (index > 0)
+    {
+        word[index] = '\0';
+        *root = insert_node(*root, word);
+        if (!(*root))
+        {
+            free(word);
+            return ERROR_WITH_MEMORY_ALLOCATION;
+        }
+    }
+    free(word);
+    return OK;
+}
+
+void print_tree(Node *root, int level)
+{
+    if(root)
+    {
+        for(int i = 0; i < level; i++)
+        {
+            printf("    ");
+        }
+        printf("%s(%d)\n", root->data, root->count);
+        print_tree(root->left, level + 1);
+        print_tree(root->right, level + 1);
+    }
+}
+
+int count_of_nodes(Node* root)
+{
+    if(!root)
+    {
+        return 0;
+    }
+
+    return 1 + count_of_nodes(root->left) + count_of_nodes(root->right);
+}
+
+//void words(Node* root, Node** array_of_nodes, int number)
+//{
+//    if (!root)
+//    {
+//        return;
+//    }
+//
+//
+//}
+
+
+void read_from_file(FILE* input_file, Node** root, const char* separators)
+{
+    char buffer[100];
+    while (fscanf(input_file, "%s", buffer) != EOF)
+    {
+        char* word = strtok(buffer, separators);
+        while (word != NULL)
+        {
+            *root = insert_node(*root, word);
+            word = strtok(NULL, separators);
+        }
+    }
+}
+
+int find_longest_and_shortest_words(Node* root, char** longest_word, char** shortest_word)
+{
+    if (!root)
+    {
+        return INVALID_VALUE;
+    }
+
+    if ((*longest_word) == NULL || strlen(root->data) > strlen(*longest_word))
+    {
+        (*longest_word) = strdup(root->data);
+        if (!(*longest_word))
+        {
+            return ERROR_WITH_MEMORY_ALLOCATION;
+        }
+    }
+
+    else if ((*shortest_word) == NULL || strlen(root->data) < strlen(*shortest_word))
+    {
+        (*shortest_word) = strdup(root->data);
+        if (!(*longest_word))
+        {
+            return ERROR_WITH_MEMORY_ALLOCATION;
+        }
+    }
+
+    find_longest_and_shortest_words(root->left, longest_word, shortest_word);
+    find_longest_and_shortest_words(root->right, longest_word, shortest_word);
+    return OK;
+}
+
+bool check_file(const char* filename)
+{
+    int len = strlen(filename);
+
+    if (len <= 4)
+    {
+        return false;
+    }
+
+    for (int i = len - 1; i > 0; i--)
+    {
+        if (filename[i] == 't' && filename[i - 1] == 'x' && filename[i - 2] == 't' && filename[i - 3] == '.' && isalnum(filename[i - 4]))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void nodes_in_one_place(Node* node, Node** array_of_nodes, int* index)
+{
+    if(!node)
+    {
+        return;
+    }
+
+    nodes_in_one_place(node->left, array_of_nodes, index);
+
+    array_of_nodes[*index] = node;
+    (*index)++;
+
+    nodes_in_one_place(node->right, array_of_nodes, index);
+}
+
+
+void write_tree_to_file(FILE* output_file, Node* root, char* separators)
+{
+    if(!root)
+    {
+        return;
+    }
+
+    fprintf(output_file, "%s%c", root->data, separators[0]);
+    save_tree_to_file(output_file, root->left, separators);
+    save_tree_to_file(output_file, root->right, separators);
+}
+
 int main(int argc, const char* argv[])
 {
     if (!check_input(argc, argv))
@@ -363,21 +500,28 @@ int main(int argc, const char* argv[])
 
     Node* root = NULL;
 
-    read_file(file_input, &root, separators);
-    int count_of_nodes = count_nodes(root);
+    status_code st_read_file = read_file(file_input, separators, &root);
+    if (st_read_file != OK)
+    {
+        free(separators);
+        print_errors(st_read_file);
+    }
+
+    print_tree(root, 0);
 
     int flag = 1;
 
+    int count = count_of_nodes(root);
+
     while(flag)
     {
+        char number_of_words;
+        char* longest_word = NULL;
+        char* shortest_word = NULL;
+        int depth;
+        int index;
         char action_char;
         char word_find[100];
-        char action_2_char;
-        int index_2 = 0;
-        Node* min = root;
-        Node* max = root;
-        int depth_3 = 1;
-        unsigned int max_depth = 0;
         char file_5[32];
         char file_6[32];
 
@@ -404,25 +548,33 @@ int main(int argc, const char* argv[])
                 printf("Enter word which you want to find:\n");
 
                 scanf("%s", word_find);
-                int count_find_words_1 = count_words(root, word_find);
+                int count_find_of_words = find_word_in_tree(root, word_find);
 
-                printf("Word %s occurred %d times in the file.\n", word_find, count_find_words_1);
+                printf("Word %s occurred %d times in the file.\n", word_find, count_find_of_words);
                 break;
 
             case 2:
                 printf("Program outputs the first <n> most common words in a file\n");
                 printf("Please enter <n>: \n");
-                scanf("%s", &action_2_char);
-                if (!is_digit(&action_2_char))
+                scanf("%s", &number_of_words);
+                if (!is_digit(&number_of_words))
                 {
                     printf("It's wrong number\nEnter only digits\n");
                     root = destroy_tree(root);
                     return INVALID_VALUE;
                 }
 
-                int action_2 = atoi(&action_2_char);
+                int number = atoi(&number_of_words);
 
-                Node** array_of_nodes = (Node**)malloc(sizeof(Node*) * count_of_nodes);
+                printf("%d\n", count);
+
+                if (number > count)
+                {
+                    printf("You enter a very big value\n");
+                    return INVALID_VALUE;
+                }
+
+                Node** array_of_nodes = (Node**)malloc(sizeof(Node*) * count);
                 if(!array_of_nodes)
                 {
                     destroy_tree(root);
@@ -430,35 +582,44 @@ int main(int argc, const char* argv[])
                     return ERROR_WITH_MEMORY_ALLOCATION;
                 }
 
-                all_nodes(root, &array_of_nodes, &index_2);
+                nodes_in_one_place(root, array_of_nodes, &index);
+                printf("erre\n");
 
-                qsort(array_of_nodes, count_of_nodes, sizeof(Node**), compare);
-                for (int i = 0; i < action_2; i++)
+                for (int i = 0; i < count; i++)
                 {
-                    printf("%s\n", array_of_nodes[i]->word);
+                    printf("%s", array_of_nodes[i]->data);
                 }
-
                 printf("\n");
-                free(array_of_nodes);
-                break;
+
 
             case 3:
                 printf("Program searches the longest and shortest words\n");
-                search_min_and_max_words(root, &min, &max);
-                printf("The shortest word is %s\n", min->word);
-                printf("The longest word is %s\n", max->word);
+                int flag = find_longest_and_shortest_words(root, &longest_word, &shortest_word);
+                if (flag != OK)
+                {
+                    return INVALID_VALUE;
+                }
+                printf("The shortest word is %s\n", shortest_word);
+                printf("The longest word is %s\n", longest_word);
                 break;
 
             case 4:
                 printf("Program finds depth in th tree\n");
-                find_depth_of_tree(root, &max_depth, depth_3);
-                printf("The max depth of the tree is %u\n", max_depth);
+                depth = get_tree_depth(root);
+                printf("The max depth of the tree is %d\n", depth);
                 break;
 
             case 5:
                 printf("Program saves tree to file\n");
                 printf("Enter the file name where you want to save tree:\n");
                 scanf("%s", file_5);
+
+                if (!check_file(file_5))
+                {
+                    printf("Error with file\n");
+                    return INVALID_VALUE;
+                }
+
                 FILE* output_file = fopen(file_5, "w");
                 if(!output_file)
                 {
@@ -468,7 +629,7 @@ int main(int argc, const char* argv[])
                     return ERROR_WITH_OPENING_FILE;
                 }
 
-                save_tree_to_file(output_file, root, separators);
+                write_tree_to_file(output_file, root, separators);
                 printf("Tree saves to file\n");
                 destroy_tree(root);
                 fclose(output_file);
@@ -488,13 +649,14 @@ int main(int argc, const char* argv[])
 
                 }
 
-                read_file(input_file, &root, separators);
+                read_from_file(input_file, &root, separators);
                 printf("Tree\n");
                 print_tree(root, 0);
                 fclose(input_file);
                 break;
         }
     }
+
     free(separators);
     destroy_tree(root);
     return 0;
