@@ -412,12 +412,11 @@ status_code validate_infix_expression(const char* infix)
     return OK;
 }
 
-status_code infix_to_postfix(const char* infix, char** postfix, int* error)
+status_code infix_to_postfix(const char* infix, char** postfix)
 {
     Stack* stack = (Stack*)malloc(sizeof(Stack));
     if (!stack)
     {
-        *error = ERROR_WITH_MEMORY_ALLOCATION;
         return ERROR_WITH_MEMORY_ALLOCATION;
     }
 
@@ -428,7 +427,6 @@ status_code infix_to_postfix(const char* infix, char** postfix, int* error)
     if (!(*postfix))
     {
         free(stack);
-        *error = ERROR_WITH_MEMORY_ALLOCATION;
         return ERROR_WITH_MEMORY_ALLOCATION;
     }
 
@@ -455,7 +453,6 @@ status_code infix_to_postfix(const char* infix, char** postfix, int* error)
             {
                 free(*postfix);
                 free(stack);
-                *error = INVALID_INPUT;
                 return INVALID_INPUT;
             }
 
@@ -534,7 +531,6 @@ status_code infix_to_postfix(const char* infix, char** postfix, int* error)
         {
             free(*postfix);
             free(stack);
-            *error = INVALID_INPUT;
             return INVALID_INPUT;
         }
     }
@@ -545,7 +541,6 @@ status_code infix_to_postfix(const char* infix, char** postfix, int* error)
         {
             free(*postfix);
             free(stack);
-            *error = INVALID_INPUT;
             return INVALID_INPUT;
         }
 
@@ -617,7 +612,7 @@ int solve_expression(Node* root, int* values_of_variables, int count_of_variable
 {
     if(!root)
     {
-        return INVALID_INPUT;
+        return 0;
     }
 
     int left_value = solve_expression(root->left, values_of_variables, count_of_variables, names_of_variables);
@@ -639,6 +634,7 @@ int solve_expression(Node* root, int* values_of_variables, int count_of_variable
         {
             if (root->data == names_of_variables[i])
             {
+//                printf("true\n");
                 return values_of_variables[i];
             }
         }
@@ -674,6 +670,10 @@ int solve_expression(Node* root, int* values_of_variables, int count_of_variable
 
             case '?':
                 return !(left_value || right_value);
+
+            default:
+                return -1;
+
         }
     }
 }
@@ -710,7 +710,9 @@ char* generate_random_filename()
 
 void create_truth_table(FILE* output_file, char* name_of_variables, int count_of_variables, Node* root)
 {
+    int values_of_variables[count_of_variables];
     int value;
+
     fprintf(output_file, "\tTRUTH TABLE\n");
     for (int i = 0; i < count_of_variables; i++)
     {
@@ -724,11 +726,12 @@ void create_truth_table(FILE* output_file, char* name_of_variables, int count_of
     {
         for (int var = 0; var < count_of_variables; var++)
         {
-            value = (row >> var) & 1;
-            fprintf(output_file, "%d | ", value);
+            values_of_variables[var] = (row >> var) & 1;
+            fprintf(output_file, "%d | ", values_of_variables[var]);
         }
 
-        int result = solve_expression(root, &value, count_of_variables, name_of_variables);
+        int result = solve_expression(root, values_of_variables, count_of_variables, name_of_variables);
+        printf("%d\n", result);
         fprintf(output_file, "%d\n", result);
     }
 }
@@ -750,16 +753,18 @@ status_code all_functions(char* filename)
     status_code st_read = read_file(input_file, &infix_expression, &error);
     if (st_read != OK)
     {
-        print_errors(st_read);
         return INVALID_INPUT;
     }
 
-    status_code st_infix_to_postfix = infix_to_postfix(infix_expression, &postfix_expression, &error);
+    status_code st_infix_to_postfix = infix_to_postfix(infix_expression, &postfix_expression);
     if (st_infix_to_postfix != OK)
     {
         print_errors(st_infix_to_postfix);
+        printf("1\n");
         return st_infix_to_postfix;
     }
+
+//    printf("%s\n", postfix_expression);
 
     status_code st_build_tree = build_expression_tree(postfix_expression, &error, &tree_result);
     if (st_build_tree != OK)
@@ -767,6 +772,8 @@ status_code all_functions(char* filename)
         print_errors(st_build_tree);
         return st_build_tree;
     }
+
+//    print_tree(tree_result, 0);
 
     char* output = generate_random_filename();
     FILE* output_file = fopen(output, "w");
@@ -784,6 +791,8 @@ status_code all_functions(char* filename)
 
     int count_of_variables = 0;
 
+    name_of_variables[count_of_variables] = '\0';
+
     for (int i = 0; i < len_postfix_expression; i++)
     {
         if (isalpha(postfix_expression[i]))
@@ -796,6 +805,8 @@ status_code all_functions(char* filename)
             }
         }
     }
+
+    printf("%s\n", name_of_variables);
 
     create_truth_table(output_file, name_of_variables, count_of_variables, tree_result);
 
