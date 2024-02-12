@@ -620,6 +620,12 @@ int main(int argc, const char* argv[])
                     return INVALID_VALUE;
                 }
 
+                if (strcmp(argv[1], file_5) == 0)
+                {
+                    printf("It's not a different files\nPlease enter other file for output\n");
+                    return ERROR_WITH_OPENING_FILE;
+                }
+
                 FILE* output_file = fopen(file_5, "w");
                 if(!output_file)
                 {
