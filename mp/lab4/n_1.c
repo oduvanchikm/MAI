@@ -3,13 +3,15 @@
 #include <string.h>
 #include <ctype.h>
 #include <limits.h>
+#include <unistd.h>
 
 typedef enum
 {
     OK,
     ERROR_WITH_MEMORY_ALLOCATION,
     INVALID_INPUT,
-    ERROR_WITH_OPENING_FILE
+    ERROR_WITH_OPENING_FILE,
+    ERROR_WITH_FILE_TRUNCATION
 
 } status_code;
 
@@ -27,6 +29,10 @@ void print_errors(int flag)
 
         case ERROR_WITH_OPENING_FILE:
             printf("Error with opening file\n");
+            break;
+
+        case ERROR_WITH_FILE_TRUNCATION:
+            printf("Error with file truncation\n");
             break;
 
         default:
@@ -364,6 +370,12 @@ status_code replace_in_file(Hash_table* hash_table, FILE* file)
     for (int i = 0; i < index_buffer; i++)
     {
         fprintf(file, "%c", buffer[i]);
+    }
+
+    int result = ftruncate(fileno(file), start_index + index_buffer);
+    if (result != 0)
+    {
+        return ERROR_WITH_FILE_TRUNCATION;
     }
 
     while(( c = fgetc(file)) != EOF)
