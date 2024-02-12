@@ -38,6 +38,7 @@ typedef struct Hash_items
 {
     char* name;
     char* value;
+    unsigned long hash;
     struct Hash_items* next;
 
 } Hash_items;
@@ -45,7 +46,6 @@ typedef struct Hash_items
 typedef struct Hash_table
 {
     int hash_size;
-    int capacity;
     Hash_items** items;
 
 } Hash_table;
@@ -79,7 +79,51 @@ int hash_function(char* name)
     return res;
 }
 
-status_code create_hash_table(Hash_table** hash_table, int capacity, int size_of_hash_table)
+status_code check_hash_table(Hash_table* hash_table, int* count)
+{
+    int min = INT_MAX;
+    int max = INT_MIN;
+
+    for (int i = 0; i < hash_table->hash_size; i++)
+    {
+        int m = 0;
+        Hash_items* current = hash_table->items[i];
+        while (current != NULL)
+        {
+            m++;
+            (*count)++;
+            current = current->next;
+        }
+
+        if (m > max)
+        {
+            max = m;
+        }
+
+        if (m < min)
+        {
+            min = m;
+        }
+    }
+    if (min == 0)
+    {
+        if (max >= 2)
+        {
+            return INVALID_INPUT;
+        }
+        else
+        {
+            return OK;
+        }
+    }
+    if (max / min >= 2)
+    {
+        return INVALID_INPUT;
+    }
+    return OK;
+}
+
+status_code create_hash_table(Hash_table** hash_table,int size_of_hash_table)
 {
     (*hash_table) = (Hash_table*)malloc(sizeof(Hash_table));
     if (!(*hash_table))
@@ -88,7 +132,6 @@ status_code create_hash_table(Hash_table** hash_table, int capacity, int size_of
     }
 
     (*hash_table)->hash_size = size_of_hash_table;
-    (*hash_table)->capacity = capacity;
 
     (*hash_table)->items = (Hash_items**)malloc(sizeof(Hash_items*) * size_of_hash_table);
     if (!(*hash_table)->items)
@@ -106,74 +149,11 @@ status_code create_hash_table(Hash_table** hash_table, int capacity, int size_of
     return OK;
 }
 
-void destroy_table(Hash_table* hash_table)
-{
-    for (int i = 0; i < hash_table->hash_size; i++)
-    {
-        if (hash_table->items[i] != NULL)
-        {
-            Hash_items * current = hash_table->items[i];
-            while(current != NULL)
-            {
-                Hash_items * previous = current;
-                current = current->next;
-                free(previous->name);
-                free(previous->value);
-                free(previous);
-            }
-            free(current);
-        }
-    }
-    free(hash_table->items);
-    free(hash_table);
-}
-
-status_code resize_hash_table(Hash_table* hash_table, Hash_table** new_hash_table)
-{
-    status_code st_creat = create_hash_table(new_hash_table, hash_table->capacity * 2, hash_table->hash_size * 2);
-    if (st_creat == ERROR_WITH_MEMORY_ALLOCATION)
-    {
-        return ERROR_WITH_MEMORY_ALLOCATION;
-    }
-
-    for (int i = 0; i < hash_table->hash_size; i++)
-    {
-        Hash_items* current_hash_table = hash_table->items[i];
-
-        while (current_hash_table)
-        {
-            Hash_items* next = current_hash_table->next;
-            int new_index = hash_function(current_hash_table->name);
-            current_hash_table->next = (*new_hash_table)->items[new_index];
-            (*new_hash_table)->items[new_index] = current_hash_table;
-            current_hash_table = next;
-        }
-    }
-
-    destroy_table(hash_table);
-    return OK;
-}
-
-void print_hash_table(Hash_table* hash_table)
-{
-    for (int i = 0; i < hash_table->hash_size; i++)
-    {
-        if (hash_table->items[i] != NULL)
-        {
-            Hash_items * current = hash_table->items[i];
-            while (current != NULL)
-            {
-                printf("%s ", current->value);
-                current = current->next;
-            }
-            printf("\n");
-        }
-    }
-}
-
 status_code insert_in_hash_table(Hash_table* hash_table, char* name, char* value)
 {
-    int index = hash_function(name) % hash_table->hash_size;
+    unsigned long hash_value = hash_function(name);
+
+    unsigned long index = hash_value % hash_table->hash_size;
 
     Hash_items* new_item = (Hash_items*)malloc(sizeof(Hash_items));
     if (!new_item)
@@ -181,9 +161,18 @@ status_code insert_in_hash_table(Hash_table* hash_table, char* name, char* value
         return ERROR_WITH_MEMORY_ALLOCATION;
     }
 
+    new_item->hash = hash_value;
     new_item->name = strdup(name);
+    if (!new_item->name)
+    {
+        return ERROR_WITH_MEMORY_ALLOCATION;
+    }
+
     new_item->value = strdup(value);
-    new_item->next = NULL;
+    if (!new_item->value)
+    {
+        return ERROR_WITH_MEMORY_ALLOCATION;
+    }
 
     new_item->next = hash_table->items[index];
     hash_table->items[index] = new_item;
@@ -191,15 +180,17 @@ status_code insert_in_hash_table(Hash_table* hash_table, char* name, char* value
     return OK;
 }
 
-char* find_word(Hash_table* hash_table, char *key)
+char* find_word(Hash_table* hash_table, char* name)
 {
-    unsigned long hash_value = hash_function(key);
-    unsigned long hash = hash_value % hash_table->hash_size;
+    unsigned long hash_value = hash_function(name);
 
-    Hash_items* items = hash_table->items[hash];
+    unsigned long index = hash_value % hash_table->hash_size;
+
+    Hash_items* items = hash_table->items[index];
+
     while(items != NULL)
     {
-        if(strcmp(items->name, key) == 0)
+        if(strcmp(items->name, name) == 0)
         {
             return items->value;
         }
@@ -220,11 +211,17 @@ status_code read_define(FILE* file, Hash_table* hash_table)
     while (strcmp(define, "#define") == 0)
     {
         fscanf(file, "%s %s\n", def_name, value);
-        if (insert_in_hash_table(hash_table, def_name, value) != OK)
+
+        status_code st_insert = insert_in_hash_table(hash_table, def_name, value);
+        if (st_insert != OK)
         {
             return ERROR_WITH_MEMORY_ALLOCATION;
         }
-        fscanf(file, "%s", define);
+
+        else
+        {
+            fscanf(file, "%s", define);
+        }
     }
 
     fseek(file, ftell(file) - strlen(define), SEEK_SET);
@@ -232,18 +229,19 @@ status_code read_define(FILE* file, Hash_table* hash_table)
     return OK;
 }
 
-status_code all_functions(Hash_table* hash_table, FILE* file)
+
+status_code replace_in_file(Hash_table* hash_table, FILE* file)
 {
     int start_index = ftell(file);
-    char str[256];
-
+    char string[256];
     fseek(file, 0, SEEK_END);
-    long file_size = ftell(file) - start_index + 1;
+
+    long size_file = ftell(file) - start_index + 1;
 
     fseek(file, start_index, SEEK_SET);
 
-    char* buffer = (char*)malloc(file_size);
-    if (buffer == NULL)
+    char *buffer = (char*)malloc(size_file);
+    if (!buffer)
     {
         return ERROR_WITH_MEMORY_ALLOCATION;
     }
@@ -254,19 +252,21 @@ status_code all_functions(Hash_table* hash_table, FILE* file)
 
     while(c != EOF && !isalnum(c))
     {
-        if (index_buffer == file_size)
+        if (index_buffer == size_file)
         {
-            char* temp = realloc(buffer,file_size * 2);
+            char* temp = realloc(buffer, size_file * 2);
             if (!temp)
             {
                 return ERROR_WITH_MEMORY_ALLOCATION;
             }
 
             buffer = temp;
-            file_size *= 2;
+            size_file *= 2;
         }
+
         buffer[index_buffer] = c;
         index_buffer++;
+
         c = fgetc(file);
     }
 
@@ -277,33 +277,33 @@ status_code all_functions(Hash_table* hash_table, FILE* file)
 
     fseek(file, -1, SEEK_CUR);
 
-    while (!flag && fscanf(file, "%s", str) == 1)
+    while (!flag && fscanf(file, "%s", string) == 1)
     {
-        if (index_buffer == file_size)
+        if (index_buffer == size_file)
         {
-            char* temp = realloc(buffer, file_size * 2);
+            char* temp = realloc(buffer, size_file * 2);
             if (!temp)
             {
                 return ERROR_WITH_MEMORY_ALLOCATION;
             }
 
             buffer = temp;
-            file_size *= 2;
+            size_file *= 2;
         }
 
-        char *value = find_word(hash_table, str);
+        char *value = find_word(hash_table, string);
         if (value != NULL)
         {
-            if (index_buffer + strlen(value) >= file_size)
+            if (index_buffer + strlen(value) >= size_file)
             {
-                char *temp = realloc(buffer, file_size * 2);
+                char *temp = realloc(buffer, size_file * 2);
                 if (!temp)
                 {
                     return ERROR_WITH_MEMORY_ALLOCATION;
                 }
 
                 buffer = temp;
-                file_size *= 2;
+                size_file *= 2;
             }
 
             for (int j = 0; j < strlen(value); j++)
@@ -315,39 +315,41 @@ status_code all_functions(Hash_table* hash_table, FILE* file)
 
         else
         {
-            if (index_buffer + strlen(str) >= file_size)
+            if (index_buffer + strlen(string) >= size_file)
             {
-                char *temp = realloc(buffer, file_size * 2);
+                char *temp = realloc(buffer, size_file * 2);
                 if (!temp)
                 {
                     return ERROR_WITH_MEMORY_ALLOCATION;
                 }
 
                 buffer = temp;
-                file_size *= 2;
+                size_file *= 2;
             }
-            index_buffer += sprintf(&(buffer[index_buffer]), "%s", str);
+
+            index_buffer += sprintf(&(buffer[index_buffer]), "%s", string);
         }
 
         c = fgetc(file);
-
         while (c != EOF && !isalnum(c))
         {
-            if (index_buffer == file_size)
+            if (index_buffer == size_file)
             {
-                char *temp = realloc(buffer, file_size * 2);
+                char *temp = realloc(buffer, size_file * 2);
                 if (!temp)
                 {
                     return ERROR_WITH_MEMORY_ALLOCATION;
                 }
+
                 buffer = temp;
-                file_size *= 2;
+                size_file *= 2;
             }
+
             buffer[index_buffer] = c;
             index_buffer++;
             c = fgetc(file);
-        }
 
+        }
         if (c == EOF)
         {
             flag = 1;
@@ -357,7 +359,6 @@ status_code all_functions(Hash_table* hash_table, FILE* file)
     }
 
     printf("%s\n", buffer);
-
     fseek(file, start_index, SEEK_SET);
 
     for (int i = 0; i < index_buffer; i++)
@@ -365,58 +366,102 @@ status_code all_functions(Hash_table* hash_table, FILE* file)
         fprintf(file, "%c", buffer[i]);
     }
 
-    while(( c = fgetc(file)) != EOF )
+    while(( c = fgetc(file)) != EOF)
     {
         fprintf(file, "%c", ' ');
     }
 
     free(buffer);
-
     return OK;
 }
 
-status_code check(Hash_table* hash_table, int* count)
+void print_hash_table(Hash_table* hash_table)
 {
-    int min = INT_MAX;
-    int max = INT_MIN;
-
     for (int i = 0; i < hash_table->hash_size; i++)
     {
-        int m = 0;
-        Hash_items* current = hash_table->items[i];
-        while (current != NULL)
+        if (hash_table->items[i] != NULL)
         {
-            m++;
-            (*count)++;
-            current = current->next;
-        }
-        if (m > max)
-        {
-            max = m;
-        }
+            Hash_items* current = hash_table->items[i];
+            while (current != NULL)
+            {
+                printf("%s ", current->value);
+                current = current->next;
+            }
 
-        if (m < min)
-        {
-            min = m;
+            printf("\n");
         }
     }
-    if (min == 0)
+}
+
+void free_table(Hash_table* hash_table)
+{
+    for (int i = 0; i < hash_table->hash_size; i++)
     {
-        if (max >= 2)
+        if (hash_table->items[i] != NULL)
         {
-            return INVALID_INPUT;
-        }
-
-        else
-        {
-            return OK;
+            Hash_items* current = hash_table->items[i];
+            while(current != NULL)
+            {
+                Hash_items* prev = current;
+                current = current->next;
+                free(prev->name);
+                free(prev->value);
+                free(prev);
+            }
+            free(current);
         }
     }
+    free(hash_table->items);
+    free(hash_table);
+}
 
-    if (max / min >= 2)
+status_code resize_hash_table(Hash_table** hash_table, int new_size)
+{
+    Hash_table* new_table;
+    status_code st_create = create_hash_table(&new_table, new_size);
+    if (st_create != OK)
     {
-        return INVALID_INPUT;
+        return ERROR_WITH_MEMORY_ALLOCATION;
     }
+
+    for (int i = 0; i < (*hash_table)->hash_size; i++)
+    {
+        if ((*hash_table)->items[i] != NULL)
+        {
+            Hash_items* current = (*hash_table)->items[i];
+            while (current != NULL)
+            {
+                unsigned long hash = current->hash;
+                int new_index = hash % new_size;
+
+                Hash_items* new_items = (Hash_items*)malloc(sizeof(Hash_items*));
+                if (!new_items)
+                {
+                    return ERROR_WITH_MEMORY_ALLOCATION;
+                }
+
+                new_items->hash = hash;
+                new_items->name = strdup(current->name);
+                if (!new_items->name)
+                {
+                    return ERROR_WITH_MEMORY_ALLOCATION;
+                }
+
+                new_items->value = strdup(current->value);
+                if (new_items->value)
+                {
+                    return ERROR_WITH_MEMORY_ALLOCATION;
+                }
+
+                new_items->next = new_table->items[new_index];
+                new_table->items[new_index] = new_items;
+                current = current->next;
+            }
+        }
+    }
+    free_table(*hash_table);
+    *hash_table = new_table;
+
     return OK;
 }
 
@@ -440,37 +485,41 @@ int main(int argc, char* argv[])
 {
     if (argc < 2)
     {
-        printf("Wrong count of arguments\n");
-        return 0;
+        printf("Error with number of arguments\nPlease enter input file\n");
+        return 1;
     }
 
     FILE* input_file = fopen(argv[1], "r+");
     if (!input_file)
     {
         printf("Error with opening file\n");
-        return 0;
+        return 1;
     }
 
-    int current_size = 128;
+    int hash_table_size = 128;
 
-    Hash_table* table;
-    int capacity = 10;
+    Hash_table* hash_table;
 
-    create_hash_table(&table, capacity, current_size);
-
-    if (read_define(input_file, table) != OK)
+    status_code st_create = create_hash_table(&hash_table, hash_table_size);
+    if (st_create)
     {
-        print_errors(read_define(input_file, table));
-        destroy_table(table);
-        fclose(input_file);
-        return 0;
+        print_errors(st_create);
+    }
+
+    status_code st_read_define = read_define(input_file, hash_table);
+    if (st_read_define != OK)
+    {
+        print_errors(st_read_define);
+        free_table(hash_table);
+        return 1;
     }
 
     int count = 0;
 
-    while (check(table, &count) != OK)
+    status_code st_check = check_hash_table(hash_table, &count);
+    while (st_check != OK)
     {
-        int new_size = (int)(count * 2);
+        int new_size = count * 2;
 
         while (!is_prime(new_size))
         {
@@ -479,22 +528,22 @@ int main(int argc, char* argv[])
 
         printf("%d\n", new_size);
 
-        Hash_table* new_hash_table;
-        if (resize_hash_table(table, &new_hash_table) != OK)
+        status_code st_change_size = resize_hash_table(&hash_table, new_size);
+        if (st_change_size != OK)
         {
-            print_errors(resize_hash_table(table, &new_hash_table));
-            destroy_table(table);
-            fclose(input_file);
+            print_errors(st_change_size);
+            free_table(hash_table);
             return 1;
         }
     }
 
-    if (all_functions(table, input_file) != OK)
+    status_code st_read_file = replace_in_file(hash_table, input_file);
+    if (st_read_file != OK)
     {
-        print_errors(all_functions(table, input_file));
+        print_errors(st_read_file);
     }
 
     fclose(input_file);
-    destroy_table(table);
+    free_table(hash_table);
     return 0;
 }
