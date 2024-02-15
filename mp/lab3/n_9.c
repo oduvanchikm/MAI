@@ -366,17 +366,6 @@ int count_of_nodes(Node* root)
     return 1 + count_of_nodes(root->left) + count_of_nodes(root->right);
 }
 
-//void words(Node* root, Node** array_of_nodes, int number)
-//{
-//    if (!root)
-//    {
-//        return;
-//    }
-//
-//
-//}
-
-
 void read_from_file(FILE* input_file, Node** root, const char* separators)
 {
     char buffer[100];
@@ -468,48 +457,50 @@ void write_tree_to_file(FILE* output_file, Node* root, char* separators)
     save_tree_to_file(output_file, root->right, separators);
 }
 
-void write_words(Node* root, Node** words, int* count, int number)
+void write_words(Node* root, Node** array_of_nodes, int* count, int number)
 {
-    if(root)
+    if (!root)
     {
-        for (int i = 0; i < number; i++)
+        return;
+    }
+
+    for (int i = 0; i < number; i++)
+    {
+        if (array_of_nodes[i] == NULL)
         {
-            if (words[i] == NULL)
+            array_of_nodes[i] = root;
+            (*count)++;
+            break;
+        }
+        else if (array_of_nodes[i]->count <= root->count)
+        {
+            if ((*count) < number)
             {
-                words[i] = root;
+                for (int j = *count; j > i; j--)
+                {
+                    array_of_nodes[j] = array_of_nodes[j - 1];
+                }
+
+                array_of_nodes[i] = root;
                 (*count)++;
                 break;
+
             }
-
-            else if(words[i]->count <= root->count)
+            else
             {
-                if((*count) < number)
+                for (int j = number - 1; j > i; j--)
                 {
-                    for (int j = *count; j > i; j--)
-                    {
-                        words[j] = words[j-1];
-                    }
-
-                    words[i] = root;
-                    (*count)++;
-                    break;
-
+                    array_of_nodes[j] = array_of_nodes[j - 1];
                 }
-                else
-                {
-                    for (int j = number - 1; j > i; j--)
-                    {
-                        words[j] = words[j-1];
-                    }
 
-                    words[i] = root;
-                    break;
-                }
+                array_of_nodes[i] = root;
+                break;
             }
         }
-        get_words(root->left, words, count, number);
-        get_words(root->right, words, count, number);
     }
+    write_words(root->left, array_of_nodes, count, number);
+    write_words(root->right, array_of_nodes, count, number);
+
 }
 
 int main(int argc, const char* argv[])
@@ -611,8 +602,6 @@ int main(int argc, const char* argv[])
 
                 int number = atoi(&number_of_words);
 
-//                printf("%d\n", count);
-
                 if (number > count)
                 {
                     printf("You enter a very big value\n");
@@ -694,6 +683,13 @@ int main(int argc, const char* argv[])
                 printf("Program loads tree from file\n");
                 printf("Please enter the filename from read tree:\n");
                 scanf("%s", file_6);
+
+                if (!check_file(file_6))
+                {
+                    printf("Error with file\n");
+                    return INVALID_VALUE;
+                }
+
                 FILE* input_file = fopen(file_6, "r");
                 if(!input_file)
                 {
