@@ -153,13 +153,16 @@ int my_pow(int base, int power) {
     }
 }
 
-int my_strlen(const char *string) {
-    if (!(*string)) {
+int my_strlen(const char *string)
+{
+    if (!(*string))
+    {
         return 0;
     }
     int count = 0;
 
-    while (*string) {
+    while (*string)
+    {
         string++;
         count++;
     }
