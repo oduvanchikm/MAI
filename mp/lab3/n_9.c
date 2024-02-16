@@ -629,6 +629,7 @@ int main(int argc, const char* argv[])
                 {
                     printf("%d. %s\n", i + 1, array_of_nodes[i]->data);
                 }
+                break;
 
             case 3:
                 printf("Program searches the longest and shortest words\n");
@@ -683,12 +684,6 @@ int main(int argc, const char* argv[])
                 printf("Program loads tree from file\n");
                 printf("Please enter the filename from read tree:\n");
                 scanf("%s", file_6);
-
-                if (!check_file(file_6))
-                {
-                    printf("Error with file\n");
-                    return INVALID_VALUE;
-                }
 
                 FILE* input_file = fopen(file_6, "r");
                 if(!input_file)
