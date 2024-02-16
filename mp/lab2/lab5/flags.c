@@ -88,16 +88,30 @@ status_code roman_digits_flag(int num, char **result)
     return OK;
 }
 
-int fibonacci(int n)
+int find_max_fibonacci(int *fib, int number)
 {
-    if (n <= 1)
+    int fib_cur = 1;
+    int fib_prev = 1;
+    int fib_next;
+    int count = 0;
+
+    while (number >= fib_cur)
     {
-        return n;
+        fib_next = fib_prev + fib_cur;
+        fib_prev = fib_cur;
+        fib_cur = fib_next;
+        count++;
     }
-    else
+
+    if (number == fib_cur)
     {
-        return fibonacci(n - 1) + fibonacci(n - 2);
+        *fib = fib_cur;
+        return count;
     }
+
+    count--;
+    *fib = fib_prev;
+    return count;
 }
 
 status_code zecedorf_representation(unsigned int num, char **result)
@@ -126,44 +140,34 @@ status_code zecedorf_representation(unsigned int num, char **result)
         (*result)[2] = '\0';
         return OK;
     }
-    else
+
+    int fib = 0;
+    int length = find_max_fibonacci(&fib, num);
+
+    char *array = (char*) malloc(length * sizeof(char));
+    if (array == NULL)
     {
-        int fib_num = 0;
-        int fib_index = 0;
-        int count = 0;
-
-        while (fib_num <= num)
-        {
-            fib_num = fibonacci(fib_index);
-            fib_index++;
-            count++;
-        }
-
-        *result = (char*)malloc(sizeof(char) * (count + 1));
-
-        if (!(*result))
-        {
-            return ERROR_WITH_MEMORY_ALLOCATION;
-        }
-
-        for (int i = 0; i < count; i++)
-        {
-            (*result)[i] = '0';
-        }
-
-        int index = fib_index - 3;
-        while (num > 0)
-        {
-            while (fibonacci(index) > num)
-            {
-                index--;
-            }
-            num -= fibonacci(index);
-            (*result)[index] = '1';
-        }
-
-        (*result)[fib_num] = '\0';
+        return ERROR_WITH_MEMORY_ALLOCATION;
     }
+
+    for (int i = 0; i < length; ++i)
+    {
+        array[i] = '0';
+    }
+
+    array[length + 2] = '\0';
+    array[length + 1] = '1';
+    array[length] = '1';
+
+    num -= fib;
+    int index = find_max_fibonacci(&fib, num);
+    while (num > 0)
+    {
+        array[index] = '1';
+        num -= fib;
+        index = find_max_fibonacci(&fib, num);
+    }
+    (*result)= array;
     return OK;
 }
 
