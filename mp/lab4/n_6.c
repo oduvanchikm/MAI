@@ -383,6 +383,7 @@ status_code validate_infix_expression(const char* infix)
         {
             if (is_operand(infix[i + 1]) || (!is_operator(infix[i + 1]) && infix[i + 1] != ')' && infix[i + 1] != '\0'))
             {
+//                printf("ere\n");
                 return INVALID_INPUT;
             }
         }
@@ -390,6 +391,7 @@ status_code validate_infix_expression(const char* infix)
         {
             if ((infix[i] == '-' || infix[i] == '+' || infix[i] == '<') && infix[i + 1] != '>')
             {
+//                printf("rer\n");
                 return INVALID_INPUT;
             }
             else if ((!(infix[i] == '-' || infix[i] == '+' || infix[i] == '<') && !is_operand(infix[i + 1]) && !isalpha(infix[i + 1]) && infix[i + 1] != '(') || infix[i + 1] == '\0')
@@ -601,7 +603,9 @@ status_code read_file(FILE* input_file, char** string, int* error)
     status_code st_validation = validate_infix_expression(*string);
     if (st_validation != OK)
     {
-        print_errors(st_validation);
+//        printf("ERE\n");
+//        print_errors(st_validation);
+        return INVALID_INPUT;
     }
 
     fclose(input_file);
@@ -711,7 +715,6 @@ char* generate_random_filename()
 void create_truth_table(FILE* output_file, char* name_of_variables, int count_of_variables, Node* root)
 {
     int values_of_variables[count_of_variables];
-    int value;
 
     fprintf(output_file, "\tTRUTH TABLE\n");
     for (int i = 0; i < count_of_variables; i++)
@@ -731,11 +734,9 @@ void create_truth_table(FILE* output_file, char* name_of_variables, int count_of
         }
 
         int result = solve_expression(root, values_of_variables, count_of_variables, name_of_variables);
-        printf("%d\n", result);
         fprintf(output_file, "%d\n", result);
     }
 }
-
 
 status_code all_functions(char* filename)
 {
@@ -759,8 +760,6 @@ status_code all_functions(char* filename)
     status_code st_infix_to_postfix = infix_to_postfix(infix_expression, &postfix_expression);
     if (st_infix_to_postfix != OK)
     {
-        print_errors(st_infix_to_postfix);
-        printf("1\n");
         return st_infix_to_postfix;
     }
 
@@ -769,7 +768,6 @@ status_code all_functions(char* filename)
     status_code st_build_tree = build_expression_tree(postfix_expression, &error, &tree_result);
     if (st_build_tree != OK)
     {
-        print_errors(st_build_tree);
         return st_build_tree;
     }
 
