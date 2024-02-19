@@ -39,7 +39,7 @@ void print_errors(int flag)
             break;
 
         case NEGATIVE_DIGIT:
-            printf("It's a negativ digit\n");
+            printf("It's a negative digit\n");
             break;
 
         case WRONG_COUNT_OF_BRACKETS:
@@ -55,24 +55,29 @@ void print_errors(int flag)
     }
 }
 
-typedef struct Node {
+typedef struct Node
+{
     int data;
     struct Node *next;
 
 } Node;
 
-typedef struct {
+typedef struct
+{
     Node *top;
 
 } Stack;
 
-void initialize(Stack *stack) {
+void initialize(Stack *stack)
+{
     stack->top = NULL;
 }
 
-void push(Stack *stack, int data) {
+void push(Stack *stack, int data)
+{
     Node *new_node = (Node *) malloc(sizeof(Node));
-    if (!new_node) {
+    if (!new_node)
+    {
         return;
     }
 
@@ -81,8 +86,10 @@ void push(Stack *stack, int data) {
     stack->top = new_node;
 }
 
-int pop(Stack **stack) {
-    if (*stack == NULL) {
+int pop(Stack **stack)
+{
+    if (*stack == NULL)
+    {
         return -1;
     }
 
@@ -94,19 +101,23 @@ int pop(Stack **stack) {
 }
 
 
-int peek(Stack *stack) {
-    if (stack->top == NULL) {
+int peek(Stack *stack)
+{
+    if (stack->top == NULL)
+    {
         return -1;
     }
 
     return stack->top->data;
 }
 
-int is_empty(Stack *stack) {
+int is_empty(Stack *stack)
+{
     return stack->top == NULL;
 }
 
-bool is_operator(const char c) {
+bool is_operator(const char c)
+{
     return ((c == '+') || (c == '-') || (c == '*') || (c == '/') || (c == '^') || (c == '%') || (c == '~'));
 }
 
@@ -136,18 +147,27 @@ int get_priority(const char operator)
     }
 }
 
-int my_pow(int base, int power) {
+int my_pow(int base, int power)
+{
     int result = 0;
 
-    if (power == 0) {
+    if (power == 0)
+    {
         return 1;
-    } else if (power == 1) {
+    }
+    else if (power == 1)
+    {
         return base;
-    } else {
-        if (power % 2 == 0) {
+    }
+    else
+    {
+        if (power % 2 == 0)
+        {
             result = my_pow(base, power / 2);
             return result * result;
-        } else {
+        }
+        else
+        {
             return my_pow(base, power - 1) * base;
         }
     }
@@ -180,7 +200,7 @@ status_code infix_to_postfix(const char *infix, char **postfix, int* error)
     initialize(stack);
 
     int len = my_strlen(infix);
-    *postfix = (char *) malloc((len + 1) * sizeof(char));
+    *postfix = (char *) malloc((len * 2 + 1) * sizeof(char));
     if (!(*postfix))
     {
         free(stack);
@@ -586,6 +606,7 @@ status_code file_works(FILE *input_file, FILE *output_file)
     int error;
     int result;
     status_code st_solve_expression;
+    status_code st_postfix_expression;
 
     char* string = (char*)malloc(capacity * sizeof(char));
     if (!string)
@@ -656,8 +677,7 @@ status_code file_works(FILE *input_file, FILE *output_file)
                     break;
 
                 case OK:
-                    printf("infix: %s\n", string);
-                    status_code st_postfix_expression = infix_to_postfix(string, &postfix_expression, &error);
+                    st_postfix_expression = infix_to_postfix(string, &postfix_expression, &error);
                     switch (st_postfix_expression)
                     {
                         case ERROR_WITH_MEMORY_ALLOCATION:
@@ -769,4 +789,3 @@ int main(int argc, char *argv[])
     }
     return 0;
 }
-
