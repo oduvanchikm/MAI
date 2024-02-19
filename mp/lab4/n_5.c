@@ -640,7 +640,7 @@ status_code file_works(FILE *input_file, FILE *output_file)
             string[index] = (char)symbol;
             index++;
             symbol = fgetc(input_file);
-            if(symbol == '\n')
+            if(symbol == '\n' || symbol == '\r')
             {
                 break;
             }
