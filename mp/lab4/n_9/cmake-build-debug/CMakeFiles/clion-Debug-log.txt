@@ -1,0 +1,1 @@
+C:\WINDOWS\system32\wsl.exe --distribution Ubuntu --exec /bin/bash -c "export CMAKE_COLOR_DIAGNOSTICS=ON && export CLION_IDE=TRUE && export JETBRAINS_IDE=TRUE && cd /home/passwd/MAI/mp/lab4/n_9/cmake-build-debug && /usr/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G 'CodeBlocks - Unix Makefiles' -S /home/passwd/MAI/mp/lab4/n_9 -B /home/passwd/MAI/mp/lab4/n_9/cmake-build-debug"
