@@ -120,21 +120,6 @@ status_code read_line(FILE* file, char** line)
     return OK;
 }
 
-//2021-10-15T08:30:00
-bool check_time(char* string)
-{
-    int len = strlen(string);
-    if (len != 19)
-    {
-        return false;
-    }
-
-    if (string[4] != '-' && string[7] != '-' && string[13] != ':' && string[16] != ':')
-    {
-        return false;
-    }
-}
-
 status_code create_request(char* line, Request* requests, FILE* input_file)
 {
     status_code st_line = read_line(input_file, &line);
@@ -144,9 +129,9 @@ status_code create_request(char* line, Request* requests, FILE* input_file)
     }
 
     int len = strlen(line);
+    printf("%s\n", line);
 
     int flag = 1;
-
     int time_size = 19;
 
     char* time_string = (char*)malloc(sizeof(char) * (time_size + 1));
@@ -154,6 +139,7 @@ status_code create_request(char* line, Request* requests, FILE* input_file)
     {
         return ERROR_WITH_MEMORY_ALLOCATION;
     }
+
     time_string[time_size] = '\0';
 
     char* comment = (char*)malloc(sizeof(char) * (len - time_size + 1));
@@ -162,14 +148,12 @@ status_code create_request(char* line, Request* requests, FILE* input_file)
         free(time_string);
         return ERROR_WITH_MEMORY_ALLOCATION;
     }
-    comment[len] = '\0';
 
-    char priority[256];
+    comment[len - time_size] = '\0';
 
     int comment_index = 0;
     int time_index = 0;
     int index = 0;
-    int priority_index = 0;
 
     while (line[index] != '\n' && !isspace(line[index]) && time_index < time_size)
     {
@@ -178,16 +162,6 @@ status_code create_request(char* line, Request* requests, FILE* input_file)
     }
 
     time_string[time_index] = '\0';
-
-    flag = 1;
-
-    while (line[index] != '\n' && !isspace(line[index]) && time_index < time_size)
-    {
-        priority[priority_index++] = line[index];
-        index++;
-    }
-
-    priority[priority_index] = '\0';
 
     flag = 1;
 
@@ -209,6 +183,13 @@ status_code create_request(char* line, Request* requests, FILE* input_file)
         index++;
     }
 
+    while (line[index] != '\n' && line[index] != EOF)
+    {
+
+
+
+    }
+
     if (flag == 1)
     {
         free(comment);
@@ -216,14 +197,8 @@ status_code create_request(char* line, Request* requests, FILE* input_file)
         return INVALID_INPUT;
     }
 
-//    if (!check_time(time_string))
-//    {
-//        return INVALID_INPUT;
-//    }
-
     printf("%s\n", time_string);
     printf("%s\n", comment);
-    printf("%s\n", priority);
 
     free(comment);
     free(time_string);
