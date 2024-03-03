@@ -1,24 +1,24 @@
-#ifndef BINARY_HEAP_H
-#define BINARY_HEAP_H
+#ifndef N_9_BINARY_HEAP_H
+#define N_9_BINARY_HEAP_H
 #include "main.h"
 
-typedef struct Min_binary_heap
+typedef struct Binary_heap
 {
-    Request* data;
+    Request** data;
     int capacity;
     int size;
-} Min_binary_heap;
 
-Min_binary_heap* create_heap(int max_priority);
-void swap(Request* first, Request* second);
-void sift_up(Min_binary_heap* heap, int index);
-void insert(Min_binary_heap* heap, int priority);
-void sift_down(Min_binary_heap* heap, int index);
-int delete_min(Min_binary_heap* heap);
-Request* extract_min(Min_binary_heap* heap);
-void destroy_heap(Min_binary_heap* heap);
-Min_binary_heap* merge_heaps_with_destruction(Min_binary_heap* heap_1, Min_binary_heap* heap_2);
-Min_binary_heap* merge_heaps_without_destruction(Min_binary_heap* heap_1, Min_binary_heap* heap_2);
+} Binary_heap;
+
+Binary_heap* create_binary_heap();
+void swap(Request** request, int index_1, int index_2);
+void sift_up(Binary_heap* binary_heap, int index);
+status_code insert_in_binary_heap(Binary_heap* binary_heap, Request* request);
+void sift_down(Binary_heap* binary_heap, int index);
+Request* extract_max_binary_heap(Binary_heap* binary_heap);
+void destroy_binary_heap(Binary_heap* binary_heap);
+void merge_binary_heaps_with_destruction(Binary_heap* binary_heap_1, Binary_heap* binary_heap_2);
+Binary_heap* merge_binary_heaps_without_destruction(Binary_heap* binary_heap_1, Binary_heap* binary_heap_2);
 
 
-#endif
+#endif // N_9_BINARY_HEAP_H

@@ -76,6 +76,24 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/home/passwd/MAI/mp/lab4/n_9/binary_heap.c">
+			<Option target="n_9"/>
+		</Unit>
+		<Unit filename="/home/passwd/MAI/mp/lab4/n_9/binary_heap.h">
+			<Option target="n_9"/>
+		</Unit>
+		<Unit filename="/home/passwd/MAI/mp/lab4/n_9/binomial_heap.c">
+			<Option target="n_9"/>
+		</Unit>
+		<Unit filename="/home/passwd/MAI/mp/lab4/n_9/binomial_heap.h">
+			<Option target="n_9"/>
+		</Unit>
+		<Unit filename="/home/passwd/MAI/mp/lab4/n_9/fibonacci_heap.c">
+			<Option target="n_9"/>
+		</Unit>
+		<Unit filename="/home/passwd/MAI/mp/lab4/n_9/fibonacci_heap.h">
+			<Option target="n_9"/>
+		</Unit>
 		<Unit filename="/home/passwd/MAI/mp/lab4/n_9/main.c">
 			<Option target="n_9"/>
 		</Unit>

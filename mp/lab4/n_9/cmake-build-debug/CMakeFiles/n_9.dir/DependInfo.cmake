@@ -4,6 +4,9 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
+  "/home/passwd/MAI/mp/lab4/n_9/binary_heap.c" "/home/passwd/MAI/mp/lab4/n_9/cmake-build-debug/CMakeFiles/n_9.dir/binary_heap.c.o"
+  "/home/passwd/MAI/mp/lab4/n_9/binomial_heap.c" "/home/passwd/MAI/mp/lab4/n_9/cmake-build-debug/CMakeFiles/n_9.dir/binomial_heap.c.o"
+  "/home/passwd/MAI/mp/lab4/n_9/fibonacci_heap.c" "/home/passwd/MAI/mp/lab4/n_9/cmake-build-debug/CMakeFiles/n_9.dir/fibonacci_heap.c.o"
   "/home/passwd/MAI/mp/lab4/n_9/main.c" "/home/passwd/MAI/mp/lab4/n_9/cmake-build-debug/CMakeFiles/n_9.dir/main.c.o"
   )
 set(CMAKE_C_COMPILER_ID "GNU")

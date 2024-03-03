@@ -1,5 +1,5 @@
 #include "main.h"
-//#include "binary_heap.h"
+#include "binary_heap.h"
 
 Info* read_data_from_first_file(FILE* file)
 {
@@ -35,7 +35,7 @@ Info* read_data_from_first_file(FILE* file)
     return data;
 }
 
-storage_of_applications choosing_data_structure(Info* data)
+heap_structure choosing_heap_structure(Info* data)
 {
     if (strcmp(data->heap_type, "BinaryHeap") == 0)
     {
@@ -73,139 +73,216 @@ storage_of_applications choosing_data_structure(Info* data)
     }
 }
 
-
-status_code read_line(FILE* file, char** line)
+set_structures choosing_data_set(Info* data)
 {
-    if (file == NULL || line == NULL)
+    if (strcmp(data->set_type, "HashSet") == 0)
     {
-        return INVALID_INPUT;
+        return HASH_SET;
     }
 
-    int i = 0;
-    int size = 10;
-
-    char* line_tmp = (char*) malloc(sizeof(char) * size);
-    if (!line_tmp)
+    else if (strcmp(data->set_type, "DynamicArray") == 0)
     {
-        return ERROR_WITH_MEMORY_ALLOCATION;
+        return DYNAMIC_ARRAY;
     }
 
-    char ch = getc(file);
-    if (feof(file))
+    else if (strcmp(data->set_type, "BinarySearchTree") == 0)
     {
-        free(line_tmp);
-        return INVALID_INPUT;
+        return BINARY_SEARCH_TREE;
     }
 
-    while (!feof(file) && ch != '\n')
+    else if (strcmp(data->set_type, "Trie") == 0)
     {
-        if (i + 1 == size)
+        return TRIE;
+    }
+
+    else
+    {
+        return INVALID_SET;
+    }
+}
+
+//status_code read_line(FILE* file, char** line)
+//{
+//    if (file == NULL || line == NULL)
+//    {
+//        return INVALID_INPUT;
+//    }
+//
+//    int i = 0;
+//    int size = 10;
+//
+//    char* line_tmp = (char*) malloc(sizeof(char) * size);
+//    if (!line_tmp)
+//    {
+//        return ERROR_WITH_MEMORY_ALLOCATION;
+//    }
+//
+//    char ch = getc(file);
+//    if (feof(file))
+//    {
+//        free(line_tmp);
+//        return INVALID_INPUT;
+//    }
+//
+//    while (!feof(file) && ch != '\n')
+//    {
+//        if (i + 1 == size)
+//        {
+//            size *= 2;
+//            char* tmp = realloc(line_tmp, size);
+//            if (!tmp)
+//            {
+//                free(line_tmp);
+//                return ERROR_WITH_MEMORY_ALLOCATION;
+//            }
+//
+//            line_tmp = tmp;
+//        }
+//        line_tmp[i++] = ch;
+//        ch = getc(file);
+//    }
+//
+//    line_tmp[i] = '\0';
+//    *line = line_tmp;
+//    return OK;
+//}
+//
+//status_code create_request(char* line, Request* requests, FILE* input_file)
+//{
+//    status_code st_line = read_line(input_file, &line);
+//    if (st_line != OK)
+//    {
+//        return INVALID_INPUT;
+//    }
+//
+//    int len = strlen(line);
+//    printf("%s\n", line);
+//
+//    int flag = 1;
+//    int time_size = 19;
+//
+//    char* time_string = (char*)malloc(sizeof(char) * (time_size + 1));
+//    if (!time_string)
+//    {
+//        return ERROR_WITH_MEMORY_ALLOCATION;
+//    }
+//
+//    time_string[time_size] = '\0';
+//
+//    char* comment = (char*)malloc(sizeof(char) * (len - time_size + 1));
+//    if (!comment)
+//    {
+//        free(time_string);
+//        return ERROR_WITH_MEMORY_ALLOCATION;
+//    }
+//
+//    comment[len - time_size] = '\0';
+//
+//    int comment_index = 0;
+//    int time_index = 0;
+//    int index = 0;
+//
+//    while (line[index] != '\n' && !isspace(line[index]) && time_index < time_size)
+//    {
+//        time_string[time_index++] = line[index];
+//        index++;
+//    }
+//
+//    time_string[time_index] = '\0';
+//
+//    flag = 1;
+//
+//    while (line[index] != '\n' && line[index] != EOF && flag)
+//    {
+//        if (line[index] == '"')
+//        {
+//            index++;
+//            while (line[index] != '"' && line[index] != '\0')
+//            {
+//                comment[comment_index++] = line[index];
+//                index++;
+//            }
+//
+//            comment[comment_index] = '\0';
+//            flag = 0;
+//        }
+//
+//        index++;
+//    }
+//
+//    while (line[index] != '\n' && line[index] != EOF)
+//    {
+//
+//
+//
+//    }
+//
+//    if (flag == 1)
+//    {
+//        free(comment);
+//        free(time_string);
+//        return INVALID_INPUT;
+//    }
+//
+//    printf("%s\n", time_string);
+//    printf("%s\n", comment);
+//
+//    free(comment);
+//    free(time_string);
+//
+//    return OK;
+//}
+
+status_code read_requests_from_file(FILE* input_file, Request** requests)
+{
+    *requests = NULL;
+    int num_requests = 0;
+
+    while (!feof(input_file))
+    {
+        Request new_request;
+        if (fscanf(input_file, "%s %d %s", new_request.timestamp, &new_request.priority, new_request.department_id) == 3)
         {
-            size *= 2;
-            char* tmp = realloc(line_tmp, size);
-            if (!tmp)
+            char line[256];
+            fgets(line, 256, input_file);
+
+            char* text_start = strchr(line, ' ');
+            text_start = strchr(text_start + 1, ' ');
+            text_start = strchr(text_start + 1, ' ');
+
+            new_request.text = strdup(text_start + 1);
+            if (!new_request.text)
             {
-                free(line_tmp);
+                free(*requests);
                 return ERROR_WITH_MEMORY_ALLOCATION;
             }
 
-            line_tmp = tmp;
-        }
-        line_tmp[i++] = ch;
-        ch = getc(file);
-    }
-
-    line_tmp[i] = '\0';
-    *line = line_tmp;
-    return OK;
-}
-
-status_code create_request(char* line, Request* requests, FILE* input_file)
-{
-    status_code st_line = read_line(input_file, &line);
-    if (st_line != OK)
-    {
-        return INVALID_INPUT;
-    }
-
-    int len = strlen(line);
-    printf("%s\n", line);
-
-    int flag = 1;
-    int time_size = 19;
-
-    char* time_string = (char*)malloc(sizeof(char) * (time_size + 1));
-    if (!time_string)
-    {
-        return ERROR_WITH_MEMORY_ALLOCATION;
-    }
-
-    time_string[time_size] = '\0';
-
-    char* comment = (char*)malloc(sizeof(char) * (len - time_size + 1));
-    if (!comment)
-    {
-        free(time_string);
-        return ERROR_WITH_MEMORY_ALLOCATION;
-    }
-
-    comment[len - time_size] = '\0';
-
-    int comment_index = 0;
-    int time_index = 0;
-    int index = 0;
-
-    while (line[index] != '\n' && !isspace(line[index]) && time_index < time_size)
-    {
-        time_string[time_index++] = line[index];
-        index++;
-    }
-
-    time_string[time_index] = '\0';
-
-    flag = 1;
-
-    while (line[index] != '\n' && line[index] != EOF && flag)
-    {
-        if (line[index] == '"')
-        {
-            index++;
-            while (line[index] != '"' && line[index] != '\0')
+            Request* new_requests = (Request*)realloc((*requests), (num_requests + 1) * sizeof(Request));
+            if (!new_requests)
             {
-                comment[comment_index++] = line[index];
-                index++;
+                free(*requests);
+                return ERROR_WITH_MEMORY_ALLOCATION;
             }
 
-            comment[comment_index] = '\0';
-            flag = 0;
+            (*requests) = new_requests;
+
+            (*requests)[num_requests] = new_request;
+            num_requests++;
         }
-
-        index++;
     }
 
-    while (line[index] != '\n' && line[index] != EOF)
-    {
-
-
-
-    }
-
-    if (flag == 1)
-    {
-        free(comment);
-        free(time_string);
-        return INVALID_INPUT;
-    }
-
-    printf("%s\n", time_string);
-    printf("%s\n", comment);
-
-    free(comment);
-    free(time_string);
-
+    fclose(input_file);
     return OK;
 }
 
+status_code heaps(heap_structure heaps, Info* data, int max_priority)
+{
+    switch(heaps)
+    {
+        case BINOMIAL_HEAP:
+            create_binary_heap(max_priority);
+    }
+}
 
 
 int main(int argc, char* argv[])
@@ -226,7 +303,7 @@ int main(int argc, char* argv[])
 
     Info* data = read_data_from_first_file(file_with_models_parameter);
 
-    storage_of_applications st_storage = choosing_data_structure(data);
+    heap_structure st_storage = choosing_heap_structure(data);
     if (st_storage == INVALID_STRUCTURE)
     {
         printf("You write a wrong structure\nPlease enter other in file\n");
@@ -240,7 +317,7 @@ int main(int argc, char* argv[])
     }
 
     FILE* file_with_info_request = NULL;
-    Request* request;
+    Request* request = NULL;
     Storage_of_applications storage;
     char* string = NULL;
     char* time = NULL;
@@ -257,14 +334,13 @@ int main(int argc, char* argv[])
             return 1;
         }
 
-        status_code st_request = create_request(string, request, file_with_info_request);
+
+        status_code st_request = read_requests_from_file(file_with_info_request, &request);
         if (st_request != OK)
         {
             print_errors(st_request);
         }
 
-//        printf("%s\n", request->timestamp);
-//        printf("%d\n", request->priority);
     }
 
     for (int i = 0; i < data->count_of_depatment; i++)

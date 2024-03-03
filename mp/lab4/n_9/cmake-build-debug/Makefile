@@ -123,6 +123,87 @@ n_9/fast:
 	$(MAKE) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/build
 .PHONY : n_9/fast
 
+binary_heap.o: binary_heap.c.o
+
+.PHONY : binary_heap.o
+
+# target to build an object file
+binary_heap.c.o:
+	$(MAKE) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/binary_heap.c.o
+.PHONY : binary_heap.c.o
+
+binary_heap.i: binary_heap.c.i
+
+.PHONY : binary_heap.i
+
+# target to preprocess a source file
+binary_heap.c.i:
+	$(MAKE) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/binary_heap.c.i
+.PHONY : binary_heap.c.i
+
+binary_heap.s: binary_heap.c.s
+
+.PHONY : binary_heap.s
+
+# target to generate assembly for a file
+binary_heap.c.s:
+	$(MAKE) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/binary_heap.c.s
+.PHONY : binary_heap.c.s
+
+binomial_heap.o: binomial_heap.c.o
+
+.PHONY : binomial_heap.o
+
+# target to build an object file
+binomial_heap.c.o:
+	$(MAKE) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/binomial_heap.c.o
+.PHONY : binomial_heap.c.o
+
+binomial_heap.i: binomial_heap.c.i
+
+.PHONY : binomial_heap.i
+
+# target to preprocess a source file
+binomial_heap.c.i:
+	$(MAKE) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/binomial_heap.c.i
+.PHONY : binomial_heap.c.i
+
+binomial_heap.s: binomial_heap.c.s
+
+.PHONY : binomial_heap.s
+
+# target to generate assembly for a file
+binomial_heap.c.s:
+	$(MAKE) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/binomial_heap.c.s
+.PHONY : binomial_heap.c.s
+
+fibonacci_heap.o: fibonacci_heap.c.o
+
+.PHONY : fibonacci_heap.o
+
+# target to build an object file
+fibonacci_heap.c.o:
+	$(MAKE) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/fibonacci_heap.c.o
+.PHONY : fibonacci_heap.c.o
+
+fibonacci_heap.i: fibonacci_heap.c.i
+
+.PHONY : fibonacci_heap.i
+
+# target to preprocess a source file
+fibonacci_heap.c.i:
+	$(MAKE) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/fibonacci_heap.c.i
+.PHONY : fibonacci_heap.c.i
+
+fibonacci_heap.s: fibonacci_heap.c.s
+
+.PHONY : fibonacci_heap.s
+
+# target to generate assembly for a file
+fibonacci_heap.c.s:
+	$(MAKE) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/fibonacci_heap.c.s
+.PHONY : fibonacci_heap.c.s
+
 main.o: main.c.o
 
 .PHONY : main.o
@@ -159,6 +240,15 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... n_9"
+	@echo "... binary_heap.o"
+	@echo "... binary_heap.i"
+	@echo "... binary_heap.s"
+	@echo "... binomial_heap.o"
+	@echo "... binomial_heap.i"
+	@echo "... binomial_heap.s"
+	@echo "... fibonacci_heap.o"
+	@echo "... fibonacci_heap.i"
+	@echo "... fibonacci_heap.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

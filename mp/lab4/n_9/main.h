@@ -9,6 +9,8 @@
 #include <limits.h>
 #include <stdbool.h>
 
+#include "binary_heap.h"
+
 
 typedef enum
 {
@@ -30,7 +32,17 @@ typedef enum
     TREAP, // декартово дерево
     INVALID_STRUCTURE
 
-} storage_of_applications;
+} heap_structure;
+
+typedef enum
+{
+    HASH_SET,
+    DYNAMIC_ARRAY,
+    BINARY_SEARCH_TREE,
+    TRIE,
+    INVALID_SET
+
+} set_structures;
 
 void print_errors(int flag)
 {
@@ -108,7 +120,7 @@ typedef struct Department
 //} Log;
 
 Info* read_data_from_first_file(FILE* file);
-storage_of_applications choosing_data_structure(Info* data);
+//storage_of_applications choosing_data_structure(Info* data);
 
 
 #endif
