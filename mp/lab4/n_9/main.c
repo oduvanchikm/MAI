@@ -1,8 +1,8 @@
 #include "main.h"
 //#include "binary_heap.h"
 
-void read_from_file(FILE* input_file, heap_structure heap_enum, set_structures storage_enum,
-                    Info_from_first_file* data, Department* dep)
+void read_from_file(FILE* input_file, heap_structure* heap_enum, set_structures* storage_enum,
+                    Info_from_first_file data, Department* dep)
 {
     char heap[25];
     char storage[30];
@@ -11,65 +11,57 @@ void read_from_file(FILE* input_file, heap_structure heap_enum, set_structures s
 
     if (strcmp(heap, "BinaryHeap") == 0)
     {
-        heap_enum = BINARY_HEAP;
+        (*heap_enum) = BINARY_HEAP;
     }
-
     else if (strcmp(heap, "BinomialHeap") == 0)
     {
-        heap_enum = BINOMIAL_HEAP;
+        (*heap_enum) = BINOMIAL_HEAP;
     }
-
     else if (strcmp(heap, "FibonacciHeap") == 0)
     {
-        heap_enum = FIBONACCI_HEAP;
+        (*heap_enum) = FIBONACCI_HEAP;
     }
-
     else if (strcmp(heap, "SkewHeap") == 0)
     {
-        heap_enum = SKEW_HEAP;
+        (*heap_enum) = SKEW_HEAP;
     }
-
     else if (strcmp(heap, "LeftistHeap") == 0)
     {
-        heap_enum = LEFTIST_HEAP;
+        (*heap_enum) = LEFTIST_HEAP;
     }
-
     else if (strcmp(heap, "Treap") == 0)
     {
-        heap_enum = TREAP;
+        (*heap_enum) = TREAP;
     }
 
     fscanf(input_file, "%s", storage);
 
     if (strcmp(storage, "HashSet") == 0)
     {
-        storage_enum = HASH_SET;
+        (*storage_enum) = HASH_SET;
     }
-
     else if (strcmp(storage, "DynamicArray") == 0)
     {
-        storage_enum = DYNAMIC_ARRAY;
+        (*storage_enum) = DYNAMIC_ARRAY;
     }
-
     else if (strcmp(storage, "BinarySearchTree") == 0)
     {
-        storage_enum = BINARY_SEARCH_TREE;
+        (*storage_enum) = BINARY_SEARCH_TREE;
     }
-
     else if (strcmp(storage, "Trie") == 0)
     {
-        storage_enum = TRIE;
+        (*storage_enum) = TRIE;
     }
 
-    fscanf(input_file, "%s", data->date_of_start);
-    fscanf(input_file, "%s", data->date_of_end);
-    fscanf(input_file, "%d", &(data->min_time));
-    fscanf(input_file, "%d", &(data->max_time));
-    fscanf(input_file, "%d", &(data->count_of_department));
+    fscanf(input_file, "%s", data.date_of_start);
+    fscanf(input_file, "%s", data.date_of_end);
+    fscanf(input_file, "%d", &(data.min_time));
+    fscanf(input_file, "%d", &(data.max_time));
+    fscanf(input_file, "%d", &(data.count_of_departments));
 
-    for (int i = 0; i < data->count_of_department; i++)
+    for (int i = 0; i < data.count_of_departments; i++)
     {
-        fscanf(input_file, "%d", &(data->count_of_operators));
+        fscanf(input_file, "%d", &(dep[i].count_of_operators));
     }
 
     fscanf(input_file, "%lf", &(dep->overload_coef));
@@ -93,6 +85,9 @@ status_code read_requests_from_file(FILE* input_file, Request* requests)
 
     fgets(requests->text, 256, input_file);
 
+//    printf("%s\n%d\n%s\n", requests->timestamp, requests->priority, requests->department_id);
+//    printf("%s\n", requests->text);
+
 }
 
 int main(int argc, char* argv[])
@@ -104,6 +99,9 @@ int main(int argc, char* argv[])
     }
 
     int max_priority = atoi(argv[1]);
+
+//    printf("%d\n", max_priority);
+
     FILE* file_with_models_parameter = fopen(argv[2], "r");
     if (!file_with_models_parameter)
     {
@@ -113,10 +111,12 @@ int main(int argc, char* argv[])
 
     heap_structure heap;
     set_structures storage;
-    Info_from_first_file* data = NULL;
-    Department* dep = NULL;
+    Info_from_first_file data;
+    Department dep;
 
-    read_from_file(file_with_models_parameter, heap, storage, data, dep);
+    read_from_file(file_with_models_parameter, &heap, &storage, data, &dep);
+
+    printf("%d\n", heap);
 
     FILE* file_with_info_request = NULL;
     Request* request = NULL;

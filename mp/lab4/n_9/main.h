@@ -92,7 +92,7 @@ typedef struct Info_from_first_file
     char date_of_end[100];
     int min_time;
     int max_time;
-    int count_of_department;
+    int count_of_departments;
     int count_of_operators;
 
 } Info_from_first_file;
@@ -115,7 +115,7 @@ typedef struct Department
 //    char* description;
 //} Log;
 
-Info* read_data_from_first_file(FILE* file);
+//Info* read_data_from_first_file(FILE* file);
 //storage_of_applications choosing_data_structure(Info* data);
 
 
