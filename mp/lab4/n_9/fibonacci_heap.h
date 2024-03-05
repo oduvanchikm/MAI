@@ -5,6 +5,7 @@
 typedef struct Fibonacci_heap_node
 {
     Request* request;
+    int degree;
     struct Fibonacci_heap* parent;
     struct Fibonacci_heap* child;
     struct Fibonacci_heap* left;

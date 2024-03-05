@@ -1,1 +1,1 @@
-/usr/bin/cc -g   CMakeFiles/n_9.dir/main.c.o CMakeFiles/n_9.dir/binary_heap.c.o CMakeFiles/n_9.dir/fibonacci_heap.c.o CMakeFiles/n_9.dir/binomial_heap.c.o  -o n_9 
+/usr/bin/cc -g CMakeFiles/n_9.dir/main.c.o CMakeFiles/n_9.dir/binary_heap.c.o CMakeFiles/n_9.dir/fibonacci_heap.c.o CMakeFiles/n_9.dir/binomial_heap.c.o -o n_9 

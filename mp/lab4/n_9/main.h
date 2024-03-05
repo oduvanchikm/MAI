@@ -9,7 +9,7 @@
 #include <limits.h>
 #include <stdbool.h>
 
-#include "binary_heap.h"
+//#include "binary_heap.h"
 
 
 typedef enum
@@ -78,38 +78,34 @@ typedef struct Request
 
 } Request;
 
-typedef struct Storage_of_applications
-{
-    Request* requests;
-    int num_requests;
-
-} Storage_of_applications;
-
 typedef struct Operator
 {
     int processing_time; // время, за которое обрабатывается заявка
     char* name; // имя
-    int is_free; // свободен ли сейчас оператор
+    int start_time; // время начала работы
+    Request* request; // заявка, которая сейчас в обработке
 } Operator;
 
-typedef struct Info
+typedef struct Info_from_first_file
 {
-    char heap_type[100];
-    char set_type[100];
     char date_of_start[100];
     char date_of_end[100];
     int min_time;
     int max_time;
-    int count_of_depatment;
-    char** count_of_operators;
-    double overload_coef;
-} Info;
+    int count_of_department;
+    int count_of_operators;
+
+} Info_from_first_file;
 
 typedef struct Department
 {
     Operator* operators;
-    int count_of_operators;
+    int count_of_operators; // количество операторов
+    int count_of_requests; // количество оставшихся заявок
     void* data_structure; // указатель на структуру, в которой хранятся заявки
+    double overload_coef;
+    int is_overload;
+
 } Department;
 
 //typedef struct Log
