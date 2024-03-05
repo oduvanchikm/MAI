@@ -83,65 +83,113 @@ CMakeFiles/n_9.dir/main.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/n_9.dir/main.c.s"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/passwd/MAI/mp/lab4/n_9/main.c -o CMakeFiles/n_9.dir/main.c.s
 
-CMakeFiles/n_9.dir/binary_heap.c.o: CMakeFiles/n_9.dir/flags.make
-CMakeFiles/n_9.dir/binary_heap.c.o: /home/passwd/MAI/mp/lab4/n_9/binary_heap.c
-CMakeFiles/n_9.dir/binary_heap.c.o: CMakeFiles/n_9.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/passwd/MAI/mp/lab4/n_9/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/n_9.dir/binary_heap.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/n_9.dir/binary_heap.c.o -MF CMakeFiles/n_9.dir/binary_heap.c.o.d -o CMakeFiles/n_9.dir/binary_heap.c.o -c /home/passwd/MAI/mp/lab4/n_9/binary_heap.c
+CMakeFiles/n_9.dir/heaps/binary_heap.c.o: CMakeFiles/n_9.dir/flags.make
+CMakeFiles/n_9.dir/heaps/binary_heap.c.o: /home/passwd/MAI/mp/lab4/n_9/heaps/binary_heap.c
+CMakeFiles/n_9.dir/heaps/binary_heap.c.o: CMakeFiles/n_9.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/passwd/MAI/mp/lab4/n_9/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/n_9.dir/heaps/binary_heap.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/n_9.dir/heaps/binary_heap.c.o -MF CMakeFiles/n_9.dir/heaps/binary_heap.c.o.d -o CMakeFiles/n_9.dir/heaps/binary_heap.c.o -c /home/passwd/MAI/mp/lab4/n_9/heaps/binary_heap.c
 
-CMakeFiles/n_9.dir/binary_heap.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/n_9.dir/binary_heap.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/passwd/MAI/mp/lab4/n_9/binary_heap.c > CMakeFiles/n_9.dir/binary_heap.c.i
+CMakeFiles/n_9.dir/heaps/binary_heap.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/n_9.dir/heaps/binary_heap.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/passwd/MAI/mp/lab4/n_9/heaps/binary_heap.c > CMakeFiles/n_9.dir/heaps/binary_heap.c.i
 
-CMakeFiles/n_9.dir/binary_heap.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/n_9.dir/binary_heap.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/passwd/MAI/mp/lab4/n_9/binary_heap.c -o CMakeFiles/n_9.dir/binary_heap.c.s
+CMakeFiles/n_9.dir/heaps/binary_heap.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/n_9.dir/heaps/binary_heap.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/passwd/MAI/mp/lab4/n_9/heaps/binary_heap.c -o CMakeFiles/n_9.dir/heaps/binary_heap.c.s
 
-CMakeFiles/n_9.dir/fibonacci_heap.c.o: CMakeFiles/n_9.dir/flags.make
-CMakeFiles/n_9.dir/fibonacci_heap.c.o: /home/passwd/MAI/mp/lab4/n_9/fibonacci_heap.c
-CMakeFiles/n_9.dir/fibonacci_heap.c.o: CMakeFiles/n_9.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/passwd/MAI/mp/lab4/n_9/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/n_9.dir/fibonacci_heap.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/n_9.dir/fibonacci_heap.c.o -MF CMakeFiles/n_9.dir/fibonacci_heap.c.o.d -o CMakeFiles/n_9.dir/fibonacci_heap.c.o -c /home/passwd/MAI/mp/lab4/n_9/fibonacci_heap.c
+CMakeFiles/n_9.dir/heaps/fibonacci_heap.c.o: CMakeFiles/n_9.dir/flags.make
+CMakeFiles/n_9.dir/heaps/fibonacci_heap.c.o: /home/passwd/MAI/mp/lab4/n_9/heaps/fibonacci_heap.c
+CMakeFiles/n_9.dir/heaps/fibonacci_heap.c.o: CMakeFiles/n_9.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/passwd/MAI/mp/lab4/n_9/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/n_9.dir/heaps/fibonacci_heap.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/n_9.dir/heaps/fibonacci_heap.c.o -MF CMakeFiles/n_9.dir/heaps/fibonacci_heap.c.o.d -o CMakeFiles/n_9.dir/heaps/fibonacci_heap.c.o -c /home/passwd/MAI/mp/lab4/n_9/heaps/fibonacci_heap.c
 
-CMakeFiles/n_9.dir/fibonacci_heap.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/n_9.dir/fibonacci_heap.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/passwd/MAI/mp/lab4/n_9/fibonacci_heap.c > CMakeFiles/n_9.dir/fibonacci_heap.c.i
+CMakeFiles/n_9.dir/heaps/fibonacci_heap.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/n_9.dir/heaps/fibonacci_heap.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/passwd/MAI/mp/lab4/n_9/heaps/fibonacci_heap.c > CMakeFiles/n_9.dir/heaps/fibonacci_heap.c.i
 
-CMakeFiles/n_9.dir/fibonacci_heap.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/n_9.dir/fibonacci_heap.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/passwd/MAI/mp/lab4/n_9/fibonacci_heap.c -o CMakeFiles/n_9.dir/fibonacci_heap.c.s
+CMakeFiles/n_9.dir/heaps/fibonacci_heap.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/n_9.dir/heaps/fibonacci_heap.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/passwd/MAI/mp/lab4/n_9/heaps/fibonacci_heap.c -o CMakeFiles/n_9.dir/heaps/fibonacci_heap.c.s
 
-CMakeFiles/n_9.dir/binomial_heap.c.o: CMakeFiles/n_9.dir/flags.make
-CMakeFiles/n_9.dir/binomial_heap.c.o: /home/passwd/MAI/mp/lab4/n_9/binomial_heap.c
-CMakeFiles/n_9.dir/binomial_heap.c.o: CMakeFiles/n_9.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/passwd/MAI/mp/lab4/n_9/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/n_9.dir/binomial_heap.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/n_9.dir/binomial_heap.c.o -MF CMakeFiles/n_9.dir/binomial_heap.c.o.d -o CMakeFiles/n_9.dir/binomial_heap.c.o -c /home/passwd/MAI/mp/lab4/n_9/binomial_heap.c
+CMakeFiles/n_9.dir/heaps/binomial_heap.c.o: CMakeFiles/n_9.dir/flags.make
+CMakeFiles/n_9.dir/heaps/binomial_heap.c.o: /home/passwd/MAI/mp/lab4/n_9/heaps/binomial_heap.c
+CMakeFiles/n_9.dir/heaps/binomial_heap.c.o: CMakeFiles/n_9.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/passwd/MAI/mp/lab4/n_9/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/n_9.dir/heaps/binomial_heap.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/n_9.dir/heaps/binomial_heap.c.o -MF CMakeFiles/n_9.dir/heaps/binomial_heap.c.o.d -o CMakeFiles/n_9.dir/heaps/binomial_heap.c.o -c /home/passwd/MAI/mp/lab4/n_9/heaps/binomial_heap.c
 
-CMakeFiles/n_9.dir/binomial_heap.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/n_9.dir/binomial_heap.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/passwd/MAI/mp/lab4/n_9/binomial_heap.c > CMakeFiles/n_9.dir/binomial_heap.c.i
+CMakeFiles/n_9.dir/heaps/binomial_heap.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/n_9.dir/heaps/binomial_heap.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/passwd/MAI/mp/lab4/n_9/heaps/binomial_heap.c > CMakeFiles/n_9.dir/heaps/binomial_heap.c.i
 
-CMakeFiles/n_9.dir/binomial_heap.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/n_9.dir/binomial_heap.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/passwd/MAI/mp/lab4/n_9/binomial_heap.c -o CMakeFiles/n_9.dir/binomial_heap.c.s
+CMakeFiles/n_9.dir/heaps/binomial_heap.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/n_9.dir/heaps/binomial_heap.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/passwd/MAI/mp/lab4/n_9/heaps/binomial_heap.c -o CMakeFiles/n_9.dir/heaps/binomial_heap.c.s
+
+CMakeFiles/n_9.dir/storages/hash_set.c.o: CMakeFiles/n_9.dir/flags.make
+CMakeFiles/n_9.dir/storages/hash_set.c.o: /home/passwd/MAI/mp/lab4/n_9/storages/hash_set.c
+CMakeFiles/n_9.dir/storages/hash_set.c.o: CMakeFiles/n_9.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/passwd/MAI/mp/lab4/n_9/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/n_9.dir/storages/hash_set.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/n_9.dir/storages/hash_set.c.o -MF CMakeFiles/n_9.dir/storages/hash_set.c.o.d -o CMakeFiles/n_9.dir/storages/hash_set.c.o -c /home/passwd/MAI/mp/lab4/n_9/storages/hash_set.c
+
+CMakeFiles/n_9.dir/storages/hash_set.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/n_9.dir/storages/hash_set.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/passwd/MAI/mp/lab4/n_9/storages/hash_set.c > CMakeFiles/n_9.dir/storages/hash_set.c.i
+
+CMakeFiles/n_9.dir/storages/hash_set.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/n_9.dir/storages/hash_set.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/passwd/MAI/mp/lab4/n_9/storages/hash_set.c -o CMakeFiles/n_9.dir/storages/hash_set.c.s
+
+CMakeFiles/n_9.dir/storages/binary_search_tree.c.o: CMakeFiles/n_9.dir/flags.make
+CMakeFiles/n_9.dir/storages/binary_search_tree.c.o: /home/passwd/MAI/mp/lab4/n_9/storages/binary_search_tree.c
+CMakeFiles/n_9.dir/storages/binary_search_tree.c.o: CMakeFiles/n_9.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/passwd/MAI/mp/lab4/n_9/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building C object CMakeFiles/n_9.dir/storages/binary_search_tree.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/n_9.dir/storages/binary_search_tree.c.o -MF CMakeFiles/n_9.dir/storages/binary_search_tree.c.o.d -o CMakeFiles/n_9.dir/storages/binary_search_tree.c.o -c /home/passwd/MAI/mp/lab4/n_9/storages/binary_search_tree.c
+
+CMakeFiles/n_9.dir/storages/binary_search_tree.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/n_9.dir/storages/binary_search_tree.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/passwd/MAI/mp/lab4/n_9/storages/binary_search_tree.c > CMakeFiles/n_9.dir/storages/binary_search_tree.c.i
+
+CMakeFiles/n_9.dir/storages/binary_search_tree.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/n_9.dir/storages/binary_search_tree.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/passwd/MAI/mp/lab4/n_9/storages/binary_search_tree.c -o CMakeFiles/n_9.dir/storages/binary_search_tree.c.s
+
+CMakeFiles/n_9.dir/storages/dynamic_array.c.o: CMakeFiles/n_9.dir/flags.make
+CMakeFiles/n_9.dir/storages/dynamic_array.c.o: /home/passwd/MAI/mp/lab4/n_9/storages/dynamic_array.c
+CMakeFiles/n_9.dir/storages/dynamic_array.c.o: CMakeFiles/n_9.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/passwd/MAI/mp/lab4/n_9/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building C object CMakeFiles/n_9.dir/storages/dynamic_array.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/n_9.dir/storages/dynamic_array.c.o -MF CMakeFiles/n_9.dir/storages/dynamic_array.c.o.d -o CMakeFiles/n_9.dir/storages/dynamic_array.c.o -c /home/passwd/MAI/mp/lab4/n_9/storages/dynamic_array.c
+
+CMakeFiles/n_9.dir/storages/dynamic_array.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/n_9.dir/storages/dynamic_array.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/passwd/MAI/mp/lab4/n_9/storages/dynamic_array.c > CMakeFiles/n_9.dir/storages/dynamic_array.c.i
+
+CMakeFiles/n_9.dir/storages/dynamic_array.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/n_9.dir/storages/dynamic_array.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/passwd/MAI/mp/lab4/n_9/storages/dynamic_array.c -o CMakeFiles/n_9.dir/storages/dynamic_array.c.s
 
 # Object files for target n_9
 n_9_OBJECTS = \
 "CMakeFiles/n_9.dir/main.c.o" \
-"CMakeFiles/n_9.dir/binary_heap.c.o" \
-"CMakeFiles/n_9.dir/fibonacci_heap.c.o" \
-"CMakeFiles/n_9.dir/binomial_heap.c.o"
+"CMakeFiles/n_9.dir/heaps/binary_heap.c.o" \
+"CMakeFiles/n_9.dir/heaps/fibonacci_heap.c.o" \
+"CMakeFiles/n_9.dir/heaps/binomial_heap.c.o" \
+"CMakeFiles/n_9.dir/storages/hash_set.c.o" \
+"CMakeFiles/n_9.dir/storages/binary_search_tree.c.o" \
+"CMakeFiles/n_9.dir/storages/dynamic_array.c.o"
 
 # External object files for target n_9
 n_9_EXTERNAL_OBJECTS =
 
 n_9: CMakeFiles/n_9.dir/main.c.o
-n_9: CMakeFiles/n_9.dir/binary_heap.c.o
-n_9: CMakeFiles/n_9.dir/fibonacci_heap.c.o
-n_9: CMakeFiles/n_9.dir/binomial_heap.c.o
+n_9: CMakeFiles/n_9.dir/heaps/binary_heap.c.o
+n_9: CMakeFiles/n_9.dir/heaps/fibonacci_heap.c.o
+n_9: CMakeFiles/n_9.dir/heaps/binomial_heap.c.o
+n_9: CMakeFiles/n_9.dir/storages/hash_set.c.o
+n_9: CMakeFiles/n_9.dir/storages/binary_search_tree.c.o
+n_9: CMakeFiles/n_9.dir/storages/dynamic_array.c.o
 n_9: CMakeFiles/n_9.dir/build.make
 n_9: CMakeFiles/n_9.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/passwd/MAI/mp/lab4/n_9/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking C executable n_9"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/passwd/MAI/mp/lab4/n_9/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking C executable n_9"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/n_9.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

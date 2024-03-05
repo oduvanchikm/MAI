@@ -129,77 +129,77 @@ n_9/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/build
 .PHONY : n_9/fast
 
-binary_heap.o: binary_heap.c.o
-.PHONY : binary_heap.o
+heaps/binary_heap.o: heaps/binary_heap.c.o
+.PHONY : heaps/binary_heap.o
 
 # target to build an object file
-binary_heap.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/binary_heap.c.o
-.PHONY : binary_heap.c.o
+heaps/binary_heap.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/heaps/binary_heap.c.o
+.PHONY : heaps/binary_heap.c.o
 
-binary_heap.i: binary_heap.c.i
-.PHONY : binary_heap.i
+heaps/binary_heap.i: heaps/binary_heap.c.i
+.PHONY : heaps/binary_heap.i
 
 # target to preprocess a source file
-binary_heap.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/binary_heap.c.i
-.PHONY : binary_heap.c.i
+heaps/binary_heap.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/heaps/binary_heap.c.i
+.PHONY : heaps/binary_heap.c.i
 
-binary_heap.s: binary_heap.c.s
-.PHONY : binary_heap.s
+heaps/binary_heap.s: heaps/binary_heap.c.s
+.PHONY : heaps/binary_heap.s
 
 # target to generate assembly for a file
-binary_heap.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/binary_heap.c.s
-.PHONY : binary_heap.c.s
+heaps/binary_heap.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/heaps/binary_heap.c.s
+.PHONY : heaps/binary_heap.c.s
 
-binomial_heap.o: binomial_heap.c.o
-.PHONY : binomial_heap.o
+heaps/binomial_heap.o: heaps/binomial_heap.c.o
+.PHONY : heaps/binomial_heap.o
 
 # target to build an object file
-binomial_heap.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/binomial_heap.c.o
-.PHONY : binomial_heap.c.o
+heaps/binomial_heap.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/heaps/binomial_heap.c.o
+.PHONY : heaps/binomial_heap.c.o
 
-binomial_heap.i: binomial_heap.c.i
-.PHONY : binomial_heap.i
+heaps/binomial_heap.i: heaps/binomial_heap.c.i
+.PHONY : heaps/binomial_heap.i
 
 # target to preprocess a source file
-binomial_heap.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/binomial_heap.c.i
-.PHONY : binomial_heap.c.i
+heaps/binomial_heap.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/heaps/binomial_heap.c.i
+.PHONY : heaps/binomial_heap.c.i
 
-binomial_heap.s: binomial_heap.c.s
-.PHONY : binomial_heap.s
+heaps/binomial_heap.s: heaps/binomial_heap.c.s
+.PHONY : heaps/binomial_heap.s
 
 # target to generate assembly for a file
-binomial_heap.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/binomial_heap.c.s
-.PHONY : binomial_heap.c.s
+heaps/binomial_heap.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/heaps/binomial_heap.c.s
+.PHONY : heaps/binomial_heap.c.s
 
-fibonacci_heap.o: fibonacci_heap.c.o
-.PHONY : fibonacci_heap.o
+heaps/fibonacci_heap.o: heaps/fibonacci_heap.c.o
+.PHONY : heaps/fibonacci_heap.o
 
 # target to build an object file
-fibonacci_heap.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/fibonacci_heap.c.o
-.PHONY : fibonacci_heap.c.o
+heaps/fibonacci_heap.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/heaps/fibonacci_heap.c.o
+.PHONY : heaps/fibonacci_heap.c.o
 
-fibonacci_heap.i: fibonacci_heap.c.i
-.PHONY : fibonacci_heap.i
+heaps/fibonacci_heap.i: heaps/fibonacci_heap.c.i
+.PHONY : heaps/fibonacci_heap.i
 
 # target to preprocess a source file
-fibonacci_heap.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/fibonacci_heap.c.i
-.PHONY : fibonacci_heap.c.i
+heaps/fibonacci_heap.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/heaps/fibonacci_heap.c.i
+.PHONY : heaps/fibonacci_heap.c.i
 
-fibonacci_heap.s: fibonacci_heap.c.s
-.PHONY : fibonacci_heap.s
+heaps/fibonacci_heap.s: heaps/fibonacci_heap.c.s
+.PHONY : heaps/fibonacci_heap.s
 
 # target to generate assembly for a file
-fibonacci_heap.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/fibonacci_heap.c.s
-.PHONY : fibonacci_heap.c.s
+heaps/fibonacci_heap.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/heaps/fibonacci_heap.c.s
+.PHONY : heaps/fibonacci_heap.c.s
 
 main.o: main.c.o
 .PHONY : main.o
@@ -225,6 +225,78 @@ main.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/main.c.s
 .PHONY : main.c.s
 
+storages/binary_search_tree.o: storages/binary_search_tree.c.o
+.PHONY : storages/binary_search_tree.o
+
+# target to build an object file
+storages/binary_search_tree.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/storages/binary_search_tree.c.o
+.PHONY : storages/binary_search_tree.c.o
+
+storages/binary_search_tree.i: storages/binary_search_tree.c.i
+.PHONY : storages/binary_search_tree.i
+
+# target to preprocess a source file
+storages/binary_search_tree.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/storages/binary_search_tree.c.i
+.PHONY : storages/binary_search_tree.c.i
+
+storages/binary_search_tree.s: storages/binary_search_tree.c.s
+.PHONY : storages/binary_search_tree.s
+
+# target to generate assembly for a file
+storages/binary_search_tree.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/storages/binary_search_tree.c.s
+.PHONY : storages/binary_search_tree.c.s
+
+storages/dynamic_array.o: storages/dynamic_array.c.o
+.PHONY : storages/dynamic_array.o
+
+# target to build an object file
+storages/dynamic_array.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/storages/dynamic_array.c.o
+.PHONY : storages/dynamic_array.c.o
+
+storages/dynamic_array.i: storages/dynamic_array.c.i
+.PHONY : storages/dynamic_array.i
+
+# target to preprocess a source file
+storages/dynamic_array.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/storages/dynamic_array.c.i
+.PHONY : storages/dynamic_array.c.i
+
+storages/dynamic_array.s: storages/dynamic_array.c.s
+.PHONY : storages/dynamic_array.s
+
+# target to generate assembly for a file
+storages/dynamic_array.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/storages/dynamic_array.c.s
+.PHONY : storages/dynamic_array.c.s
+
+storages/hash_set.o: storages/hash_set.c.o
+.PHONY : storages/hash_set.o
+
+# target to build an object file
+storages/hash_set.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/storages/hash_set.c.o
+.PHONY : storages/hash_set.c.o
+
+storages/hash_set.i: storages/hash_set.c.i
+.PHONY : storages/hash_set.i
+
+# target to preprocess a source file
+storages/hash_set.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/storages/hash_set.c.i
+.PHONY : storages/hash_set.c.i
+
+storages/hash_set.s: storages/hash_set.c.s
+.PHONY : storages/hash_set.s
+
+# target to generate assembly for a file
+storages/hash_set.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/storages/hash_set.c.s
+.PHONY : storages/hash_set.c.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -234,18 +306,27 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... n_9"
-	@echo "... binary_heap.o"
-	@echo "... binary_heap.i"
-	@echo "... binary_heap.s"
-	@echo "... binomial_heap.o"
-	@echo "... binomial_heap.i"
-	@echo "... binomial_heap.s"
-	@echo "... fibonacci_heap.o"
-	@echo "... fibonacci_heap.i"
-	@echo "... fibonacci_heap.s"
+	@echo "... heaps/binary_heap.o"
+	@echo "... heaps/binary_heap.i"
+	@echo "... heaps/binary_heap.s"
+	@echo "... heaps/binomial_heap.o"
+	@echo "... heaps/binomial_heap.i"
+	@echo "... heaps/binomial_heap.s"
+	@echo "... heaps/fibonacci_heap.o"
+	@echo "... heaps/fibonacci_heap.i"
+	@echo "... heaps/fibonacci_heap.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... storages/binary_search_tree.o"
+	@echo "... storages/binary_search_tree.i"
+	@echo "... storages/binary_search_tree.s"
+	@echo "... storages/dynamic_array.o"
+	@echo "... storages/dynamic_array.i"
+	@echo "... storages/dynamic_array.s"
+	@echo "... storages/hash_set.o"
+	@echo "... storages/hash_set.i"
+	@echo "... storages/hash_set.s"
 .PHONY : help
 
 

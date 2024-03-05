@@ -1,6 +1,6 @@
-#ifndef N_9_FIBONACCI_HEAP_H
-#define N_9_FIBONACCI_HEAP_H
-#include "main.h"
+#ifndef N_9_HEAPS_FIBONACCI_HEAP_H
+#define N_9_HEAPS_FIBONACCI_HEAP_H
+#include "../main.h"
 
 typedef struct Fibonacci_heap_node
 {
@@ -20,4 +20,4 @@ typedef struct Fibonacci_heap
 
 } Fibonacci_heap;
 
-#endif //N_9_FIBONACCI_HEAP_H
+#endif //N_9_HEAPS_FIBONACCI_HEAP_H

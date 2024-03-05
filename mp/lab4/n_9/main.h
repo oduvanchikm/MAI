@@ -93,7 +93,6 @@ typedef struct Info_from_first_file
     int min_time;
     int max_time;
     int count_of_departments;
-    int count_of_operators;
 
 } Info_from_first_file;
 

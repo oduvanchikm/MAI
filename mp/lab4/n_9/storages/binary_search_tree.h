@@ -3,14 +3,22 @@
 
 #include "../main.h"
 
-typedef struct Node
+typedef struct Binary_node
 {
-    int data;
-    struct Node* left;
-    struct Node* right;
+    char* data;
+    Department* dep;
+    struct Binary_node* left;
+    struct Binary_node* right;
+    Department* least_load;
+
+} Binary_node;
+
+typedef struct Binary_search_true
+{
+    Binary_node* node;
 
 
-} Node;
+} Binary_search_true;
 
 
 #endif

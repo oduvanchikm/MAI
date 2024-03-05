@@ -1,6 +1,6 @@
-#ifndef N_9_BINOMIAL_HEAP_H
-#define N_9_BINOMIAL_HEAP_H
-#include "main.h"
+#ifndef N_9_HEAPS_BINOMIAL_HEAP_H
+#define N_9_HEAPS_BINOMIAL_HEAP_H
+#include "../main.h"
 
 typedef struct Binomial_heap
 {
@@ -12,4 +12,4 @@ typedef struct Binomial_heap
     struct Binomial_heap *sibling;
 } Binomial_heap;
 
-#endif // N_9_BINOMIAL_HEAP_H
+#endif // N_9_HEAPS_BINOMIAL_HEAP_H

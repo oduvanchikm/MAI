@@ -1,6 +1,6 @@
-#ifndef N_9_BINARY_HEAP_H
-#define N_9_BINARY_HEAP_H
-#include "main.h"
+#ifndef N_9_HEAPS_BINARY_HEAP_H
+#define N_9_HEAPS_BINARY_HEAP_H
+#include "../main.h"
 
 typedef struct Binary_heap
 {
@@ -21,4 +21,4 @@ void merge_binary_heaps_with_destruction(Binary_heap* binary_heap_1, Binary_heap
 Binary_heap* merge_binary_heaps_without_destruction(Binary_heap* binary_heap_1, Binary_heap* binary_heap_2);
 
 
-#endif // N_9_BINARY_HEAP_H
+#endif // N_9_HEAPS_BINARY_HEAP_H
