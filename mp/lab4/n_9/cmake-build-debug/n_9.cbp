@@ -94,6 +94,12 @@
 		<Unit filename="/home/passwd/MAI/mp/lab4/n_9/heaps/fibonacci_heap.h">
 			<Option target="n_9"/>
 		</Unit>
+		<Unit filename="/home/passwd/MAI/mp/lab4/n_9/logger.c">
+			<Option target="n_9"/>
+		</Unit>
+		<Unit filename="/home/passwd/MAI/mp/lab4/n_9/logger.h">
+			<Option target="n_9"/>
+		</Unit>
 		<Unit filename="/home/passwd/MAI/mp/lab4/n_9/main.c">
 			<Option target="n_9"/>
 		</Unit>

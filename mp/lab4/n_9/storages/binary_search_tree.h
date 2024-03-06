@@ -13,12 +13,5 @@ typedef struct Binary_node
 
 } Binary_node;
 
-typedef struct Binary_search_true
-{
-    Binary_node* node;
-
-
-} Binary_search_true;
-
 
 #endif

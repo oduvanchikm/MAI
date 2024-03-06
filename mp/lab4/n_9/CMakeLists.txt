@@ -10,4 +10,5 @@ add_executable(n_9 main.c
         storages/hash_set.c
         storages/binary_search_tree.c
         storages/dynamic_array.c
+        logger.c
 )

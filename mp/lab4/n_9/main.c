@@ -100,8 +100,6 @@ int main(int argc, char* argv[])
 
     int max_priority = atoi(argv[1]);
 
-//    printf("%d\n", max_priority);
-
     FILE* file_with_models_parameter = fopen(argv[2], "r");
     if (!file_with_models_parameter)
     {
@@ -115,8 +113,6 @@ int main(int argc, char* argv[])
     Department dep;
 
     read_from_file(file_with_models_parameter, &heap, &storage, data, &dep);
-
-    printf("%d\n", heap);
 
     FILE* file_with_info_request = NULL;
     Request* request = NULL;
@@ -137,13 +133,5 @@ int main(int argc, char* argv[])
         }
 
     }
-
-//    for (int i = 0; i < data->count_of_depatment; i++)
-//    {
-//        free(data->count_of_operators[i]);
-//    }
-//
-//    free(data->count_of_operators);
-//    free(data);
     return 0;
 }

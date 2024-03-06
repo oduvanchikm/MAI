@@ -9,8 +9,15 @@
 #include <limits.h>
 #include <stdbool.h>
 
-//#include "binary_heap.h"
+#include "logger.h"
 
+#include "heaps/binary_heap.h"
+#include "heaps/binomial_heap.h"
+#include "heaps/fibonacci_heap.h"
+
+#include "storages/binary_search_tree.h"
+#include "storages/dynamic_array.h"
+#include "storages/hash_set.h"
 
 typedef enum
 {

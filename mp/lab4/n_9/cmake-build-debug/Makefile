@@ -201,6 +201,30 @@ heaps/fibonacci_heap.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/heaps/fibonacci_heap.c.s
 .PHONY : heaps/fibonacci_heap.c.s
 
+logger.o: logger.c.o
+.PHONY : logger.o
+
+# target to build an object file
+logger.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/logger.c.o
+.PHONY : logger.c.o
+
+logger.i: logger.c.i
+.PHONY : logger.i
+
+# target to preprocess a source file
+logger.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/logger.c.i
+.PHONY : logger.c.i
+
+logger.s: logger.c.s
+.PHONY : logger.s
+
+# target to generate assembly for a file
+logger.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/n_9.dir/build.make CMakeFiles/n_9.dir/logger.c.s
+.PHONY : logger.c.s
+
 main.o: main.c.o
 .PHONY : main.o
 
@@ -315,6 +339,9 @@ help:
 	@echo "... heaps/fibonacci_heap.o"
 	@echo "... heaps/fibonacci_heap.i"
 	@echo "... heaps/fibonacci_heap.s"
+	@echo "... logger.o"
+	@echo "... logger.i"
+	@echo "... logger.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

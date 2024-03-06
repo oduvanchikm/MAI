@@ -5,6 +5,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/n_9.dir/heaps/binomial_heap.c.o.d"
   "CMakeFiles/n_9.dir/heaps/fibonacci_heap.c.o"
   "CMakeFiles/n_9.dir/heaps/fibonacci_heap.c.o.d"
+  "CMakeFiles/n_9.dir/logger.c.o"
+  "CMakeFiles/n_9.dir/logger.c.o.d"
   "CMakeFiles/n_9.dir/main.c.o"
   "CMakeFiles/n_9.dir/main.c.o.d"
   "CMakeFiles/n_9.dir/storages/binary_search_tree.c.o"
